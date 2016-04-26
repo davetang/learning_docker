@@ -76,6 +76,33 @@ apt-get install -y cpanminus
 cpanm Archive::Extract Archive::Zip DBD::mysql
 ~~~~
 
+## Creating a data container
+
+This [guide on working with Docker data volumes](https://www.digitalocean.com/community/tutorials/how-to-work-with-docker-data-volumes-on-ubuntu-14-04) provides a really nice introduction. Use `docker create` to create a data container; the `-v` indicates the directory for the data container; the `--name data_container` indicates the name of the data container; and `ubuntu` is the image to be used for the container.
+
+~~~~{.bash}
+docker create -v /tmp --name data_container ubuntu
+~~~~
+
+If we run a new Ubuntu container with the `--volumes-from` flag, output written to the `/tmp` directory will be saved to the `/tmp` directory of the `data_container` container.
+
+~~~~{.bash}
+docker run -it --volumes-from data_container ubuntu /bin/bash
+~~~~
+
+## Sharing between host and the Docker container
+
+Adapted from this [guide on working with Docker data volumes](https://www.digitalocean.com/community/tutorials/how-to-work-with-docker-data-volumes-on-ubuntu-14-04).
+
+~~~~{.bash}
+# on the host make a directory
+mkdir ~/random
+
+# any output written to the /tmp dir will
+# will be saved to ~/random on the host computer
+docker run -it -v ~/random:/tmp ubuntu /bin/bash
+~~~~
+
 ## Useful links
 
 * [A quick introduction to Docker](http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/)
