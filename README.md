@@ -121,7 +121,7 @@ total 2816
 -rw-r--r-- 1 root root   56824 Apr 27 02:04 aln.sam
 ~~~~
 
-This is problematic because when you're back in the host environment, you can modify these files. To circumvent this, create a user that matches the host user by passing three environmental variables from the host to the container.
+This is problematic because when you're back in the host environment, you can't modify these files. To circumvent this, create a user that matches the host user by passing three environmental variables from the host to the container.
 
 ~~~~{.bash}
 docker run -it \
@@ -224,4 +224,5 @@ docker run -it --volumes-from data_container ubuntu /bin/bash
 ## Useful links
 
 * [A quick introduction to Docker](http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/)
+* [The BioDocker project](https://github.com/BioDocker/biodocker); check out their [Wiki](https://github.com/BioDocker/biodocker/wiki), which has a lot of useful information
 
