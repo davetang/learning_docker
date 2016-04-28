@@ -196,6 +196,22 @@ docker rm <blah>
 docker rmi bwa
 ~~~~
 
+## Committing a change
+
+When you log out of a container, the changes made are still stored; type `docker ps -a` to see all containers and the latest changes. You can [commit](https://docs.docker.com/engine/reference/commandline/commit/) these changes to the image. (Generally, it is better to use Dockerfiles to manage your images in a documented and maintainable way.)
+
+~~~~{.bash}
+docker ps -a
+
+# git style commit
+# -a, --author=       Author (e.g., "John Hannibal Smith <hannibal@a-team.com>")
+# -m, --message=      Commit message
+docker commit -m 'Made change to blah' -a 'Dave Tang' <CONTAINER ID> <image>
+
+# use docker history <image> to check history
+docker history <image>
+~~~~
+
 ## Installing Perl modules
 
 Use `cpanminus`.
