@@ -8,10 +8,10 @@ Build:
 docker build -t gemini .
 ~~~~
 
-I already have a test GEMINI database; run a test query:
+I already have a test GEMINI database called test.db; run a test query:
 
 ~~~~{.bash}
-docker run -v /SCRATCH/Tang/docker/gemini:/data/ seqnextgen_gemini gemini query -q 'select count(*) from variants' --header /data/test.db
+docker run -v /local:/data/ gemini gemini query -q 'select count(*) from variants' --header /data/test.db
 count(*)
 53103
 ~~~~
