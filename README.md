@@ -237,6 +237,20 @@ If we run a new Ubuntu container with the `--volumes-from` flag, output written 
 docker run -it --volumes-from data_container ubuntu /bin/bash
 ~~~~
 
+## Bioconductor
+
+Obtain the Bioconductor [release_core](https://hub.docker.com/r/bioconductor/release_core/) from the [Bioconductor Docker Hub](https://hub.docker.com/u/bioconductor/) by running:
+
+~~~~{.bash}
+docker pull bioconductor/release_core
+
+# run R in vanilla mode (just like the ice cream, it means plain)
+docker run -it bioconductor/release_core R --vanilla
+
+# quit R
+q()
+~~~~
+
 ## Useful links
 
 * [A quick introduction to Docker](http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/)
