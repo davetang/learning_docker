@@ -186,6 +186,15 @@ total 2816
 -rw-rw-r-- 1 dtang dtang   56824 Apr 27 10:12 aln.sam
 ~~~~
 
+### File Permissions 2
+
+An easier way is to use the `-u` parameter
+
+~~~~{.bash}
+# assuming blah.fa exists in /local/data/
+docker run -v /local/data:/data -u `stat -c "%u:%g" /local/data` bwa bwa index /data/blah.fa
+~~~~
+
 ## Removing the image
 
 Find all the `bwa` processes (which should be stopped once you exit the container) and remove them.
