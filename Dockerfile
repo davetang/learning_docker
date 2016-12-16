@@ -1,5 +1,5 @@
 From ubuntu
-MAINTAINER Dave Tang <dave.tang@telethonkids.org.au>
+MAINTAINER Dave Tang <me@davetang.org>
 RUN apt-get update
 RUN apt-get install -y git build-essential zlib1g-dev
 

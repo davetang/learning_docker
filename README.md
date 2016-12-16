@@ -9,7 +9,7 @@ Check out the official [getting started guide](https://docs.docker.com/linux/).
 ~~~~{.bash}
 cat Dockerfile
 From ubuntu
-MAINTAINER Dave Tang <dave.tang@telethonkids.org.au>
+MAINTAINER Dave Tang <me@davetang.org>
 RUN apt-get update
 RUN apt-get install -y git build-essential zlib1g-dev
 
@@ -219,6 +219,14 @@ docker commit -m 'Made change to blah' -a 'Dave Tang' <CONTAINER ID> <image>
 
 # use docker history <image> to check history
 docker history <image>
+~~~~
+
+## Cleaning up exited containers
+
+Sub-shell to get all (`-a`) container IDs (`-q`) that have exited (`-f status=exited`), which are then removed (`docker rm -v`).
+
+~~~~{.bash}
+docker rm -v $(docker ps -a -q -f status=exited)
 ~~~~
 
 ## Installing Perl modules

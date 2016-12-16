@@ -1,6 +1,25 @@
 ## README
 
-One can simply use `apt-get install -y r-base` if you don't require an R version later than `R version 3.0.2 (2013-09-25) -- "Frisbee Sailing"`. The `ubuntu` version is Precise Pangolin (12.04) and [as noted](https://cran.r-project.org/bin/linux/ubuntu/): "R 3.3.0 and above is not supported for Precise Pangolin (12.04; LTS), but previous builds will remain here until end of life for 12.04." The `ontologyIndex` package required R (≥ 3.1.0), hence this Dockerfile that installs a lot of libraries required to compile R. The Docker image created from this Dockerfile was 1.5 GB.
+One can simply use `apt-get install -y r-base` but that installs `R version 3.0.2 (2013-09-25) -- "Frisbee Sailing"`. The `ubuntu` version I was using:
+
+~~~~{.bash}
+docker run -it ubuntu cat /etc/*release
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=14.04
+DISTRIB_CODENAME=trusty
+DISTRIB_DESCRIPTION="Ubuntu 14.04.3 LTS"
+NAME="Ubuntu"
+VERSION="14.04.3 LTS, Trusty Tahr"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 14.04.3 LTS"
+VERSION_ID="14.04"
+HOME_URL="http://www.ubuntu.com/"
+SUPPORT_URL="http://help.ubuntu.com/"
+BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
+~~~~
+
+The `ontologyIndex` package required R (≥ 3.1.0), so I created this Dockerfile to install all the required libraries for compiling R. The Docker image created from this Dockerfile was 1.5 GB.
 
 To use `install_github()` from the `devtools` package, you need to set: `options(unzip = 'internal')`.
 
