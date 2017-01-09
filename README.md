@@ -268,6 +268,15 @@ docker run -it bioconductor/release_core R --vanilla
 q()
 ~~~~
 
+## Saving and transferring a Docker image
+
+See [this post](http://stackoverflow.com/questions/23935141/how-to-copy-docker-images-from-one-host-to-another-without-via-repository) on Stack Overflow.
+
+~~~~{.bash}
+docker save -o <save image to path> <image name>
+docker load -i <path to image tar file>
+~~~~
+
 ## Useful links
 
 * [A quick introduction to Docker](http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/)
