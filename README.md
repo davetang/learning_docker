@@ -229,6 +229,18 @@ Sub-shell to get all (`-a`) container IDs (`-q`) that have exited (`-f status=ex
 docker rm -v $(docker ps -a -q -f status=exited)
 ~~~~
 
+As a Bash script; `-z` returns true if `$exited` is empty, i.e. no exited containers.
+
+~~~~{.bash}
+#!/bin/bash
+
+exited=`docker ps -a -q -f status=exited`
+
+if [ ! -z "$exited" ]; then
+   docker rm -v $(docker ps -a -q -f status=exited)
+fi
+~~~~
+
 ## Installing Perl modules
 
 Use `cpanminus`.
