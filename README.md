@@ -1,3 +1,25 @@
+Table of Contents
+=================
+
+   * [Getting started with Docker](#getting-started-with-docker)
+      * [Dockerfile](#dockerfile)
+         * [CMD](#cmd)
+      * [Building the image](#building-the-image)
+      * [Running the image](#running-the-image)
+      * [Sharing between host and Docker container](#sharing-between-host-and-docker-container)
+         * [File permissions](#file-permissions)
+         * [File Permissions 2](#file-permissions-2)
+      * [Removing the image](#removing-the-image)
+      * [Committing a change](#committing-a-change)
+      * [Cleaning up exited containers](#cleaning-up-exited-containers)
+      * [Installing Perl modules](#installing-perl-modules)
+      * [Creating a data container](#creating-a-data-container)
+      * [Bioconductor](#bioconductor)
+      * [Saving and transferring a Docker image](#saving-and-transferring-a-docker-image)
+      * [Useful links](#useful-links)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 # Getting started with Docker
 
 Check out the official [getting started guide](https://docs.docker.com/linux/).
