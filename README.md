@@ -289,6 +289,32 @@ docker save -o <save image to path> <image name>
 docker load -i <path to image tar file>
 ~~~~
 
+Here's an example.
+
+```bash
+# save on Unix server
+docker save -o davebox.tar davebox
+
+# copy file to MacBook Pro
+scp davetang@192.168.0.31:/home/davetang/davebox.tar .
+
+docker load -i davebox.tar 
+93c22f563196: Loading layer [==================================================>] 134.6 MB/134.6 MB
+...
+
+docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+davebox             latest              d38f27446445        10 days ago         3.46 GB
+
+docker run davebox samtools
+
+Program: samtools (Tools for alignments in the SAM format)
+Version: 1.3 (using htslib 1.3)
+
+Usage:   samtools <command> [options]
+...
+```
+
 ## Useful links
 
 * [A quick introduction to Docker](http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/)
