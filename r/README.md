@@ -1,8 +1,8 @@
 ## README
 
-One can simply use `apt-get install -y r-base` but that installs `R version 3.0.2 (2013-09-25) -- "Frisbee Sailing"`. The `ubuntu` version I was using:
+The R version that is currently packaged on Ubuntu 14.04 is `R version 3.0.2 (2013-09-25) -- "Frisbee Sailing"`; you can run `apt-get install -y r-base` to install that version. If you require a later version and want to compile from source, read on. Below is the Ubuntu version I'm using as the base image:
 
-~~~~{.bash}
+```bash
 docker run -it ubuntu cat /etc/*release
 DISTRIB_ID=Ubuntu
 DISTRIB_RELEASE=14.04
@@ -17,21 +17,25 @@ VERSION_ID="14.04"
 HOME_URL="http://www.ubuntu.com/"
 SUPPORT_URL="http://help.ubuntu.com/"
 BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
-~~~~
+```
+
+### Motivation
 
 The `ontologyIndex` package required R (≥ 3.1.0), so I created this Dockerfile to install all the required libraries for compiling R. The Docker image created from this Dockerfile was 1.5 GB.
+
+### Building R from source using Docker
 
 To use `install_github()` from the `devtools` package, you need to set: `options(unzip = 'internal')`.
 
 Build:
 
-~~~~{.bash}
+```bash
 docker build -t r .
-~~~~
+```
 
-Run:
+### Running R
 
-~~~~{.bash}
+```bash
 docker run r
 R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
 Copyright (C) 2016 The R Foundation for Statistical Computing
@@ -94,5 +98,45 @@ docker run r /src/human_phenotype_ontology/cluster/omim_to_closest_2.R 100300
 18                               #614039 CORTICAL DYSPLASIA, COMPLEX, WITH OTHER BRAIN MALFORMATIONS
 19                                                 #615502 MENTAL RETARDATION, AUTOSOMAL DOMINANT 21
 20                                                          #603671 ACROMELIC FRONTONASAL DYSOSTOSIS
-~~~~
+```
+
+Running R while mounting the current directory:
+
+```bash
+docker run -v `pwd`:/data/ -w /data/ -it r R
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> list.files('/data')
+> [1] "1M_neurons_aggr_web_summary.html"          
+> [2] "1M_neurons_analysis.tar.gz"                
+> [3] "1M_neurons_cloupe.cloupe"                  
+> [4] "1M_neurons_filtered_gene_bc_matrices_h5.h5"
+> [5] "1M_neurons_neuron20k.h5"                   
+> [6] "1M_neurons_reanalyze.csv"                  
+> [7] "1M_neurons_web_summary.html"               
+```
+
+Commit changes you've made, if you want:
+
+```bash
+# Show the latest created container (includes all states)
+docker ps -l
+
+docker commit -m 'Installed monocole' -a 'Dave Tang' <CONTAINER ID> <image>
+```
 
