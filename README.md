@@ -1,11 +1,13 @@
 Table of Contents
 =================
 
+   * [Table of Contents](#table-of-contents)
    * [Getting started with Docker](#getting-started-with-docker)
       * [Dockerfile](#dockerfile)
          * [CMD](#cmd)
       * [Building the image](#building-the-image)
       * [Running the image](#running-the-image)
+      * [Copying files between host and container and vice versa](#copying-files-between-host-and-container-and-vice-versa)
       * [Sharing between host and Docker container](#sharing-between-host-and-docker-container)
          * [File permissions](#file-permissions)
          * [File Permissions 2](#file-permissions-2)
@@ -22,13 +24,13 @@ Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 # Getting started with Docker
 
-Check out the official [getting started guide](https://docs.docker.com/linux/).
+Check out this [awesome tutorial](http://seankross.com/2017/09/17/Enough-Docker-to-be-Dangerous.html) by Sean Kross and the official [getting started guide](https://docs.docker.com/linux/).
 
 ## Dockerfile
 
 [Dockerfile documentation](https://docs.docker.com/engine/reference/builder/).
 
-~~~~{.bash}
+```bash
 cat Dockerfile
 From ubuntu
 MAINTAINER Dave Tang <me@davetang.org>
@@ -41,7 +43,7 @@ RUN cd /src && git clone https://github.com/lh3/bwa.git && cd bwa && make && ln 
 # shell form of CMD
 # default to show version of BWA
 CMD bwa
-~~~~
+```
 
 ### CMD
 
@@ -49,15 +51,15 @@ The [CMD](https://docs.docker.com/engine/reference/builder/#cmd) instruction in 
 
 ## Building the image
 
-~~~~{.bash}
+```bash
 docker build -t bwa .
-~~~~
+```
 
 ## Running the image
 
 [Docker run documentation](https://docs.docker.com/engine/reference/run/).
 
-~~~~{.bash}
+```bash
 docker run bwa
 
 Program: bwa (alignment via Burrows-Wheeler transformation)
@@ -86,13 +88,55 @@ Note: To use BWA, you need to first index the genome with `bwa index'.
       There are three alignment algorithms in BWA: `mem', `bwasw', and
       `aln/samse/sampe'. If you are not sure which to use, try `bwa mem'
       first. Please `man ./bwa.1' for the manual.
-~~~~
+```
+
+## Copying files between host and container and vice versa
+
+Use `docker cp`.
+
+```bash
+docker cp --help
+
+Usage:  docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
+        docker cp [OPTIONS] SRC_PATH|- CONTAINER:DEST_PATH
+
+Copy files/folders between a container and the local filesystem
+
+Options:
+  -L, --follow-link   Always follow symbol link in SRC_PATH
+      --help          Print usage
+
+# find container name
+docker ps -a
+
+# create file to transfer
+echo hi > hi.txt
+
+docker cp hi.txt fee424ef6bf0:/root/
+
+# start container
+docker start -ai fee424ef6bf0
+
+# inside container
+cat /root/hi.txt 
+hi
+
+# create file inside container
+echo bye > /root/bye.txt
+exit
+
+# transfer file from container to host
+docker cp fee424ef6bf0:/root/bye.txt .
+
+cat bye.txt 
+bye
+```
 
 ## Sharing between host and Docker container
 
 The `bwa` image does not contain any data; we can use the `-v` flag to share directories between the host and Docker container.
 
-~~~~{.bash}
+```bash
 # the directory ~/my_data on the host will be
 # in /data of the Docker container
 # any output written to the /data dir will
@@ -122,13 +166,13 @@ head aln.sam
 3:987593        147     1000000 987993  60      100M    =       987593  -500    CGACTCGCAATTATCTCGTATCCGGGAAACTGTATAGCCGGGGGAAACTCCGATACGGACCGGCATTGGTACCAAGCGTCGAGTAGATTACCACCGACCC    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
 4:301430        99      1000000 301430  60      100M    =       301830  500     TCAATTGAACTTCGACCCGGGACTAGCGGGGGACGTATACCTACTCGCCCAATTCGATCAGTGGTATCTAGTTAAGAAATAGTCTTCCTCAATTTGACTC    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
 4:301430        147     1000000 301830  60      100M    =       301430  -500    TACATTTGGACTTGATACCGTTACAACGGTTGTGTGATTTCTAGCATTACGTAACAAAACATATCTTCACGGGAGTACGAATATAGGGGTATTCGGGTAA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
-~~~~
+```
 
 ### File permissions
 
 The files created inside the Docker container will be owned by root; inside the Docker container, you are `root` and the files you produce will have `root` permissions. 
 
-~~~~{.bash}
+```bash
 ls -lrt
 total 2816
 -rw-r--r-- 1 1211 1211 1000015 Apr 27 02:00 ref.fa
@@ -141,22 +185,22 @@ total 2816
 -rw-r--r-- 1 root root      12 Apr 27 02:03 ref.fa.amb
 -rw-r--r-- 1 root root  500056 Apr 27 02:03 ref.fa.sa
 -rw-r--r-- 1 root root   56824 Apr 27 02:04 aln.sam
-~~~~
+```
 
 This is problematic because when you're back in the host environment, you can't modify these files. To circumvent this, create a user that matches the host user by passing three environmental variables from the host to the container.
 
-~~~~{.bash}
+```bash
 docker run -it \
 -v ~/my_data:/data \
 -e MYUID=`id -u` \
 -e MYGID=`id -g` \
 -e ME=`whoami` \
 bwa /bin/bash
-~~~~
+```
 
 Use the steps below to create an identical user inside the container.
 
-~~~{.bash}
+```bash
 adduser --quiet --home /home/san/$ME --no-create-home --gecos "" --shell /bin/bash --disabled-password $ME
 
 # optional: give yourself admin privileges
@@ -189,11 +233,11 @@ total 2816
 
 # exit container
 exit
-~~~
+```
 
 The files will be saved in `~/my_data` on the host.
 
-~~~~{.bash}
+```bash
 ls -lrt ~/my_data
 total 2816
 -rw-r--r-- 1 dtang dtang 1000015 Apr 27 10:00 ref.fa
@@ -206,32 +250,32 @@ total 2816
 -rw-rw-r-- 1 dtang dtang      12 Apr 27 10:12 ref.fa.amb
 -rw-rw-r-- 1 dtang dtang  500056 Apr 27 10:12 ref.fa.sa
 -rw-rw-r-- 1 dtang dtang   56824 Apr 27 10:12 aln.sam
-~~~~
+```
 
 ### File Permissions 2
 
 An easier way is to use the `-u` parameter
 
-~~~~{.bash}
+```bash
 # assuming blah.fa exists in /local/data/
 docker run -v /local/data:/data -u `stat -c "%u:%g" /local/data` bwa bwa index /data/blah.fa
-~~~~
+```
 
 ## Removing the image
 
 Find all the `bwa` processes (which should be stopped once you exit the container) and remove them.
 
-~~~~{.bash}
+```bash
 docker ps -a
 docker rm <blah>
 docker rmi bwa
-~~~~
+```
 
 ## Committing a change
 
 When you log out of a container, the changes made are still stored; type `docker ps -a` to see all containers and the latest changes. You can [commit](https://docs.docker.com/engine/reference/commandline/commit/) these changes to the image. (Generally, it is better to use Dockerfiles to manage your images in a documented and maintainable way.)
 
-~~~~{.bash}
+```bash
 docker ps -a
 
 # git style commit
@@ -241,19 +285,19 @@ docker commit -m 'Made change to blah' -a 'Dave Tang' <CONTAINER ID> <image>
 
 # use docker history <image> to check history
 docker history <image>
-~~~~
+```
 
 ## Cleaning up exited containers
 
 Sub-shell to get all (`-a`) container IDs (`-q`) that have exited (`-f status=exited`), which are then removed (`docker rm -v`).
 
-~~~~{.bash}
+```bash
 docker rm -v $(docker ps -a -q -f status=exited)
-~~~~
+```
 
 As a Bash script; `-z` returns true if `$exited` is empty, i.e. no exited containers.
 
-~~~~{.bash}
+```bash
 #!/bin/bash
 
 exited=`docker ps -a -q -f status=exited`
@@ -261,38 +305,38 @@ exited=`docker ps -a -q -f status=exited`
 if [ ! -z "$exited" ]; then
    docker rm -v $(docker ps -a -q -f status=exited)
 fi
-~~~~
+```
 
 ## Installing Perl modules
 
 Use `cpanminus`.
 
-~~~~{.bash}
+```bash
 apt-get install -y cpanminus
 
 # install some Perl modules
 cpanm Archive::Extract Archive::Zip DBD::mysql
-~~~~
+```
 
 ## Creating a data container
 
 This [guide on working with Docker data volumes](https://www.digitalocean.com/community/tutorials/how-to-work-with-docker-data-volumes-on-ubuntu-14-04) provides a really nice introduction. Use `docker create` to create a data container; the `-v` indicates the directory for the data container; the `--name data_container` indicates the name of the data container; and `ubuntu` is the image to be used for the container.
 
-~~~~{.bash}
+```bash
 docker create -v /tmp --name data_container ubuntu
-~~~~
+```
 
 If we run a new Ubuntu container with the `--volumes-from` flag, output written to the `/tmp` directory will be saved to the `/tmp` directory of the `data_container` container.
 
-~~~~{.bash}
+```bash
 docker run -it --volumes-from data_container ubuntu /bin/bash
-~~~~
+```
 
 ## Bioconductor
 
 Obtain the Bioconductor [release_core](https://hub.docker.com/r/bioconductor/release_core/) from the [Bioconductor Docker Hub](https://hub.docker.com/u/bioconductor/) by running:
 
-~~~~{.bash}
+```bash
 docker pull bioconductor/release_core
 
 # run R in vanilla mode (just like the ice cream, it means plain)
@@ -300,16 +344,16 @@ docker run -it bioconductor/release_core R --vanilla
 
 # quit R
 q()
-~~~~
+```
 
 ## Saving and transferring a Docker image
 
 See [this post](http://stackoverflow.com/questions/23935141/how-to-copy-docker-images-from-one-host-to-another-without-via-repository) on Stack Overflow.
 
-~~~~{.bash}
+```bash
 docker save -o <save image to path> <image name>
 docker load -i <path to image tar file>
-~~~~
+```
 
 Here's an example.
 
