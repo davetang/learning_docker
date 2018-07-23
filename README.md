@@ -387,4 +387,4 @@ Usage:   samtools <command> [options]
 * [The BioDocker project](https://github.com/BioDocker/biodocker); check out their [Wiki](https://github.com/BioDocker/biodocker/wiki), which has a lot of useful information
 * [The impact of Docker containers on the performance of genomic pipelines](http://www.ncbi.nlm.nih.gov/pubmed/26421241)
 * [10 things to avoid in Docker containers](http://developers.redhat.com/blog/2016/02/24/10-things-to-avoid-in-docker-containers/)
-
+* The [Play with Docker classroom](https://training.play-with-docker.com/) brings you labs and tutorials that help you get hands-on experience using Docker
