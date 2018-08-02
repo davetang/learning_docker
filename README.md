@@ -5,6 +5,7 @@ Table of Contents
    * [Getting started with Docker](#getting-started-with-docker)
       * [Dockerfile](#dockerfile)
          * [CMD](#cmd)
+         * [ENTRYPOINT](#entrypoint)
       * [Building the image](#building-the-image)
       * [Running the image](#running-the-image)
       * [Copying files between host and container and vice versa](#copying-files-between-host-and-container-and-vice-versa)
@@ -28,7 +29,7 @@ Check out this [awesome tutorial](http://seankross.com/2017/09/17/Enough-Docker-
 
 ## Dockerfile
 
-[Dockerfile documentation](https://docs.docker.com/engine/reference/builder/).
+[Dockerfile documentation](https://docs.docker.com/engine/reference/builder/); also refer to [Best practices for writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
 
 ```bash
 cat Dockerfile
@@ -48,6 +49,25 @@ CMD bwa
 ### CMD
 
 The [CMD](https://docs.docker.com/engine/reference/builder/#cmd) instruction in a Dockerfile does not execute anything at build time but specifies the intended command for the image; there can only be one CMD instruction in a Dockerfile and if you list more than one CMD then only the last CMD will take effect. The main purpose of a CMD is to provide defaults for an executing container.
+
+### ENTRYPOINT
+
+An [ENTRYPOINT](https://docs.docker.com/engine/reference/builder/#entrypoint) allows you to configure a container that will run as an executable. ENTRYPOINT has two forms:
+
+* ENTRYPOINT ["executable", "param1", "param2"] (exec form, preferred)
+* ENTRYPOINT command param1 param2 (shell form)
+
+```bash
+FROM ubuntu
+ENTRYPOINT ["top", "-b"]
+CMD ["-c"]
+```
+
+Use `--entrypoint` to override ENTRYPOINT instruction.
+
+```bash
+docker run --entrypoint
+```
 
 ## Building the image
 
