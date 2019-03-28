@@ -1,33 +1,35 @@
 Table of Contents
 =================
 
-   * [Table of Contents](#table-of-contents)
    * [Getting started with Docker](#getting-started-with-docker)
-      * [Dockerfile](#dockerfile)
-         * [CMD](#cmd)
-         * [ENTRYPOINT](#entrypoint)
-      * [Building the image](#building-the-image)
-      * [Running the image](#running-the-image)
-      * [Copying files between host and container and vice versa](#copying-files-between-host-and-container-and-vice-versa)
-      * [Sharing between host and Docker container](#sharing-between-host-and-docker-container)
-         * [File permissions](#file-permissions)
-         * [File Permissions 2](#file-permissions-2)
-      * [Removing the image](#removing-the-image)
-      * [Committing a change](#committing-a-change)
-      * [Cleaning up exited containers](#cleaning-up-exited-containers)
-      * [Installing Perl modules](#installing-perl-modules)
-      * [Creating a data container](#creating-a-data-container)
-      * [Bioconductor](#bioconductor)
-      * [Saving and transferring a Docker image](#saving-and-transferring-a-docker-image)
+   * [Dockerfile](#dockerfile)
+      * [CMD](#cmd)
+      * [ENTRYPOINT](#entrypoint)
+   * [Building the image](#building-the-image)
+   * [Running the image](#running-the-image)
+   * [Copying files between host and container and vice versa](#copying-files-between-host-and-container-and-vice-versa)
+   * [Sharing between host and Docker container](#sharing-between-host-and-docker-container)
+      * [File permissions](#file-permissions)
+      * [File Permissions 2](#file-permissions-2)
+   * [Removing the image](#removing-the-image)
+   * [Committing a change](#committing-a-change)
+   * [Cleaning up exited containers](#cleaning-up-exited-containers)
+   * [Installing Perl modules](#installing-perl-modules)
+   * [Creating a data container](#creating-a-data-container)
+   * [R](#r)
+   * [Saving and transferring a Docker image](#saving-and-transferring-a-docker-image)
+   * [Tips](#tips)
       * [Useful links](#useful-links)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 # Getting started with Docker
 
+Docker is an open source project that allows one to pack, ship, and run any application as a lightweight container; the use of container here refers to the consistent and standard packaging of applications. An analogy of Docker containers are shipping containers, which provide a standard and consistent way of shipping just about anything. Another concept is a Docker image; an image is software that you load into a container. A Docker image can run a simple command and exit or contain an entire workflow.
+
 Check out this [awesome tutorial](http://seankross.com/2017/09/17/Enough-Docker-to-be-Dangerous.html) by Sean Kross and the official [getting started guide](https://docs.docker.com/linux/).
 
-## Dockerfile
+# Dockerfile
 
 [Dockerfile documentation](https://docs.docker.com/engine/reference/builder/); also refer to [Best practices for writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
 
@@ -46,11 +48,11 @@ RUN cd /src && git clone https://github.com/lh3/bwa.git && cd bwa && make && ln 
 CMD bwa
 ```
 
-### CMD
+## CMD
 
 The [CMD](https://docs.docker.com/engine/reference/builder/#cmd) instruction in a Dockerfile does not execute anything at build time but specifies the intended command for the image; there can only be one CMD instruction in a Dockerfile and if you list more than one CMD then only the last CMD will take effect. The main purpose of a CMD is to provide defaults for an executing container.
 
-### ENTRYPOINT
+## ENTRYPOINT
 
 An [ENTRYPOINT](https://docs.docker.com/engine/reference/builder/#entrypoint) allows you to configure a container that will run as an executable. ENTRYPOINT has two forms:
 
@@ -69,13 +71,13 @@ Use `--entrypoint` to override ENTRYPOINT instruction.
 docker run --entrypoint
 ```
 
-## Building the image
+# Building the image
 
 ```bash
 docker build -t bwa .
 ```
 
-## Running the image
+# Running the image
 
 [Docker run documentation](https://docs.docker.com/engine/reference/run/).
 
@@ -110,7 +112,7 @@ Note: To use BWA, you need to first index the genome with `bwa index'.
       first. Please `man ./bwa.1' for the manual.
 ```
 
-## Copying files between host and container and vice versa
+# Copying files between host and container and vice versa
 
 Use `docker cp`.
 
@@ -152,7 +154,7 @@ cat bye.txt
 bye
 ```
 
-## Sharing between host and Docker container
+# Sharing between host and Docker container
 
 The `bwa` image does not contain any data; we can use the `-v` flag to share directories between the host and Docker container.
 
@@ -188,7 +190,7 @@ head aln.sam
 4:301430        147     1000000 301830  60      100M    =       301430  -500    TACATTTGGACTTGATACCGTTACAACGGTTGTGTGATTTCTAGCATTACGTAACAAAACATATCTTCACGGGAGTACGAATATAGGGGTATTCGGGTAA    JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ    NM:i:0  MD:Z:100        AS:i:100        XS:i:0
 ```
 
-### File permissions
+## File permissions
 
 The files created inside the Docker container will be owned by root; inside the Docker container, you are `root` and the files you produce will have `root` permissions. 
 
@@ -272,7 +274,7 @@ total 2816
 -rw-rw-r-- 1 dtang dtang   56824 Apr 27 10:12 aln.sam
 ```
 
-### File Permissions 2
+## File Permissions 2
 
 An easier way is to use the `-u` parameter
 
@@ -281,7 +283,7 @@ An easier way is to use the `-u` parameter
 docker run -v /local/data:/data -u `stat -c "%u:%g" /local/data` bwa bwa index /data/blah.fa
 ```
 
-## Removing the image
+# Removing the image
 
 Find all the `bwa` processes (which should be stopped once you exit the container) and remove them.
 
@@ -291,7 +293,7 @@ docker rm <blah>
 docker rmi bwa
 ```
 
-## Committing a change
+# Committing a change
 
 When you log out of a container, the changes made are still stored; type `docker ps -a` to see all containers and the latest changes. You can [commit](https://docs.docker.com/engine/reference/commandline/commit/) these changes to the image. (Generally, it is better to use Dockerfiles to manage your images in a documented and maintainable way.)
 
@@ -307,7 +309,7 @@ docker commit -m 'Made change to blah' -a 'Dave Tang' <CONTAINER ID> <image>
 docker history <image>
 ```
 
-## Cleaning up exited containers
+# Cleaning up exited containers
 
 Sub-shell to get all (`-a`) container IDs (`-q`) that have exited (`-f status=exited`), which are then removed (`docker rm -v`).
 
@@ -327,7 +329,7 @@ if [ ! -z "$exited" ]; then
 fi
 ```
 
-## Installing Perl modules
+# Installing Perl modules
 
 Use `cpanminus`.
 
@@ -338,7 +340,7 @@ apt-get install -y cpanminus
 cpanm Archive::Extract Archive::Zip DBD::mysql
 ```
 
-## Creating a data container
+# Creating a data container
 
 This [guide on working with Docker data volumes](https://www.digitalocean.com/community/tutorials/how-to-work-with-docker-data-volumes-on-ubuntu-14-04) provides a really nice introduction. Use `docker create` to create a data container; the `-v` indicates the directory for the data container; the `--name data_container` indicates the name of the data container; and `ubuntu` is the image to be used for the container.
 
@@ -352,9 +354,15 @@ If we run a new Ubuntu container with the `--volumes-from` flag, output written 
 docker run -it --volumes-from data_container ubuntu /bin/bash
 ```
 
-## Bioconductor
+# R
 
-Obtain the Bioconductor [release_core](https://hub.docker.com/r/bioconductor/release_core/) from the [Bioconductor Docker Hub](https://hub.docker.com/u/bioconductor/) by running:
+Use https://github.com/rocker-org/rocker
+
+```bash
+docker run --rm -ti rocker/r-base
+```
+
+For Bioconductor use [release_core](https://hub.docker.com/r/bioconductor/release_core/) from the [Bioconductor Docker Hub](https://hub.docker.com/u/bioconductor/) by running:
 
 ```bash
 docker pull bioconductor/release_core
@@ -366,7 +374,7 @@ docker run -it bioconductor/release_core R --vanilla
 q()
 ```
 
-## Saving and transferring a Docker image
+# Saving and transferring a Docker image
 
 See [this post](http://stackoverflow.com/questions/23935141/how-to-copy-docker-images-from-one-host-to-another-without-via-repository) on Stack Overflow.
 
@@ -401,6 +409,37 @@ Usage:   samtools <command> [options]
 ...
 ```
 
+# Pushing to Docker Hub
+
+https://ropenscilabs.github.io/r-docker-tutorial/04-Dockerhub.html
+
+```bash
+docker login
+
+# create repo on Docker Hub then tag your image
+docker tag bb38976d03cf yourhubusername/newrepo
+
+# push
+docker push yourhubusername/newrepo
+```
+
+# Tips
+
+Tip from https://support.pawsey.org.au/documentation/display/US/Containers: each RUN, COPY, and ADD command in a Dockerfile generates another layer in the container thus increasing its size; use multi-line commands and clean up package manager caches to minimise image size:
+
+```bash
+RUN apt-get update \
+      && apt-get install -y \
+         autoconf \
+         automake \
+         gcc \
+         g++ \
+         python \
+         python-dev \
+      && apt-get clean all \
+      && rm -rf /var/lib/apt/lists/*
+```
+
 ## Useful links
 
 * [A quick introduction to Docker](http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/)
@@ -408,3 +447,5 @@ Usage:   samtools <command> [options]
 * [The impact of Docker containers on the performance of genomic pipelines](http://www.ncbi.nlm.nih.gov/pubmed/26421241)
 * [10 things to avoid in Docker containers](http://developers.redhat.com/blog/2016/02/24/10-things-to-avoid-in-docker-containers/)
 * The [Play with Docker classroom](https://training.play-with-docker.com/) brings you labs and tutorials that help you get hands-on experience using Docker
+* [Shifter](https://github.com/NERSC/shifter) enables container images for HPC 
+
