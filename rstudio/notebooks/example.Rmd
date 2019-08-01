@@ -1,0 +1,28 @@
+---
+title: "Example"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Heatmap
+
+Load `/packages` directory.
+
+```{r add_lib_path}
+.libPaths(new = "/packages")
+```
+
+Load library.
+
+```{r load_lib}
+library(pheatmap)
+```
+
+Generate example heatmap.
+
+```{r heatmap}
+pheatmap(as.matrix(iris[, -5]))
+```

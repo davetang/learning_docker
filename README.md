@@ -447,5 +447,6 @@ RUN apt-get update \
 * [The impact of Docker containers on the performance of genomic pipelines](http://www.ncbi.nlm.nih.gov/pubmed/26421241)
 * [10 things to avoid in Docker containers](http://developers.redhat.com/blog/2016/02/24/10-things-to-avoid-in-docker-containers/)
 * The [Play with Docker classroom](https://training.play-with-docker.com/) brings you labs and tutorials that help you get hands-on experience using Docker
-* [Shifter](https://github.com/NERSC/shifter) enables container images for HPC 
+* [Shifter](https://github.com/NERSC/shifter) enables container images for HPC
+* http://biocworkshops2019.bioconductor.org.s3-website-us-east-1.amazonaws.com/page/BioconductorOnContainers__Bioconductor_Containers_Workshop/
 
