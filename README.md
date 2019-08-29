@@ -311,10 +311,24 @@ docker history <image>
 
 # Cleaning up exited containers
 
-Sub-shell to get all (`-a`) container IDs (`-q`) that have exited (`-f status=exited`), which are then removed (`docker rm -v`).
+By default a container's file system persists even after the container exits. For example:
+
+```bash
+docker run hello-world
+
+docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+5f640a09f34c        hello-world         "/hello"            6 seconds ago       Exited (0) 5 seconds ago                       xenodochial_kapitsa
+```
+
+We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have exited (`-f status=exited`) and then remove them (`docker rm -v`).
 
 ```bash
 docker rm -v $(docker ps -a -q -f status=exited)
+5f640a09f34c
+
+docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 ```
 
 As a Bash script; `-z` returns true if `$exited` is empty, i.e. no exited containers.
@@ -327,6 +341,15 @@ exited=`docker ps -a -q -f status=exited`
 if [ ! -z "$exited" ]; then
    docker rm -v $(docker ps -a -q -f status=exited)
 fi
+```
+
+You can use the [--rm](https://docs.docker.com/engine/reference/run/#clean-up---rm) parameter to automatically clean up the container and remove the file system when the container exits.
+
+```bash
+docker run --rm hello-world
+
+docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 ```
 
 # Installing Perl modules
