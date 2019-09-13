@@ -74,7 +74,50 @@ docker run --rm \
            -p 8888:8787 \
            -v /Users/dtang/github/learning_docker/rstudio/packages:/packages \
            -v /Users/dtang/github/learning_docker/rstudio/notebooks:/notebooks \
+           -v /Users/dtang/github/learning_docker/rstudio:/data \
            -e PASSWORD=password \
            rocker/rstudio
 ```
+
+When you're done use CONTROL+C to stop the container.
+
+### System libraries
+
+Some packages will require libraries that are not installed on the default Debian installation. For example, the `Seurat` package will fail to install because it will be missing the `png` library. We can "log in" to the running container and install the missing libraries. First find out the container ID by running `docker ps`.
+
+```bash
+docker ps 
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                    NAMES
+215d041c976b        rocker/rstudio      "/init"             58 minutes ago      Up 58 minutes       0.0.0.0:8888->8787/tcp   interesting_turing
+```
+
+Now we can "log in" to `215d041c976b`.
+
+```bash
+docker exec -it 215d041c976b /bin/bash
+
+# once inside
+apt update
+apt install libpng-dev
+```
+
+You can create another Docker image from `rocker/rstudio` so that you don't have to do this manually each time.
+
+### RStudio Server preferences
+
+I have some specific preferences for RStudio Server that are absolutely necessary, such as using Vim key bindings. These preferences are set via the `Tools` menu bar and then selecting `Global Options...`. Each time we start a new container, we will lose our preferences and I don't want to manually change them each time. Luckily, the settings are saved in a specific file, which we can use to save our settings; the `user-settings` file is stored in the location below:
+
+```
+/home/rstudio/.rstudio/monitored/user-settings/user-settings
+```
+
+Once you have made all your settings, save this file back to your local computer and use it to rewrite the default file next time you start a new instance. For example:
+
+```
+# once you have the container running in the background, log into Docker container
+# I have mounted this directory to /data
+cp /data/user-settings /home/rstudio/.rstudio/monitored/user-settings/user-settings
+```
+
+Now you can have persistent RStudio Server preferences!
 
