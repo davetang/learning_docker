@@ -6,5 +6,5 @@ docker run --rm \
            -v /Users/dtang/github/learning_docker/rstudio/notebooks:/notebooks \
            -v /Users/dtang/github/learning_docker/rstudio:/data \
            -e PASSWORD=password \
-           rocker/rstudio
+           davetang/rstudio
 

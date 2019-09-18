@@ -121,3 +121,7 @@ cp /data/user-settings /home/rstudio/.rstudio/monitored/user-settings/user-setti
 
 Now you can have persistent RStudio Server preferences!
 
+## Dockerfile
+
+I created a new Docker image (see `Dockerfile`) from the `rstudio` image to set `.libPaths("/packages/")`, to install the `png` library, and to copy over my `user-settings` file. I can now run this image instead of the base `rstudio` image so that new packages are installed in `packages` and my user settings are preserved. In addition, I installed the `rmarkdown` and `tidyverse` packages in this new image.
+

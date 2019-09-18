@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker build -t seurat3 .
+docker build -t davetang/seurat3 .
 
 # push to Docker Hub
 # docker login

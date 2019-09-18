@@ -1,4 +1,4 @@
-FROM rocker/r-ver:3.6.1
+FROM rocker/rstudio:3.6.1
 
 MAINTAINER Dave Tang <me@davetang.org>
 
@@ -16,5 +16,8 @@ RUN apt-get clean all && \
 	apt-get purge && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN Rscript -e "install.packages('tidyverse'); install.packages('Seurat')"
+RUN Rscript -e "install.packages('rmarkdown'); install.packages('tidyverse');"
+
+COPY user-settings /home/rstudio/.rstudio/monitored/user-settings/user-settings
+COPY .Rprofile /home/rstudio/
 
