@@ -1,10 +1,25 @@
-From ubuntu
-MAINTAINER Dave Tang <me@davetang.org>
-RUN apt-get update
-RUN apt-get install -y git build-essential zlib1g-dev
+FROM ubuntu:18.04
 
-RUN mkdir /src
-RUN cd /src && git clone https://github.com/lh3/bwa.git && cd bwa && make && ln -s /src/bwa/bwa /usr/bin/bwa
+MAINTAINER Dave Tang <me@davetang.org>
+
+RUN apt-get clean all && \
+	apt-get update && \
+	apt-get upgrade -y && \
+	apt-get install -y \
+		build-essential \
+		git \
+		zlib1g-dev \
+	&& apt-get clean all && \
+	apt-get purge && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN mkdir /src && \
+	cd /src && \
+	git clone https://github.com/lh3/bwa.git && \
+	cd bwa && \
+	make && \
+	ln -s /src/bwa/bwa /usr/bin/bwa
 
 # shell form of CMD
 CMD bwa
+

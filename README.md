@@ -34,17 +34,29 @@ Check out this [awesome tutorial](http://seankross.com/2017/09/17/Enough-Docker-
 [Dockerfile documentation](https://docs.docker.com/engine/reference/builder/); also refer to [Best practices for writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
 
 ```bash
-cat Dockerfile
-From ubuntu
-MAINTAINER Dave Tang <me@davetang.org>
-RUN apt-get update
-RUN apt-get install -y git build-essential zlib1g-dev
+FROM ubuntu:18.04
 
-RUN mkdir /src
-RUN cd /src && git clone https://github.com/lh3/bwa.git && cd bwa && make && ln -s /src/bwa/bwa /usr/bin/bwa
+MAINTAINER Dave Tang <me@davetang.org>
+
+RUN apt-get clean all && \
+        apt-get update && \
+        apt-get upgrade -y && \
+        apt-get install -y \
+                build-essential \
+                git \
+                zlib1g-dev \
+        && apt-get clean all && \
+        apt-get purge && \
+        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN mkdir /src && \
+        cd /src && \
+        git clone https://github.com/lh3/bwa.git && \
+        cd bwa && \
+        make && \
+        ln -s /src/bwa/bwa /usr/bin/bwa
 
 # shell form of CMD
-# default to show version of BWA
 CMD bwa
 ```
 
@@ -85,7 +97,7 @@ docker build -t bwa .
 docker run bwa
 
 Program: bwa (alignment via Burrows-Wheeler transformation)
-Version: 0.7.13-r1126
+Version: 0.7.17-r1198-dirty
 Contact: Heng Li <lh3@sanger.ac.uk>
 
 Usage:   bwa <command> [options]
