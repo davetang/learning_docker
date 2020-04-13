@@ -86,7 +86,11 @@ docker run --entrypoint
 # Building the image
 
 ```bash
+# uses Dockerfile in current directory
 docker build -t bwa .
+
+# use -f to specify the Dockerfile to use
+docker build -f Dockerfile.base -t base .
 ```
 
 # Running the image
