@@ -59,6 +59,8 @@ Download testing data and check integrity (md5sum):
 * PRG_MHC_GRCh38_withIMGT.tar.gz 525a8aa0c7f357bf29fe2c75ef1d477d
 * NA12878.mini.cram 45d1769ffed71418571c9a2414465a12
 
+Download tarball and CRAM file in `graphs` directory.
+
     cd /tmp/HLA-LA/graphs/
     wget -c http://www.well.ox.ac.uk/downloads/PRG_MHC_GRCh38_withIMGT.tar.gz
     md5sum PRG_MHC_GRCh38_withIMGT.tar.gz

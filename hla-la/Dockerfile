@@ -21,7 +21,7 @@ RUN apt-get clean all && \
       libssl-dev \
       libxml2-dev \
       python-dev \
-      tree
+      tree \
       unzip \
       vim \
       wget \
