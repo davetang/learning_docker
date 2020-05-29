@@ -4,9 +4,9 @@ Installing https://github.com/DiltheyLab/HLA-LA
 
 ## Installation
 
-Use Docker.
+Use Docker. Check out https://github.com/zlskidmore/docker-hla-la/blob/master/Dockerfile.
 
-    docker build -f Dockerfile -t hla-la .
+    docker build -f Dockerfile -t davetang/hla-la .
     docker run --rm -it hla-la /bin/bash
 
 Follow instructions from https://stackoverflow.com/questions/12578499/how-to-install-boost-on-ubuntu to install Boost (requires >= 1.59)
@@ -37,7 +37,9 @@ Miniconda
 
 Picard
 
+    cd /tmp/
     wget https://sourceforge.net/projects/picard/files/picard-tools/1.119/picard-tools-1.119.zip/download -O picard-tools-1.119.zip
+    unzip picard-tools-1.119.zip
 
 HLA-LA
 

@@ -90,7 +90,8 @@ docker run --entrypoint
 docker build -t bwa .
 
 # use -f to specify the Dockerfile to use
-docker build -f Dockerfile.base -t base .
+# the period indicates that the Dockerfile is in the current directory
+docker build -f Dockerfile.base -t davetang/base .
 ```
 
 # Running the image

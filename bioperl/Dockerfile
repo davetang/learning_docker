@@ -21,6 +21,7 @@ RUN apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# libraries required by Bio::DB::Sam
 RUN mkdir /src && \
    cd /src && \
    wget https://sourceforge.net/projects/samtools/files/samtools/0.1.19/samtools-0.1.19.tar.bz2 && \
@@ -29,8 +30,14 @@ RUN mkdir /src && \
    cat Makefile | sed -E 's/^(CFLAGS.*)/\1 -fPIC/' > blah && \
    mv blah Makefile && \
    make
-
 ENV SAMTOOLS=/src/samtools-0.1.19/
+
+# Miniconda and dependencies
+RUN cd /tmp/ && \
+   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+   bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3 && \
+   /root/miniconda3/condabin/conda install -y -c bioconda bwa samtools picard mummer minimap2
+ENV PATH=$PATH:/root/miniconda3/bin
 
 RUN cpanm Parallel::ForkManager Bio::DB::Sam namespace::clean
 
