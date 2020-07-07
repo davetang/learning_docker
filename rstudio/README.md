@@ -2,24 +2,29 @@
 
 The [Rocker project](https://www.rocker-project.org/) provides various Docker images for the R environment. Here's one way of using the [RStudio Server image](https://hub.docker.com/r/rocker/rstudio/) to enable reproducibility.
 
-First use `docker` to pull version `3.6.1` of the RStudio Server image; remember to specify the version so we can reproducible analyses.
+First use `docker` to pull the RStudio Server image; remember to specify a version to promote reproducibility.
 
 ```bash
-docker pull rocker/rstudio:3.6.1
+rstudio_image=rocker/rstudio:4.0.1
+docker pull $rstudio_image
 ```
 
-Once you have successfully pulled the image, try running the command below. The output indicates that the image is using the Debian operating system.
+Once you have successfully pulled the image, try running the command below. The output indicates the operating system used to build the image.
 
 ```bash
-docker run --rm -it rocker/rstudio:3.6.1 cat /etc/os-release
-PRETTY_NAME="Debian GNU/Linux 9 (stretch)"
-NAME="Debian GNU/Linux"
-VERSION_ID="9"
-VERSION="9 (stretch)"
-ID=debian
-HOME_URL="https://www.debian.org/"
-SUPPORT_URL="https://www.debian.org/support"
-BUG_REPORT_URL="https://bugs.debian.org/"
+docker run --rm -it $rstudio_image cat /etc/os-release
+NAME="Ubuntu"
+VERSION="20.04 LTS (Focal Fossa)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 20.04 LTS"
+VERSION_ID="20.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=focal
+UBUNTU_CODENAME=focal
 ```
 
 For this example, I have created a `packages` directory for installing R packages into. We will use the `-v` parameter to share the `packages` directory; this directory will be accessible inside the container as `/packages`.
@@ -27,9 +32,9 @@ For this example, I have created a `packages` directory for installing R package
 ```bash
 docker run --rm \
            -p 8888:8787 \
-           -v /Users/dtang/github/learning_docker/rstudio/packages:/packages \
+           -v ~/github/learning_docker/rstudio/packages:/packages \
            -e PASSWORD=password \
-           rocker/rstudio
+           $rstudio_image
 ```
 
 If all went well, you can access the RStudio Server at http://localhost:8888/ via your favourite web browser. The username is `rstudio` and the password is `password`.
@@ -76,7 +81,7 @@ docker run --rm \
            -v /Users/dtang/github/learning_docker/rstudio/notebooks:/notebooks \
            -v /Users/dtang/github/learning_docker/rstudio:/data \
            -e PASSWORD=password \
-           rocker/rstudio
+           $rstudio_image
 ```
 
 When you're done use CONTROL+C to stop the container.

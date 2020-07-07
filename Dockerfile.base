@@ -20,3 +20,10 @@ RUN apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Miniconda and dependencies
+RUN cd /tmp/ && \
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+        bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3 && \
+        /root/miniconda3/condabin/conda install -y python=3.7
+ENV PATH=$PATH:/root/miniconda3/bin
+
