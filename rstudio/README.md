@@ -34,8 +34,12 @@ docker run --rm \
            -p 8888:8787 \
            -v ~/github/learning_docker/rstudio/packages:/packages \
            -e PASSWORD=password \
+           -e USERID=$(id -u) \
+           -e GROUPID=$(id -g) \
            $rstudio_image
 ```
+
+NOTE: for the Docker installation on my Linux box (Docker Engine - Community 19.03.11), I had a file persmission problem when using RStudio Server. This was because the `rstudio` user does not have permission to write to the mounted directory. This was [solved](https://github.com/rocker-org/rocker/issues/324#issuecomment-454715753) by setting `USERID` and `GROUPID` to the same ID's.
 
 If all went well, you can access the RStudio Server at http://localhost:8888/ via your favourite web browser. The username is `rstudio` and the password is `password`.
 
