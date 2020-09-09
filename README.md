@@ -13,6 +13,7 @@ Table of Contents
       * [File Permissions 2](#file-permissions-2)
    * [Removing the image](#removing-the-image)
    * [Committing a change](#committing-a-change)
+   * [Access running container](access-running-container)
    * [Cleaning up exited containers](#cleaning-up-exited-containers)
    * [Installing Perl modules](#installing-perl-modules)
    * [Creating a data container](#creating-a-data-container)
@@ -324,6 +325,14 @@ docker commit -m 'Made change to blah' -a 'Dave Tang' <CONTAINER ID> <image>
 
 # use docker history <image> to check history
 docker history <image>
+```
+
+# Access running container
+
+To access a container that is already running, perhaps in the background (`docker run` with `-d`) use `docker exec`
+
+```bash
+docker exec -it rstudio_dtang /bin/bash
 ```
 
 # Cleaning up exited containers
