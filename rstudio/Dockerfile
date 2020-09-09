@@ -12,6 +12,7 @@ RUN apt-get clean all && \
 		libxml2-dev \
 		libpng-dev \
 		zlib1g-dev \
+		libz-dev \
 	&& apt-get clean all && \
 	apt-get purge && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
