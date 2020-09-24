@@ -85,6 +85,8 @@ docker run --entrypoint
 
 # Building the image
 
+Use the `build` subcommand to build images and use the `-f` parameter if your Dockerfile is a different name. You can push the built image to [Docker Hub](https://hub.docker.com/) if you have an account.
+
 ```bash
 # uses Dockerfile in current directory
 docker build -t bwa .
@@ -92,6 +94,8 @@ docker build -t bwa .
 # use -f to specify the Dockerfile to use
 # the period indicates that the Dockerfile is in the current directory
 docker build -f Dockerfile.base -t davetang/base .
+docker login
+docker push davetang/base
 ```
 
 # Running the image

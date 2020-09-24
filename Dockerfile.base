@@ -7,7 +7,7 @@ RUN apt-get clean all && \
    apt-get upgrade -y && \
    apt-get install -y \
       build-essential \
-      git \
+      git-core \
       wget \
       vim \
       libhdf5-dev \
@@ -16,6 +16,7 @@ RUN apt-get clean all && \
       libxml2-dev \
       libpng-dev \
       zlib1g-dev \
+      libncurses-dev \
    && apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -26,4 +27,15 @@ RUN cd /tmp/ && \
         bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3 && \
         /root/miniconda3/condabin/conda install -y python=3.7
 ENV PATH=$PATH:/root/miniconda3/bin
+
+# CMake
+RUN cd /tmp/ && \
+   wget https://github.com/Kitware/CMake/releases/download/v3.16.5/cmake-3.16.5.tar.gz && \
+   tar -zxf cmake-3.16.5.tar.gz && \
+   cd cmake-3.16.5 && \
+   ./bootstrap && \
+   make && \
+   make install
+
+RUN rm -rf /tmp/*
 
