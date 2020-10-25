@@ -1,7 +1,9 @@
 #!/bin/bash
 
-docker build -t davetang/rstudio:4.0.1 .
+ver=$(cat Dockerfile | grep "^FROM" | cut -f2 -d':')
+
+docker build -t davetang/rstudio:${ver} .
 
 # docker login
-# docker push davetang/rstudio:4.0.1
+# docker push davetang/rstudio:${ver}
 

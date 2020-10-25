@@ -134,3 +134,17 @@ Now you can have persistent RStudio Server preferences!
 
 I created a new Docker image (see `Dockerfile`) from the `rstudio` image to set `.libPaths("/packages/")`, to install the `png` library, and to copy over my `user-settings` file. I can now run this image instead of the base `rstudio` image so that new packages are installed in `packages` and my user settings are preserved. In addition, I installed the `rmarkdown` and `tidyverse` packages in this new image.
 
+## Windows
+
+This works very nicely with Windows! Just make sure you have WSL 2, a Linux distro, and follow [this guide](https://docs.docker.com/docker-for-windows/wsl/).
+
+```bash
+wsl -l -v
+# convert to WSL 2 if you were using WSL 1
+wsl --set-version Ubuntu-20.04 2
+
+./run_docker.sh
+```
+
+Now open your favourite browser and head to localhost:8888!
+

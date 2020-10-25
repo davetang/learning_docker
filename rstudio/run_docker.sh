@@ -1,6 +1,8 @@
 #!/bin/bash
 
-rstudio_image=davetang/rstudio:4.0.1 
+ver=$(cat Dockerfile | grep "^FROM" | cut -f2 -d':')
+
+rstudio_image=davetang/rstudio:${ver}
 
 docker run --rm \
            -p 8888:8787 \

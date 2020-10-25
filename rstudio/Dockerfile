@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.0.1
+FROM rocker/rstudio:4.0.3
 
 MAINTAINER Dave Tang <me@davetang.org>
 
