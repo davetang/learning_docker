@@ -5,6 +5,7 @@ ver=$(cat Dockerfile | grep "^FROM" | cut -f2 -d':')
 rstudio_image=davetang/rstudio:${ver}
 
 docker run --rm \
+           -d \
            -p 8888:8787 \
            -v ~/github/learning_docker/rstudio/packages:/packages \
            -v ~/github/learning_docker/rstudio/notebooks:/notebooks \

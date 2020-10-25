@@ -11,6 +11,7 @@ RUN apt-get clean all && \
 		libssl-dev \
 		libxml2-dev \
 		libpng-dev \
+		libxt-dev \
 		zlib1g-dev \
 		libbz2-dev \
 		liblzma-dev \
