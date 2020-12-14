@@ -7,6 +7,7 @@ Table of Contents
       * [ENTRYPOINT](#entrypoint)
    * [Building the image](#building-the-image)
    * [Running the image](#running-the-image)
+   * [Restrict CPU usage](#cpu)
    * [Copying files between host and container and vice versa](#copying-files-between-host-and-container-and-vice-versa)
    * [Sharing between host and Docker container](#sharing-between-host-and-docker-container)
       * [File permissions](#file-permissions)
@@ -132,6 +133,33 @@ Note: To use BWA, you need to first index the genome with `bwa index'.
       There are three alignment algorithms in BWA: `mem', `bwasw', and
       `aln/samse/sampe'. If you are not sure which to use, try `bwa mem'
       first. Please `man ./bwa.1' for the manual.
+```
+
+# CPU
+
+[Restrict](https://docs.docker.com/config/containers/resource_constraints/) CPUs; run some endless Perl code and use `docker stats` to confirm CPU usage.
+
+```bash
+# restrict to 1 CPU
+docker run --rm --cpus=1 -it davetang/base /bin/bash
+perl -le 'while(1){ }'
+
+CONTAINER ID        NAME                   CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
+78b44b67f9dc        adoring_albattani      99.88%              760KiB / 376.6GiB     0.00%               840B / 0B           0B / 0B             2
+
+# restrict to 1/2 CPU
+docker run --rm --cpus=0.5 -it davetang/base /bin/bash
+perl -le 'while(1){ }'
+
+CONTAINER ID        NAME                CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
+0b6d4cb36e57        tender_wilson       49.35%              756KiB / 376.6GiB     0.00%               8.53MB / 152kB      0B / 0B             2
+
+# restrict to 1/3 CPU
+docker run --rm --cpus=0.33 -it davetang/base /bin/bash
+perl -le 'while(1){ }'
+
+CONTAINER ID        NAME                   CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
+a8675c0fadca        elegant_leavitt        32.71%              760KiB / 376.6GiB     0.00%               978B / 0B           0B / 0B             2
 ```
 
 # Copying files between host and container and vice versa
