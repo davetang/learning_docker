@@ -9,6 +9,8 @@ RUN apt-get clean all && \
       build-essential \
       git-core \
       wget \
+      unzip \
+      time \
       vim \
       libhdf5-dev \
       libcurl4-gnutls-dev \
