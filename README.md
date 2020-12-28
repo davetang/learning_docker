@@ -6,8 +6,9 @@ Table of Contents
       * [CMD](#cmd)
       * [ENTRYPOINT](#entrypoint)
    * [Building the image](#building-the-image)
+   * [Renaming image](#renaming-image)
    * [Running the image](#running-the-image)
-   * [Restrict CPU usage](#cpu)
+   * [Restrict resource usage](#resource-usage)
    * [Copying files between host and container and vice versa](#copying-files-between-host-and-container-and-vice-versa)
    * [Sharing between host and Docker container](#sharing-between-host-and-docker-container)
       * [File permissions](#file-permissions)
@@ -100,6 +101,14 @@ docker login
 docker push davetang/base
 ```
 
+# Renaming image
+
+Use `docker image tag`.
+
+```bash
+docker image tag old_image_name:latest new_image_name:latest
+```
+
 # Running the image
 
 [Docker run documentation](https://docs.docker.com/engine/reference/run/).
@@ -135,9 +144,9 @@ Note: To use BWA, you need to first index the genome with `bwa index'.
       first. Please `man ./bwa.1' for the manual.
 ```
 
-# CPU
+# Resource usage
 
-[Restrict](https://docs.docker.com/config/containers/resource_constraints/) CPUs; run some endless Perl code and use `docker stats` to confirm CPU usage.
+To [restrict](https://docs.docker.com/config/containers/resource_constraints/) CPU usage use `--cpus=n`. We can confirm the limited usage by running some endless Perl code and using `docker stats` to confirm CPU usage.
 
 ```bash
 # restrict to 1 CPU
@@ -161,6 +170,8 @@ perl -le 'while(1){ }'
 CONTAINER ID        NAME                   CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
 a8675c0fadca        elegant_leavitt        32.71%              760KiB / 376.6GiB     0.00%               978B / 0B           0B / 0B             2
 ```
+
+Use `--memory=` to restrict the maximum amount of memory the container can use.
 
 # Copying files between host and container and vice versa
 
