@@ -15,6 +15,7 @@ RUN apt-get clean all && \
 		zlib1g-dev \
 		libbz2-dev \
 		liblzma-dev \
+		libglpk40 \
 	&& apt-get clean all && \
 	apt-get purge && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

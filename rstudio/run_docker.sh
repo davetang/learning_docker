@@ -4,7 +4,7 @@ ver=$(cat Dockerfile | grep "^FROM" | cut -f2 -d':')
 
 rstudio_image=davetang/rstudio:${ver}
 container_name=rstudio_dtang
-port=8888
+port=9999
 
 >&2 echo $container_name listening on port $port
 
