@@ -8,14 +8,17 @@ if [[ ! -x $(command -v docker) ]]; then
 fi
 
 usage() {
-   >&2 echo "Usage: $0 [ -v image version ] < dirs >"
+   >&2 echo "Usage: $0 [ -v rstudio_dtang version ] [ -p port ] < dirs_to_mount >"
    exit 1
 }
 
-while getopts ":v:" options; do
+while getopts ":v:p:" options; do
    case "${options}" in
       v)
          ver=${OPTARG}
+         ;;
+      p)
+         port=${OPTARG}
          ;;
       :)
          echo "Error: -${OPTARG} requires an argument."
@@ -26,18 +29,17 @@ while getopts ":v:" options; do
    esac
 done
 
-if [[ ${OPTIND} -lt 3 ]]; then
+if [[ ${OPTIND} -lt 5 ]]; then
    usage
 fi
 
 rstudio_image=davetang/rstudio:${ver}
 check_image=$(docker image inspect ${rstudio_image})
 container_name=rstudio_dtang
-port=9999
 
 to_mount=
-if [[ $#-2 -gt 0 ]]; then
-   for ((i=0; i<$#-2; i++)); do
+if [[ $#-4 -gt 0 ]]; then
+   for ((i=0; i<$#-4; i++)); do
       d=${@:$OPTIND+$i:1}
       full_d=$(readlink -f ${d})
       if [[ ! -d ${full_d} ]]; then
@@ -56,19 +58,20 @@ if [[ ! -d ${r_package_dir} ]]; then
    mkdir ${r_package_dir}
 fi
 
->&2 echo $container_name listening on port $port
-
 docker run --rm \
-           -p $port:8787 \
-           -d \
-           --name $container_name \
-           -v ${r_package_dir}:/packages \
-	   ${to_mount} \
-           -e PASSWORD=password \
-           -e USERID=$(id -u) \
-           -e GROUPID=$(id -g) \
-           $rstudio_image
+   -p $port:8787 \
+   -d \
+   --name $container_name \
+   -v ${r_package_dir}:/packages \
+   ${to_mount} \
+   -e PASSWORD=password \
+   -e USERID=$(id -u) \
+   -e GROUPID=$(id -g) \
+   $rstudio_image
 
+>&2 echo $container_name listening on port $port
+>&2 echo Copy and paste http://localhost:$port into your browser
+>&2 echo Username is rstudio and password is password
 >&2 echo To stop container run: docker stop ${container_name}
 >&2 echo Done
 

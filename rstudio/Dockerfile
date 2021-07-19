@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.0.5
+FROM rocker/rstudio:4.1.0
 
 MAINTAINER Dave Tang <me@davetang.org>
 
@@ -22,7 +22,7 @@ RUN apt-get clean all && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse', 'workflowr', 'BiocManager'));"
-RUN Rscript -e "BiocManager::install(version = '3.12')"
+RUN Rscript -e "BiocManager::install(version = '3.13')"
 
 COPY user-settings /home/rstudio/.rstudio/monitored/user-settings/user-settings
 COPY .Rprofile /home/rstudio/
