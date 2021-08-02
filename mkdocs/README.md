@@ -22,5 +22,9 @@ docker run \
   mkdocs build
 ```
 
-Serving is work in progress.
+Serve.
+
+```bash
+./mkdocs_serve.sh
+```
 

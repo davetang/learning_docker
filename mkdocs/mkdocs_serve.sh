@@ -7,25 +7,42 @@ if [[ ! -x $(command -v docker) ]]; then
    exit 1
 fi
 
+proj=test
+
+if [[ ! -d ${proj} ]]; then
+   >&2 echo Creating ${proj}
+   docker run \
+     --rm \
+     -u $(stat -c "%u:%g" README.md) \
+     -v $(pwd):/work \
+     davetang/mkdocs:0.0.1 \
+     mkdocs new ${proj}
+fi
+
+if [[ ! -d ${proj}/site ]]; then
+   >&2 echo Building ${proj}
+   docker run \
+     --rm \
+     -u $(stat -c "%u:%g" README.md) \
+     -v $(pwd)/${proj}:/work \
+     davetang/mkdocs:0.0.1 \
+     mkdocs build
+fi
+
 ver=0.0.1
 docker_image=davetang/mkdocs:${ver}
 check_image=$(docker image inspect ${docker_image})
 container_name=mkdocs_dtang
-dir=$(pwd)/test
 port=5555
-
-if [[ ! -e ${dir} ]]; then
-   >&2 echo ${dir} does not exist
-   exit 1
-fi
+dir=$(pwd)/${proj}/site
 
 docker run --rm \
    -d \
-   -p ${port}:8000 \
+   -p ${port}:${port} \
    --name $container_name \
    -v ${dir}:/work \
    $docker_image \
-   mkdocs serve
+   python -m http.server ${port}
 
 >&2 echo $container_name listening on port $port
 >&2 echo Copy and paste http://localhost:$port into your browser
