@@ -26,6 +26,7 @@ RUN apt-get clean all && \
       unzip \
       vim \
       wget \
+      curl \
       zlib1g-dev \
    && apt-get clean all && \
    apt-get purge && \
