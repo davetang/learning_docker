@@ -13,6 +13,7 @@ Table of Contents
    * [Sharing between host and Docker container](#sharing-between-host-and-docker-container)
       * [File permissions](#file-permissions)
       * [File Permissions 2](#file-permissions-2)
+      * [Read only](#read-only)
    * [Removing the image](#removing-the-image)
    * [Committing a change](#committing-a-change)
    * [Access running container](#access-running-container)
@@ -342,6 +343,18 @@ An easier way is to use the `-u` parameter
 ```bash
 # assuming blah.fa exists in /local/data/
 docker run -v /local/data:/data -u `stat -c "%u:%g" /local/data` bwa bwa index /data/blah.fa
+```
+
+## Read only
+
+To mount a volumne but with read-only permissions, append `:ro` at the end.
+
+```bash
+docker run --rm -it -v $(pwd):/work:ro davetang/base /bin/bash
+cd work
+touch test
+# touch: cannot touch 'test': Read-only file system
+exit
 ```
 
 # Removing the image
