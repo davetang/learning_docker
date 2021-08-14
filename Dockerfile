@@ -1,25 +1,29 @@
 FROM ubuntu:18.04
 
 MAINTAINER Dave Tang <me@davetang.org>
+LABEL source="https://github.com/davetang/learning_docker/blob/master/Dockerfile"
 
 RUN apt-get clean all && \
-	apt-get update && \
-	apt-get upgrade -y && \
-	apt-get install -y \
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y \
 		build-essential \
-		git \
-		zlib1g-dev \
-	&& apt-get clean all && \
-	apt-get purge && \
-	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+		wget \
+		zlib1g-dev && \
+    apt-get clean all && \
+    apt-get purge && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN mkdir /src && \
-	cd /src && \
-	git clone https://github.com/lh3/bwa.git && \
-	cd bwa && \
-	make && \
-	ln -s /src/bwa/bwa /usr/bin/bwa
+    cd /src && \
+    wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2 && \
+    tar xjf bwa-0.7.17.tar.bz2 && \
+    cd bwa-0.7.17 && \
+    make && \
+    mv bwa /usr/local/bin && \
+    cd && rm -rf /src
 
-# shell form of CMD
-CMD bwa
+WORKDIR /work
+
+CMD ["bwa"]
 
