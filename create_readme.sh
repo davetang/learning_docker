@@ -13,12 +13,15 @@ if ! [ -x "$(command -v Rscript)" ]; then
 fi
 
 out_md=tmp.md
-Rscript -e "rmarkdown::render('readme.Rmd', output_file=\"$out_md\")"
-gh-md-toc $out_md > toc
+Rscript -e "rmarkdown::render('readme.Rmd', output_file=\"${out_md}\")"
 
-cat toc <(echo) <(date) <(echo) $out_md > README.md
+cp -f ${out_md} mkdocs_site/docs/index.md
 
-rm $out_md toc
+gh-md-toc ${out_md} > toc
+
+cat toc <(echo) <(date) <(echo) ${out_md} > README.md
+
+rm ${out_md} toc
 
 >&2 echo Done!
 

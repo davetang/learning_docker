@@ -1,3 +1,4 @@
 *.swp
 rstudio/packages
 .Rhistory
+mkdocs_site/site
