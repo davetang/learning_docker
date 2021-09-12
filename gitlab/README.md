@@ -68,6 +68,25 @@ ssh -T git@localhost
 # Welcome to GitLab, @davetang!
 ```
 
+## GitLab Runner
+
+[Install GitLab Runner](https://docs.gitlab.com/runner/install/).
+
+```bash
+# Download the binary for your system
+curl -L --output /usr/local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
+
+# Give it permissions to execute
+chmod +x /usr/local/bin/gitlab-runner
+
+# Create a GitLab CI user
+useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
+
+# Install and run as service
+gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
+gitlab-runner start
+```
+
 ## Clone
 
 Create a new project from the GUI.
@@ -90,10 +109,39 @@ git clone git@localhost:davetang/static_html.git
 cd static_html
 ```
 
-Install [Jekyll on Ubuntu]().
+Create `index.html`.
 
-```bash
-sudo apt update
-sudo apt-get install -y ruby-full build-essential zlib1g-dev
+```
+ <html>
+ <head>
+   <title>Home</title>
+ </head>
+ <body>
+   <h1>Hello World!</h1>
+ </body>
+ </html>
+```
+
+Create `.gitlab-ci.yml`.
+
+```
+image: ruby:2.7
+
+pages:
+  script:
+    - gem install bundler
+    - bundle install
+    - bundle exec jekyll build -d public
+  artifacts:
+    paths:
+      - public
+```
+
+Create `Gemfile`.
+
+```
+source "https://rubygems.org"
+
+gem "jekyll"
 ```
 
