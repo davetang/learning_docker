@@ -134,7 +134,7 @@ docker run --rm -it -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitla
 # Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
 ```
 
-In the `Admin Area` and `Runners` section, you should now see the Runner you registered.
+In the `Admin Area` and `Runners` section, you should now see the Runner you registered. However the hyperlink for the Runner is the IP address of our Docker container. To change the settings of the Runner, right-click and save link as. Then paste the link but change the IP address to `localhost:8889` (for example: http://localhost:8889/admin/runners/4). Make sure the `Run untagged jobs` is checked/ticked and then `Save changes`.
 
 ## Clone
 
