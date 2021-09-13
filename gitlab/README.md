@@ -1,6 +1,8 @@
 # README
 
-[GitLab Docker images](https://docs.gitlab.com/ee/install/docker.html) are monolithic images of GitLab running all the necessary services in a single container. Official Docker image at <https://hub.docker.com/r/gitlab/gitlab-ee/>, which contains the GitLab Enterprise Edition image based on the Omnibus package. This container uses the official Omnibus GitLab package, so all configuration is done in the unique configuration file `/etc/gitlab/gitlab.rb`.
+Set up your own GitLab server using Docker! The [GitLab Docker images](https://docs.gitlab.com/ee/install/docker.html) contain all the necessary services in a single container. Official Docker images are at <https://hub.docker.com/r/gitlab/gitlab-ee/> and contain the GitLab Enterprise Edition image based on the Omnibus package. All configurations are done in the unique configuration file `/etc/gitlab/gitlab.rb` for containers using the official Omnibus GitLab package.
+
+First we'll pull the latest image. (Use a version tag instead of simply using latest.)
 
 ```bash
 docker pull gitlab/gitlab-ee:14.2.3-ee.0
@@ -10,7 +12,7 @@ docker images gitlab/gitlab-ee:14.2.3-ee.0
 # gitlab/gitlab-ee   14.2.3-ee.0   9654fe42c8b2   9 days ago   2.43GB
 ```
 
-Start a container. (This takes a couple of minutes to start up depending on your compute resources; check `docker ps -a` and make sure the container does not say "health: starting" anymore.)
+Next we'll run a container in detached mode, expose some ports, and mount some volumes. (The container takes a couple of minutes to start up [especially the first time you run this step]; check `docker ps -a` and make sure the container does not say "health: starting" anymore.)
 
 ```bash
 export GITLAB_HOME=$HOME/gitlab
@@ -27,31 +29,43 @@ docker run \
   gitlab/gitlab-ee:14.2.3-ee.0
 ```
 
-Visit `localhost:8889` and log in with username root and the password from the following command:
+If all goes well you should be able to see the GitLab page at <localhost:8889>.
 
-```bash
-docker exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_password
-```
+## Configuring
 
-To edit configuration file use `docker exec`.
+To edit the configuration file use `docker exec` (after you have started the container).
 
 ```bash
 docker exec -it gitlab vi /etc/gitlab/gitlab.rb
 ```
 
-Use `docker restart` to restart container.
+For your changes to take effect, use `docker restart` to restart container (or run `gitlab-ctl reconfigure`).
 
 ```bash
 docker restart gitlab
+
+# or
+
+docker exec -it gitlab /bin/bash
+gitlab-ctl reconfigure
+exit
 ```
 
 ## Add user
 
-Logout from `root` account, then register a new account on the main page. Log back in as `root` and click `Menu` and then `Admin`. Then goto `Users` in the left menu bar and click the `Pending approval` tab and approve. Once approved go to the `Active` tab, click on the new user's name, look for the `Edit` button near the top right and click on it, and change the access level to `Admin`. 
+To create your own account, visit `localhost:8889` and register a new acccount; it will say that the account is pending. Next log in with username `root` and the password from the following command.
+
+```bash
+docker exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_password
+```
+
+Click on `Menu` and then `Admin`. Then go to `Users` in the left menu bar and click on the `Pending approval` tab and approve the account you just registered. Once approved go to the `Active` tab, click on the new user's name, look for the `Edit` button near the top right and click on it, and change the access level to `Admin`. 
 
 ## SSH key
 
-Add the following to `~/.ssh/config`.
+First create your key pair and save the public SSH key. In your `User Settings` click on `SSH Keys` and paste the public key.
+
+Next, add the following to `~/.ssh/config` on your local computer.
 
 ```
 Host localhost
@@ -61,7 +75,7 @@ Host localhost
  Port 7778
 ```
 
-Check.
+Check to see if it works.
 
 ```bash
 ssh -T git@localhost
@@ -70,22 +84,57 @@ ssh -T git@localhost
 
 ## GitLab Runner
 
-[Install GitLab Runner](https://docs.gitlab.com/runner/install/).
+The [GitLab Runner](https://docs.gitlab.com/runner/) is an application that works with GitLab CI/CD to run jobs in a pipeline. We can also [install the GitLab Runner](https://docs.gitlab.com/runner/install/docker.html) in a container. But first, we need to find the IP address of our GitLab container by running the following.
 
 ```bash
-# Download the binary for your system
-curl -L --output /usr/local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
-
-# Give it permissions to execute
-chmod +x /usr/local/bin/gitlab-runner
-
-# Create a GitLab CI user
-useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
-
-# Install and run as service
-gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
-gitlab-runner start
+docker network inspect bridge | grep "gitlab" -A 3
+                "Name": "gitlab",
+                "EndpointID": "d2e73801e30fbe79c054749a111e6d7de6a0b3b8badcca33ab027fb074b5e5ba",
+                "MacAddress": "02:42:ac:11:00:05",
+                "IPv4Address": "172.17.0.5/16",
 ```
+
+The IP is `172.17.0.5`. Next set the following in `/etc/gitlab/gitlab.rb`:
+
+* `external_url 'http://172.17.0.5'`.
+* `pages_external_url "http://localhost/"`
+
+```bash
+docker exec -it gitlab /bin/bash
+vi /etc/gitlab/gitlab.rb
+gitlab-ctl reconfigure
+exit
+```
+
+Now pull the `gitlab-runner` image and start a container.
+
+```bash
+docker pull gitlab/gitlab-runner:ubuntu-v14.2.0
+
+docker run \
+  -d \
+  --name gitlab-runner \
+  -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  gitlab/gitlab-runner:ubuntu-v14.2.0
+```
+
+Log into <localhost:8889> and go to the `Admin Area` and `Runners` and copy the registration token. When prompted:
+
+* Use the IP of the container: 172.17.0.5
+* Use the registration token from the Admin page of `localhost:8889`
+* Enter a description
+* Enter tags
+* Enter `docker` as your executor
+* Enter a default Docker image, such as `ruby:2.7`
+
+```bash
+docker run --rm -it -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner:ubuntu-v14.2.0 register
+
+# Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
+```
+
+In the `Admin Area` and `Runners` section, you should now see the Runner you registered.
 
 ## Clone
 
@@ -102,14 +151,7 @@ git clone git@localhost:davetang/test_pages.git
 
 ## GitLab Pages
 
-See [GitLab Pages](https://docs.gitlab.com/ee/user/project/pages/) and following the tutorial for [creating a GitLab Pages website from scratch](https://docs.gitlab.com/ee/user/project/pages/getting_started/pages_from_scratch.html). Firstly, create a new project using the GUI.
-
-```bash
-git clone git@localhost:davetang/static_html.git
-cd static_html
-```
-
-Create `index.html`.
+To create a new [GitLab Pages](https://docs.gitlab.com/ee/user/project/pages/) create a new project; I will call my new project `pages-test`. Add a new HTML file with the following.
 
 ```
  <html>
@@ -117,31 +159,36 @@ Create `index.html`.
    <title>Home</title>
  </head>
  <body>
-   <h1>Hello World!</h1>
+   <h1>It's working!</h1>
  </body>
  </html>
 ```
 
-Create `.gitlab-ci.yml`.
+Add a new file called `.gitlab-ci.yml` with the following.
 
 ```
-image: ruby:2.7
+# This file is a template, and might need editing before it works on your project.
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Pages/HTML.gitlab-ci.yml
 
+# Full project: https://gitlab.com/pages/plain-html
 pages:
+  stage: deploy
   script:
-    - gem install bundler
-    - bundle install
-    - bundle exec jekyll build -d public
+    - mkdir .public
+    - cp -r * .public
+    - mv .public public
   artifacts:
     paths:
       - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 ```
 
-Create `Gemfile`.
+If you go to `CI/CD` and then `Pipelines`, hopefully the page successfully built and passed. Go to `Settings` and then `Pages` to find the URL of your page site. It should look something like `http://username.localhost/pages-test`. In this guide I have forwarded post `80` to `8889`, so you will have to visit <http://username.localhost:8889/pages-test> to see the site.
 
-```
-source "https://rubygems.org"
-
-gem "jekyll"
-```
+See [GitLab Pages administration](https://docs.gitlab.com/ee/administration/pages/index.html) for information on how to administer GitLab Pages.
 
