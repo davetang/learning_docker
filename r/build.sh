@@ -1,9 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 ver=$(cat Dockerfile | grep "^FROM" | cut -f2 -d':')
+image=r_build
 
-docker build -t davetang/r_build:${ver} .
+docker build -t davetang/${image}:${ver} .
 
 # docker login
-# docker push davetang/rstudio:${ver}
+# docker push davetang/${image}:${ver}
 

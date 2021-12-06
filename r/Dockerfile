@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.1.0
+FROM rocker/r-ver:4.1.2
 
 MAINTAINER Dave Tang <me@davetang.org>
 
@@ -28,11 +28,13 @@ RUN apt-get clean all && \
       wget \
       curl \
       zlib1g-dev \
+      python3-pip \
    && apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse'));"
+RUN pip install --upgrade pip && pip install mkdocs
 
 WORKDIR /work
 
