@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-ver=0.0.1
+ver=0.0.2
 
 docker build -t davetang/mkdocs:${ver} .
 
