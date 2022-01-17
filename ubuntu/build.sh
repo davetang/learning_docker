@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-ver=1.0
+# use Ubuntu 20.04
+ver=1.1
 
 docker build -t davetang/build:${ver} .
 

@@ -1,6 +1,8 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 MAINTAINER Dave Tang <me@davetang.org>
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get clean all && \
    apt-get update && \
@@ -23,6 +25,7 @@ RUN apt-get clean all && \
       time \
       unzip \
       vim \
+      pigz \
       wget \
       zlib1g-dev \
    && apt-get clean all && \
@@ -30,10 +33,10 @@ RUN apt-get clean all && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # CMake
-RUN cd /tmp/ && \
-   wget https://github.com/Kitware/CMake/releases/download/v3.16.5/cmake-3.16.5.tar.gz && \
-   tar -zxf cmake-3.16.5.tar.gz && \
-   cd cmake-3.16.5 && \
+RUN cmake_ver=3.22.1 && cd /tmp/ && \
+   wget https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}.tar.gz && \
+   tar -zxf cmake-${cmake_ver}.tar.gz && \
+   cd cmake-${cmake_ver} && \
    ./bootstrap && \
    make && \
    make install
