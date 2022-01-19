@@ -7,6 +7,7 @@ Table of Contents
    * [Installing the Docker Engine](#installing-the-docker-engine)
    * [Checking your installation](#checking-your-installation)
    * [Basics](#basics)
+   * [Start containers automatically](#start-containers-automatically)
    * [Dockerfile](#dockerfile)
    * [CMD](#cmd)
    * [ENTRYPOINT](#entrypoint)
@@ -33,7 +34,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Tue Jan 11 04:24:20 UTC 2022
+Wed Jan 19 02:02:45 UTC 2022
 
 Learning Docker
 ================
@@ -91,7 +92,7 @@ docker run --rm hello-world
     ## 2db29710123e: Verifying Checksum
     ## 2db29710123e: Download complete
     ## 2db29710123e: Pull complete
-    ## Digest: sha256:2498fce14358aa50ead0cc6c19990fc6ff866ce72aeb5546e1d59caac3d0d60f
+    ## Digest: sha256:975f4b14f326b05db86e16de00144f9c12257553bba9484fed41f9b6f2257800
     ## Status: Downloaded newer image for hello-world:latest
     ## 
     ## Hello from Docker!
@@ -138,12 +139,8 @@ docker pull ubuntu:18.04
 ```
 
     ## 18.04: Pulling from library/ubuntu
-    ## 2f94e549220a: Pulling fs layer
-    ## 2f94e549220a: Verifying Checksum
-    ## 2f94e549220a: Download complete
-    ## 2f94e549220a: Pull complete
     ## Digest: sha256:37b7471c1945a2a12e5a57488ee4e3e216a8369d0b9ee1ec2e41db9c2c1e3d22
-    ## Status: Downloaded newer image for ubuntu:18.04
+    ## Status: Image is up to date for ubuntu:18.04
     ## docker.io/library/ubuntu:18.04
 
 To run Ubuntu using Docker, we use `docker run`.
@@ -178,6 +175,38 @@ is saved up until the point that you exit; all changes you made, files
 you created, etc. are saved. Why am I deleting all my changes? Because
 there is a better (and more reproducible) way to make changes to the
 system and that is by using a Dockerfile.
+
+## Start containers automatically
+
+When hosting a service using Docker (such as running [RStudio
+Server](https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/)),
+it would be nice if the container automatically starts up again when the
+server (and Docker) restarts. If you use `--restart flag` with `docker
+run`, Docker will [restart your
+container](https://docs.docker.com/config/containers/start-containers-automatically/)
+when they your container is exited or when Docker restarts. The value of
+the `--restart` flag can be the following:
+
+  - `no` - do not automatically restart (default)
+  - `on-failure[:max-retries]` - restarts if it exits due to an error
+    (non-zero exit code) and the number of attempts is limited using the
+    `max-retries` option
+  - `always` - always restarts the container; if it is manually stopped,
+    it is restarted only when the Docker daemon restarts (or when the
+    container is manually restarted)
+  - `unless-stopped` - similar to `always` but when the container is
+    stopped, it is not restarted even after the Docker daemon restarts.
+
+<!-- end list -->
+
+``` bash
+docker run --rm \
+           -p 8888:8787 \
+           -d \
+           --restart always \
+           -e PASSWORD=password \
+           rocker/rstudio:4.0.5
+```
 
 ## Dockerfile
 
@@ -319,15 +348,15 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
-    ## 5f22362f8660: Verifying Checksum
-    ## 5f22362f8660: Download complete
     ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
+    ## feac53061382: Pull complete
     ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
-    ## feac53061382: Pull complete
+    ## 5f22362f8660: Verifying Checksum
+    ## 5f22362f8660: Download complete
     ## 549f86662946: Pull complete
     ## 5f22362f8660: Pull complete
     ## 3836f06c7ac7: Pull complete
@@ -469,15 +498,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.25 sec
+    ## [bwa_index] Pack FASTA... 0.19 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 4.64 seconds elapse.
-    ## [bwa_index] Update BWT... 0.10 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.17 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 2.59 sec
+    ## [bwa_index] 3.65 seconds elapse.
+    ## [bwa_index] Update BWT... 0.09 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.15 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 1.70 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 7.886 sec; CPU: 7.793 sec
+    ## [main] Real time: 5.852 sec; CPU: 5.813 sec
 
 We can see the newly created index files.
 
@@ -486,13 +515,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Jan 11 04:19 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Jan 11 04:19 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Jan 11 04:23 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Jan 11 04:23 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Jan 11 04:23 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Jan 11 04:23 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Jan 11 04:23 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Jan 19 01:58 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Jan 19 01:58 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Jan 19 02:02 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Jan 19 02:02 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Jan 19 02:02 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Jan 19 02:02 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Jan 19 02:02 chrI.fa.gz.sa
 
 ### File permissions
 
@@ -636,7 +665,7 @@ docker images busybox
 ```
 
     ## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-    ## busybox      latest    beae173ccac6   11 days ago   1.24MB
+    ## busybox      latest    beae173ccac6   2 weeks ago   1.24MB
 
 Remove `busybox`.
 
@@ -723,8 +752,8 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                              PORTS     NAMES
-    ## 472358ee063e   hello-world   "/hello"   1 second ago   Exited (0) Less than a second ago             cranky_euclid
+    ## CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS                              PORTS     NAMES
+    ## 0657df015a54   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             silly_borg
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -733,7 +762,7 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 472358ee063e
+    ## 0657df015a54
 
 Check to see if the container still exists.
 
@@ -846,18 +875,22 @@ docker run --rm rocker/r-ver:4.1.0
 
     ## Unable to find image 'rocker/r-ver:4.1.0' locally
     ## 4.1.0: Pulling from rocker/r-ver
-    ## 7b1a6ab2e44d: Already exists
+    ## 7b1a6ab2e44d: Pulling fs layer
     ## 34cb923ed704: Pulling fs layer
     ## f2f213d01c8c: Pulling fs layer
     ## 7c05c07f0160: Pulling fs layer
     ## f72cf49d9462: Pulling fs layer
+    ## 7c05c07f0160: Waiting
     ## f72cf49d9462: Waiting
     ## 34cb923ed704: Verifying Checksum
     ## 34cb923ed704: Download complete
+    ## 7b1a6ab2e44d: Verifying Checksum
+    ## 7b1a6ab2e44d: Download complete
     ## 7c05c07f0160: Verifying Checksum
     ## 7c05c07f0160: Download complete
     ## f72cf49d9462: Verifying Checksum
     ## f72cf49d9462: Download complete
+    ## 7b1a6ab2e44d: Pull complete
     ## 34cb923ed704: Pull complete
     ## f2f213d01c8c: Verifying Checksum
     ## f2f213d01c8c: Download complete
