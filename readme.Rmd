@@ -71,12 +71,13 @@ When hosting a service using Docker (such as running [RStudio Server](https://da
 * `unless-stopped` - similar to `always` but when the container is stopped, it is not restarted even after the Docker daemon restarts.
 
 ```bash
-docker run --rm \
-           -p 8888:8787 \
-           -d \
-           --restart always \
-           -e PASSWORD=password \
-           rocker/rstudio:4.0.5
+docker run -d \
+   --restart always \
+   -p 8888:8787 \
+   -e PASSWORD=password \
+   -e USERID=$(id -u) \
+   -e GROUPID=$(id -g) \
+   rocker/rstudio:4.1.2
 ```
 
 ## Dockerfile
