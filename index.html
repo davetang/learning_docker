@@ -57,6 +57,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#basics">Basics</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#start-containers-automatically">Start containers automatically</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#dockerfile">Dockerfile</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#cmd">CMD</a>
@@ -181,7 +183,7 @@ automatically remove the container when it exits.)</p>
 ## 2db29710123e: Verifying Checksum
 ## 2db29710123e: Download complete
 ## 2db29710123e: Pull complete
-## Digest: sha256:2498fce14358aa50ead0cc6c19990fc6ff866ce72aeb5546e1d59caac3d0d60f
+## Digest: sha256:975f4b14f326b05db86e16de00144f9c12257553bba9484fed41f9b6f2257800
 ## Status: Downloaded newer image for hello-world:latest
 ## 
 ## Hello from Docker!
@@ -223,12 +225,8 @@ repository</a> from Docker Hub by running
 <pre><code class="language-bash">docker pull ubuntu:18.04
 </code></pre>
 <pre><code>## 18.04: Pulling from library/ubuntu
-## 2f94e549220a: Pulling fs layer
-## 2f94e549220a: Verifying Checksum
-## 2f94e549220a: Download complete
-## 2f94e549220a: Pull complete
 ## Digest: sha256:37b7471c1945a2a12e5a57488ee4e3e216a8369d0b9ee1ec2e41db9c2c1e3d22
-## Status: Downloaded newer image for ubuntu:18.04
+## Status: Image is up to date for ubuntu:18.04
 ## docker.io/library/ubuntu:18.04
 </code></pre>
 <p>To run Ubuntu using Docker, we use <code>docker run</code>.</p>
@@ -257,6 +255,35 @@ is saved up until the point that you exit; all changes you made, files
 you created, etc. are saved. Why am I deleting all my changes? Because
 there is a better (and more reproducible) way to make changes to the
 system and that is by using a Dockerfile.</p>
+<h2 id="start-containers-automatically">Start containers automatically</h2>
+<p>When hosting a service using Docker (such as running <a href="https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/">RStudio
+Server</a>),
+it would be nice if the container automatically starts up again when the
+server (and Docker) restarts. If you use <code>--restart flag</code> with <code>docker
+run</code>, Docker will <a href="https://docs.docker.com/config/containers/start-containers-automatically/">restart your
+container</a>
+when they your container is exited or when Docker restarts. The value of
+the <code>--restart</code> flag can be the following:</p>
+<ul>
+<li><code>no</code> - do not automatically restart (default)</li>
+<li><code>on-failure[:max-retries]</code> - restarts if it exits due to an error
+    (non-zero exit code) and the number of attempts is limited using the
+    <code>max-retries</code> option</li>
+<li><code>always</code> - always restarts the container; if it is manually stopped,
+    it is restarted only when the Docker daemon restarts (or when the
+    container is manually restarted)</li>
+<li><code>unless-stopped</code> - similar to <code>always</code> but when the container is
+    stopped, it is not restarted even after the Docker daemon restarts.</li>
+</ul>
+<!-- end list -->
+
+<pre><code class="language-bash">docker run --rm \
+           -p 8888:8787 \
+           -d \
+           --restart always \
+           -e PASSWORD=password \
+           rocker/rstudio:4.0.5
+</code></pre>
 <h2 id="dockerfile">Dockerfile</h2>
 <p>A Dockerfile is a text file that contains instructions for building
 Docker images. A Dockerfile adheres to a specific format and set of
@@ -369,15 +396,15 @@ documentation</a>.</p>
 ## 5f22362f8660: Pulling fs layer
 ## 3836f06c7ac7: Pulling fs layer
 ## 3836f06c7ac7: Waiting
-## 5f22362f8660: Verifying Checksum
-## 5f22362f8660: Download complete
 ## feac53061382: Verifying Checksum
 ## feac53061382: Download complete
 ## 3836f06c7ac7: Verifying Checksum
 ## 3836f06c7ac7: Download complete
+## feac53061382: Pull complete
 ## 549f86662946: Verifying Checksum
 ## 549f86662946: Download complete
-## feac53061382: Pull complete
+## 5f22362f8660: Verifying Checksum
+## 5f22362f8660: Download complete
 ## 549f86662946: Pull complete
 ## 5f22362f8660: Pull complete
 ## 3836f06c7ac7: Pull complete
@@ -498,27 +525,27 @@ inside <code>data</code> on the host. The command below will create BWA index fi
 for <code>data/chrI.fa.gz</code>.</p>
 <pre><code class="language-bash">docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 </code></pre>
-<pre><code>## [bwa_index] Pack FASTA... 0.25 sec
+<pre><code>## [bwa_index] Pack FASTA... 0.19 sec
 ## [bwa_index] Construct BWT for the packed sequence...
-## [bwa_index] 4.64 seconds elapse.
-## [bwa_index] Update BWT... 0.10 sec
-## [bwa_index] Pack forward-only FASTA... 0.17 sec
-## [bwa_index] Construct SA from BWT and Occ... 2.59 sec
+## [bwa_index] 3.65 seconds elapse.
+## [bwa_index] Update BWT... 0.09 sec
+## [bwa_index] Pack forward-only FASTA... 0.15 sec
+## [bwa_index] Construct SA from BWT and Occ... 1.70 sec
 ## [main] Version: 0.7.17-r1188
 ## [main] CMD: bwa index chrI.fa.gz
-## [main] Real time: 7.886 sec; CPU: 7.793 sec
+## [main] Real time: 5.852 sec; CPU: 5.813 sec
 </code></pre>
 <p>We can see the newly created index files.</p>
 <pre><code class="language-bash">ls -lrt data
 </code></pre>
 <pre><code>## total 30436
-## -rw-r--r-- 1 runner docker      194 Jan 11 04:19 README.md
-## -rw-r--r-- 1 runner docker  4772981 Jan 11 04:19 chrI.fa.gz
-## -rw-r--r-- 1 root   root   15072516 Jan 11 04:23 chrI.fa.gz.bwt
-## -rw-r--r-- 1 root   root    3768110 Jan 11 04:23 chrI.fa.gz.pac
-## -rw-r--r-- 1 root   root         41 Jan 11 04:23 chrI.fa.gz.ann
-## -rw-r--r-- 1 root   root         13 Jan 11 04:23 chrI.fa.gz.amb
-## -rw-r--r-- 1 root   root    7536272 Jan 11 04:23 chrI.fa.gz.sa
+## -rw-r--r-- 1 runner docker      194 Jan 19 01:58 README.md
+## -rw-r--r-- 1 runner docker  4772981 Jan 19 01:58 chrI.fa.gz
+## -rw-r--r-- 1 root   root   15072516 Jan 19 02:02 chrI.fa.gz.bwt
+## -rw-r--r-- 1 root   root    3768110 Jan 19 02:02 chrI.fa.gz.pac
+## -rw-r--r-- 1 root   root         41 Jan 19 02:02 chrI.fa.gz.ann
+## -rw-r--r-- 1 root   root         13 Jan 19 02:02 chrI.fa.gz.amb
+## -rw-r--r-- 1 root   root    7536272 Jan 19 02:02 chrI.fa.gz.sa
 </code></pre>
 <h3 id="file-permissions">File permissions</h3>
 <p>On newer version of Docker, you no longer have to worry about this.
@@ -632,7 +659,7 @@ find stopped containers and <code>docker rm</code> to remove these containers.</
 <pre><code class="language-bash">docker images busybox
 </code></pre>
 <pre><code>## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-## busybox      latest    beae173ccac6   11 days ago   1.24MB
+## busybox      latest    beae173ccac6   2 weeks ago   1.24MB
 </code></pre>
 <p>Remove <code>busybox</code>.</p>
 <pre><code class="language-bash">docker rmi busybox
@@ -699,14 +726,14 @@ container exits. For example:</p>
 <p>Show all containers.</p>
 <pre><code class="language-bash">docker ps -a
 </code></pre>
-<pre><code>## CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                              PORTS     NAMES
-## 472358ee063e   hello-world   "/hello"   1 second ago   Exited (0) Less than a second ago             cranky_euclid
+<pre><code>## CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS                              PORTS     NAMES
+## 0657df015a54   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             silly_borg
 </code></pre>
 <p>We can use a sub-shell to get all (<code>-a</code>) container IDs (<code>-q</code>) that have
 exited (<code>-f status=exited</code>) and then remove them (<code>docker rm -v</code>).</p>
 <pre><code class="language-bash">docker rm -v $(docker ps -a -q -f status=exited)
 </code></pre>
-<pre><code>## 472358ee063e
+<pre><code>## 0657df015a54
 </code></pre>
 <p>Check to see if the container still exists.</p>
 <pre><code class="language-bash">docker ps -a
@@ -792,18 +819,22 @@ for example <code>rocker/r-ver:4.1.0</code>.</p>
 </code></pre>
 <pre><code>## Unable to find image 'rocker/r-ver:4.1.0' locally
 ## 4.1.0: Pulling from rocker/r-ver
-## 7b1a6ab2e44d: Already exists
+## 7b1a6ab2e44d: Pulling fs layer
 ## 34cb923ed704: Pulling fs layer
 ## f2f213d01c8c: Pulling fs layer
 ## 7c05c07f0160: Pulling fs layer
 ## f72cf49d9462: Pulling fs layer
+## 7c05c07f0160: Waiting
 ## f72cf49d9462: Waiting
 ## 34cb923ed704: Verifying Checksum
 ## 34cb923ed704: Download complete
+## 7b1a6ab2e44d: Verifying Checksum
+## 7b1a6ab2e44d: Download complete
 ## 7c05c07f0160: Verifying Checksum
 ## 7c05c07f0160: Download complete
 ## f72cf49d9462: Verifying Checksum
 ## f72cf49d9462: Download complete
+## 7b1a6ab2e44d: Pull complete
 ## 34cb923ed704: Pull complete
 ## f2f213d01c8c: Verifying Checksum
 ## f2f213d01c8c: Download complete
@@ -957,5 +988,5 @@ clean up package manager caches to minimise image size:</p>
 
 <!--
 MkDocs version : 1.2.3
-Build Date UTC : 2022-01-11 04:24:28.965446+00:00
+Build Date UTC : 2022-01-19 02:02:54.314704+00:00
 -->
