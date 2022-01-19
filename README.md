@@ -34,7 +34,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Wed Jan 19 02:02:45 UTC 2022
+Wed Jan 19 02:49:21 UTC 2022
 
 Learning Docker
 ================
@@ -184,8 +184,8 @@ it would be nice if the container automatically starts up again when the
 server (and Docker) restarts. If you use `--restart flag` with `docker
 run`, Docker will [restart your
 container](https://docs.docker.com/config/containers/start-containers-automatically/)
-when they your container is exited or when Docker restarts. The value of
-the `--restart` flag can be the following:
+when your container has exited or when Docker restarts. The value of the
+`--restart` flag can be the following:
 
   - `no` - do not automatically restart (default)
   - `on-failure[:max-retries]` - restarts if it exits due to an error
@@ -348,15 +348,15 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
+    ## 5f22362f8660: Verifying Checksum
+    ## 5f22362f8660: Download complete
     ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
-    ## feac53061382: Pull complete
     ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
-    ## 5f22362f8660: Verifying Checksum
-    ## 5f22362f8660: Download complete
+    ## feac53061382: Pull complete
     ## 549f86662946: Pull complete
     ## 5f22362f8660: Pull complete
     ## 3836f06c7ac7: Pull complete
@@ -498,15 +498,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.19 sec
+    ## [bwa_index] Pack FASTA... 0.22 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 3.65 seconds elapse.
-    ## [bwa_index] Update BWT... 0.09 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.15 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 1.70 sec
+    ## [bwa_index] 7.46 seconds elapse.
+    ## [bwa_index] Update BWT... 0.10 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.17 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 2.11 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 5.852 sec; CPU: 5.813 sec
+    ## [main] Real time: 10.135 sec; CPU: 10.084 sec
 
 We can see the newly created index files.
 
@@ -515,13 +515,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Jan 19 01:58 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Jan 19 01:58 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Jan 19 02:02 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Jan 19 02:02 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Jan 19 02:02 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Jan 19 02:02 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Jan 19 02:02 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Jan 19 02:43 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Jan 19 02:43 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Jan 19 02:48 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Jan 19 02:48 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Jan 19 02:48 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Jan 19 02:48 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Jan 19 02:48 chrI.fa.gz.sa
 
 ### File permissions
 
@@ -752,8 +752,8 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS                              PORTS     NAMES
-    ## 0657df015a54   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             silly_borg
+    ## CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                              PORTS     NAMES
+    ## 8a680de788e8   hello-world   "/hello"   1 second ago   Exited (0) Less than a second ago             intelligent_lamport
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -762,7 +762,7 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 0657df015a54
+    ## 8a680de788e8
 
 Check to see if the container still exists.
 
@@ -992,6 +992,19 @@ RUN apt-get update \
          python-dev \
       && apt-get clean all \
       && rm -rf /var/lib/apt/lists/*
+```
+
+I have found it handy to mount my current directory to the same path
+inside a Docker container and to [set it as the working
+directory](https://docs.docker.com/engine/reference/commandline/run/#set-working-directory--w);
+the directory will be automatically created inside the container if it
+does not already exist. When the container starts up, I will
+conveniently be in my current directory. In the command below I have
+also added the `-u` option, which sets the user to
+`<name|uid>[:<group|gid>]`.
+
+``` bash
+docker run --rm -it -u $(stat -c "%u:%g" ${HOME}) -v $(pwd):$(pwd) -w $(pwd) davetang/build:1.1 /bin/bash
 ```
 
 ## Useful links
