@@ -34,7 +34,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Wed Jan 19 02:49:21 UTC 2022
+Wed Jan 19 03:00:01 UTC 2022
 
 Learning Docker
 ================
@@ -200,12 +200,13 @@ when your container has exited or when Docker restarts. The value of the
 <!-- end list -->
 
 ``` bash
-docker run --rm \
-           -p 8888:8787 \
-           -d \
-           --restart always \
-           -e PASSWORD=password \
-           rocker/rstudio:4.0.5
+docker run -d \
+   --restart always \
+   -p 8888:8787 \
+   -e PASSWORD=password \
+   -e USERID=$(id -u) \
+   -e GROUPID=$(id -g) \
+   rocker/rstudio:4.1.2
 ```
 
 ## Dockerfile
@@ -350,10 +351,10 @@ docker run --rm davetang/bwa:0.7.17
     ## 3836f06c7ac7: Waiting
     ## 5f22362f8660: Verifying Checksum
     ## 5f22362f8660: Download complete
-    ## feac53061382: Verifying Checksum
-    ## feac53061382: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
+    ## feac53061382: Verifying Checksum
+    ## feac53061382: Download complete
     ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
     ## feac53061382: Pull complete
@@ -498,15 +499,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.22 sec
+    ## [bwa_index] Pack FASTA... 0.20 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 7.46 seconds elapse.
-    ## [bwa_index] Update BWT... 0.10 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.17 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 2.11 sec
+    ## [bwa_index] 5.81 seconds elapse.
+    ## [bwa_index] Update BWT... 0.09 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.15 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 2.08 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 10.135 sec; CPU: 10.084 sec
+    ## [main] Real time: 8.428 sec; CPU: 8.374 sec
 
 We can see the newly created index files.
 
@@ -515,13 +516,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Jan 19 02:43 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Jan 19 02:43 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Jan 19 02:48 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Jan 19 02:48 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Jan 19 02:48 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Jan 19 02:48 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Jan 19 02:48 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Jan 19 02:55 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Jan 19 02:55 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Jan 19 02:59 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Jan 19 02:59 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Jan 19 02:59 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Jan 19 02:59 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Jan 19 02:59 chrI.fa.gz.sa
 
 ### File permissions
 
@@ -651,7 +652,6 @@ docker pull busybox
     ## Using default tag: latest
     ## latest: Pulling from library/busybox
     ## 5cc84ad355aa: Pulling fs layer
-    ## 5cc84ad355aa: Verifying Checksum
     ## 5cc84ad355aa: Download complete
     ## 5cc84ad355aa: Pull complete
     ## Digest: sha256:5acba83a746c7608ed544dc1533b87c737a0b0fb730301639a0179f9344b1678
@@ -752,8 +752,8 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                              PORTS     NAMES
-    ## 8a680de788e8   hello-world   "/hello"   1 second ago   Exited (0) Less than a second ago             intelligent_lamport
+    ## CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS                              PORTS     NAMES
+    ## afd7d71de2dc   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             peaceful_engelbart
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -762,7 +762,7 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 8a680de788e8
+    ## afd7d71de2dc
 
 Check to see if the container still exists.
 
@@ -884,16 +884,16 @@ docker run --rm rocker/r-ver:4.1.0
     ## f72cf49d9462: Waiting
     ## 34cb923ed704: Verifying Checksum
     ## 34cb923ed704: Download complete
-    ## 7b1a6ab2e44d: Verifying Checksum
-    ## 7b1a6ab2e44d: Download complete
     ## 7c05c07f0160: Verifying Checksum
     ## 7c05c07f0160: Download complete
     ## f72cf49d9462: Verifying Checksum
     ## f72cf49d9462: Download complete
+    ## 7b1a6ab2e44d: Verifying Checksum
+    ## 7b1a6ab2e44d: Download complete
     ## 7b1a6ab2e44d: Pull complete
-    ## 34cb923ed704: Pull complete
     ## f2f213d01c8c: Verifying Checksum
     ## f2f213d01c8c: Download complete
+    ## 34cb923ed704: Pull complete
     ## f2f213d01c8c: Pull complete
     ## 7c05c07f0160: Pull complete
     ## f72cf49d9462: Pull complete
