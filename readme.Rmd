@@ -63,7 +63,7 @@ You may have noticed that I keep using the `--rm` option, which removes the cont
 
 ## Start containers automatically
 
-When hosting a service using Docker (such as running [RStudio Server](https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/)), it would be nice if the container automatically starts up again when the server (and Docker) restarts. If you use `--restart flag` with `docker run`, Docker will [restart your container](https://docs.docker.com/config/containers/start-containers-automatically/) when they your container is exited or when Docker restarts. The value of the `--restart` flag can be the following:
+When hosting a service using Docker (such as running [RStudio Server](https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/)), it would be nice if the container automatically starts up again when the server (and Docker) restarts. If you use `--restart flag` with `docker run`, Docker will [restart your container](https://docs.docker.com/config/containers/start-containers-automatically/) when your container has exited or when Docker restarts. The value of the `--restart` flag can be the following:
 
 * `no` - do not automatically restart (default)
 * `on-failure[:max-retries]` - restarts if it exits due to an error (non-zero exit code) and the number of attempts is limited using the `max-retries` option
@@ -543,6 +543,12 @@ RUN apt-get update \
          python-dev \
       && apt-get clean all \
       && rm -rf /var/lib/apt/lists/*
+```
+
+I have found it handy to mount my current directory to the same path inside a Docker container and to [set it as the working directory](https://docs.docker.com/engine/reference/commandline/run/#set-working-directory--w); the directory will be automatically created inside the container if it does not already exist. When the container starts up, I will conveniently be in my current directory. In the command below I have also added the `-u` option, which sets the user to `<name|uid>[:<group|gid>]`.
+
+```bash
+docker run --rm -it -u $(stat -c "%u:%g" ${HOME}) -v $(pwd):$(pwd) -w $(pwd) davetang/build:1.1 /bin/bash
 ```
 
 ## Useful links
