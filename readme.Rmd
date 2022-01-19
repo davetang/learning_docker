@@ -61,6 +61,24 @@ docker run --rm -it ubuntu:18:04 /bin/bash
 
 You may have noticed that I keep using the `--rm` option, which removes the container once you quit. If you don't use this option, the container is saved up until the point that you exit; all changes you made, files you created, etc. are saved. Why am I deleting all my changes? Because there is a better (and more reproducible) way to make changes to the system and that is by using a Dockerfile.
 
+## Start containers automatically
+
+When hosting a service using Docker (such as running [RStudio Server](https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/)), it would be nice if the container automatically starts up again when the server (and Docker) restarts. If you use `--restart flag` with `docker run`, Docker will [restart your container](https://docs.docker.com/config/containers/start-containers-automatically/) when they your container is exited or when Docker restarts. The value of the `--restart` flag can be the following:
+
+* `no` - do not automatically restart (default)
+* `on-failure[:max-retries]` - restarts if it exits due to an error (non-zero exit code) and the number of attempts is limited using the `max-retries` option
+* `always` - always restarts the container; if it is manually stopped, it is restarted only when the Docker daemon restarts (or when the container is manually restarted)
+* `unless-stopped` - similar to `always` but when the container is stopped, it is not restarted even after the Docker daemon restarts.
+
+```bash
+docker run --rm \
+           -p 8888:8787 \
+           -d \
+           --restart always \
+           -e PASSWORD=password \
+           rocker/rstudio:4.0.5
+```
+
 ## Dockerfile
 
 A Dockerfile is a text file that contains instructions for building Docker images. A Dockerfile adheres to a specific format and set of instructions, which you can find at [Dockerfile reference](https://docs.docker.com/engine/reference/builder/). There is also a [Best practices guide](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/) for writing Dockerfiles.
