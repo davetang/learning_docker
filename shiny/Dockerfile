@@ -1,6 +1,6 @@
 FROM rocker/shiny:4.1.2
 
-LABEL source="https://github.com/davetang/learning_docker/blob/master/shiny/Dockerfile"
+LABEL source="https://github.com/davetang/learning_docker/blob/main/shiny/Dockerfile"
 
 MAINTAINER Dave Tang <me@davetang.org>
 

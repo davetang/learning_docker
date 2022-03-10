@@ -1,7 +1,8 @@
 FROM ubuntu:18.04
 
 MAINTAINER Dave Tang <me@davetang.org>
-LABEL source="https://github.com/davetang/learning_docker/blob/master/Dockerfile"
+
+LABEL source="https://github.com/davetang/learning_docker/blob/main/Dockerfile"
 
 RUN apt-get clean all && \
     apt-get update && \
