@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.1.2
+FROM rocker/r-ver:4.1.3
 
 MAINTAINER Dave Tang <me@davetang.org>
 
@@ -29,6 +29,7 @@ RUN apt-get clean all && \
       curl \
       zlib1g-dev \
       python3-pip \
+      pandoc \
    && apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
