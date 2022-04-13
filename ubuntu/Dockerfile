@@ -1,6 +1,7 @@
 FROM ubuntu:20.04
 
 MAINTAINER Dave Tang <me@davetang.org>
+LABEL source="https://github.com/davetang/learning_docker/blob/main/ubuntu/Dockerfile"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -27,6 +28,7 @@ RUN apt-get clean all && \
       vim \
       pigz \
       wget \
+      python3 \
       zlib1g-dev \
    && apt-get clean all && \
    apt-get purge && \
@@ -39,9 +41,8 @@ RUN cmake_ver=3.22.1 && cd /tmp/ && \
    cd cmake-${cmake_ver} && \
    ./bootstrap && \
    make && \
-   make install
-
-RUN rm -rf /tmp/*
+   make install && \
+   rm -rf /tmp/*
 
 WORKDIR /work
 

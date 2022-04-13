@@ -2,11 +2,15 @@
 
 set -euo pipefail
 
-# use Ubuntu 20.04
-ver=1.1
+image=build
+ver=1.2
 
-docker build -t davetang/build:${ver} .
+docker build -t davetang/${image}:${ver} .
 
-# docker login
-# docker push davetang/build:${ver}
+>&2 echo Build complete
+>&2 echo -e "Run the following to push to Docker Hub:\n"
+>&2 echo docker login
+>&2 echo docker push davetang/${image}:${ver}
+
+exit 0
 
