@@ -9,6 +9,7 @@ Table of Contents
    * [Basics](#basics)
    * [Start containers automatically](#start-containers-automatically)
    * [Dockerfile](#dockerfile)
+   * [ARG](#arg)
    * [CMD](#cmd)
    * [ENTRYPOINT](#entrypoint)
    * [Building an image](#building-an-image)
@@ -34,7 +35,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Wed Jan 19 03:00:01 UTC 2022
+Fri Apr 15 05:33:38 UTC 2022
 
 Learning Docker
 ================
@@ -77,7 +78,7 @@ To see if everything is working, try to obtain the Docker version.
 docker --version
 ```
 
-    ## Docker version 20.10.11+azure-3, build dea9396e184290f638ea873c76db7c80efd5a1d2
+    ## Docker version 20.10.14+azure-1, build a224086349269551becacce16e5842ceeb2a98d6
 
 And run the `hello-world` image. (The `--rm` parameter is used to
 automatically remove the container when it exits.)
@@ -89,10 +90,9 @@ docker run --rm hello-world
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
     ## 2db29710123e: Pulling fs layer
-    ## 2db29710123e: Verifying Checksum
     ## 2db29710123e: Download complete
     ## 2db29710123e: Pull complete
-    ## Digest: sha256:975f4b14f326b05db86e16de00144f9c12257553bba9484fed41f9b6f2257800
+    ## Digest: sha256:10d7d58d5ebd2a652f4d93fdd86da8f265f5318c6a73cc5b6a9798ff6d2b2e67
     ## Status: Downloaded newer image for hello-world:latest
     ## 
     ## Hello from Docker!
@@ -139,7 +139,7 @@ docker pull ubuntu:18.04
 ```
 
     ## 18.04: Pulling from library/ubuntu
-    ## Digest: sha256:37b7471c1945a2a12e5a57488ee4e3e216a8369d0b9ee1ec2e41db9c2c1e3d22
+    ## Digest: sha256:982d72c16416b09ffd2f71aa381f761422085eda1379dc66b668653607969e38
     ## Status: Image is up to date for ubuntu:18.04
     ## docker.io/library/ubuntu:18.04
 
@@ -230,7 +230,8 @@ cat Dockerfile
     ## FROM ubuntu:18.04
     ## 
     ## MAINTAINER Dave Tang <me@davetang.org>
-    ## LABEL source="https://github.com/davetang/learning_docker/blob/master/Dockerfile"
+    ## 
+    ## LABEL source="https://github.com/davetang/learning_docker/blob/main/Dockerfile"
     ## 
     ## RUN apt-get clean all && \
     ##     apt-get update && \
@@ -255,6 +256,23 @@ cat Dockerfile
     ## WORKDIR /work
     ## 
     ## CMD ["bwa"]
+
+## ARG
+
+To define variables in your Dockerfile use `ARG name=value`. For
+example, you can use `ARG` to create a new variable that stores a
+version number of a program. When a new version of the program is
+released, you can simply change the `ARG` and re-build your Dockerfile.
+
+    ARG star_ver=2.7.10a
+    RUN cd /usr/src && \
+        wget https://github.com/alexdobin/STAR/archive/refs/tags/${star_ver}.tar.gz && \
+        tar xzf ${star_ver}.tar.gz && \
+        rm ${star_ver}.tar.gz && \
+        cd STAR-${star_ver}/source && \
+        make STAR && \
+        cd /usr/local/bin && \
+        ln -s /usr/src/STAR-${star_ver}/source/STAR .
 
 ## CMD
 
@@ -355,9 +373,9 @@ docker run --rm davetang/bwa:0.7.17
     ## 3836f06c7ac7: Download complete
     ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
+    ## feac53061382: Pull complete
     ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
-    ## feac53061382: Pull complete
     ## 549f86662946: Pull complete
     ## 5f22362f8660: Pull complete
     ## 3836f06c7ac7: Pull complete
@@ -501,13 +519,13 @@ docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 
     ## [bwa_index] Pack FASTA... 0.20 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 5.81 seconds elapse.
-    ## [bwa_index] Update BWT... 0.09 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.15 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 2.08 sec
+    ## [bwa_index] 3.55 seconds elapse.
+    ## [bwa_index] Update BWT... 0.08 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.14 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 1.69 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 8.428 sec; CPU: 8.374 sec
+    ## [main] Real time: 5.735 sec; CPU: 5.697 sec
 
 We can see the newly created index files.
 
@@ -516,13 +534,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Jan 19 02:55 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Jan 19 02:55 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Jan 19 02:59 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Jan 19 02:59 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Jan 19 02:59 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Jan 19 02:59 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Jan 19 02:59 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Apr 15 05:26 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Apr 15 05:26 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Apr 15 05:33 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Apr 15 05:33 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Apr 15 05:33 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Apr 15 05:33 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Apr 15 05:33 chrI.fa.gz.sa
 
 ### File permissions
 
@@ -651,10 +669,11 @@ docker pull busybox
 
     ## Using default tag: latest
     ## latest: Pulling from library/busybox
-    ## 5cc84ad355aa: Pulling fs layer
-    ## 5cc84ad355aa: Download complete
-    ## 5cc84ad355aa: Pull complete
-    ## Digest: sha256:5acba83a746c7608ed544dc1533b87c737a0b0fb730301639a0179f9344b1678
+    ## 50e8d59317eb: Pulling fs layer
+    ## 50e8d59317eb: Verifying Checksum
+    ## 50e8d59317eb: Download complete
+    ## 50e8d59317eb: Pull complete
+    ## Digest: sha256:d2b53584f580310186df7a2055ce3ff83cc0df6caacf1e3489bff8cf5d0af5d8
     ## Status: Downloaded newer image for busybox:latest
     ## docker.io/library/busybox:latest
 
@@ -664,8 +683,8 @@ Check out `busybox`.
 docker images busybox
 ```
 
-    ## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-    ## busybox      latest    beae173ccac6   2 weeks ago   1.24MB
+    ## REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+    ## busybox      latest    1a80408de790   27 hours ago   1.24MB
 
 Remove `busybox`.
 
@@ -674,9 +693,9 @@ docker rmi busybox
 ```
 
     ## Untagged: busybox:latest
-    ## Untagged: busybox@sha256:5acba83a746c7608ed544dc1533b87c737a0b0fb730301639a0179f9344b1678
-    ## Deleted: sha256:beae173ccac6ad749f76713cf4440fe3d21d1043fe616dfbe30775815d1d0f6a
-    ## Deleted: sha256:01fd6df81c8ec7dd24bbbd72342671f41813f992999a3471b9d9cbc44ad88374
+    ## Untagged: busybox@sha256:d2b53584f580310186df7a2055ce3ff83cc0df6caacf1e3489bff8cf5d0af5d8
+    ## Deleted: sha256:1a80408de790c0b1075d0a7e23ff7da78b311f85f36ea10098e4a6184c200964
+    ## Deleted: sha256:eb6b01329ebe73e209e44a616a0e16c2b8e91de6f719df9c35e6cdadadbe5965
 
 ## Committing changes
 
@@ -752,8 +771,8 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS                              PORTS     NAMES
-    ## afd7d71de2dc   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             peaceful_engelbart
+    ## CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                              PORTS     NAMES
+    ## c42e0288ce7a   hello-world   "/hello"   1 second ago   Exited (0) Less than a second ago             angry_joliot
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -762,7 +781,7 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## afd7d71de2dc
+    ## c42e0288ce7a
 
 Check to see if the container still exists.
 
@@ -875,29 +894,29 @@ docker run --rm rocker/r-ver:4.1.0
 
     ## Unable to find image 'rocker/r-ver:4.1.0' locally
     ## 4.1.0: Pulling from rocker/r-ver
-    ## 7b1a6ab2e44d: Pulling fs layer
-    ## 34cb923ed704: Pulling fs layer
-    ## f2f213d01c8c: Pulling fs layer
-    ## 7c05c07f0160: Pulling fs layer
-    ## f72cf49d9462: Pulling fs layer
-    ## 7c05c07f0160: Waiting
-    ## f72cf49d9462: Waiting
-    ## 34cb923ed704: Verifying Checksum
-    ## 34cb923ed704: Download complete
-    ## 7c05c07f0160: Verifying Checksum
-    ## 7c05c07f0160: Download complete
-    ## f72cf49d9462: Verifying Checksum
-    ## f72cf49d9462: Download complete
-    ## 7b1a6ab2e44d: Verifying Checksum
-    ## 7b1a6ab2e44d: Download complete
-    ## 7b1a6ab2e44d: Pull complete
-    ## f2f213d01c8c: Verifying Checksum
-    ## f2f213d01c8c: Download complete
-    ## 34cb923ed704: Pull complete
-    ## f2f213d01c8c: Pull complete
-    ## 7c05c07f0160: Pull complete
-    ## f72cf49d9462: Pull complete
-    ## Digest: sha256:11b1e274de06b82435de2746481aa70e37bdc60b8badd8a5f62db07f50a3beb9
+    ## 7c3b88808835: Pulling fs layer
+    ## 1cb7623729da: Pulling fs layer
+    ## 480e79aa95a7: Pulling fs layer
+    ## 3c84bfc13d4a: Pulling fs layer
+    ## f0fbb0d3d0c7: Pulling fs layer
+    ## 3c84bfc13d4a: Waiting
+    ## f0fbb0d3d0c7: Waiting
+    ## 1cb7623729da: Verifying Checksum
+    ## 1cb7623729da: Download complete
+    ## 3c84bfc13d4a: Verifying Checksum
+    ## 3c84bfc13d4a: Download complete
+    ## 7c3b88808835: Verifying Checksum
+    ## 7c3b88808835: Download complete
+    ## f0fbb0d3d0c7: Verifying Checksum
+    ## f0fbb0d3d0c7: Download complete
+    ## 7c3b88808835: Pull complete
+    ## 480e79aa95a7: Verifying Checksum
+    ## 480e79aa95a7: Download complete
+    ## 1cb7623729da: Pull complete
+    ## 480e79aa95a7: Pull complete
+    ## 3c84bfc13d4a: Pull complete
+    ## f0fbb0d3d0c7: Pull complete
+    ## Digest: sha256:542eafcf270a1ec563b82c089650193335d59f0d8eb448cabc52b56fe47dc22d
     ## Status: Downloaded newer image for rocker/r-ver:4.1.0
     ## 
     ## R version 4.1.0 (2021-05-18) -- "Camp Pontanezen"
@@ -907,6 +926,8 @@ docker run --rm rocker/r-ver:4.1.0
     ## R is free software and comes with ABSOLUTELY NO WARRANTY.
     ## You are welcome to redistribute it under certain conditions.
     ## Type 'license()' or 'licence()' for distribution details.
+    ## 
+    ##   Natural language support but running in an English locale
     ## 
     ## R is a collaborative project with many contributors.
     ## Type 'contributors()' for more information and
