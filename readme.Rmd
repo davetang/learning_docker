@@ -90,6 +90,22 @@ I have an example Dockerfile that uses the Ubuntu 18.04 image to build [BWA](htt
 cat Dockerfile
 ```
 
+## ARG
+
+To define variables in your Dockerfile use `ARG name=value`. For example, you can use `ARG` to create a new variable that stores a version number of a program. When a new version of the program is released, you can simply change the `ARG` and re-build your Dockerfile.
+
+```
+ARG star_ver=2.7.10a
+RUN cd /usr/src && \
+    wget https://github.com/alexdobin/STAR/archive/refs/tags/${star_ver}.tar.gz && \
+    tar xzf ${star_ver}.tar.gz && \
+    rm ${star_ver}.tar.gz && \
+    cd STAR-${star_ver}/source && \
+    make STAR && \
+    cd /usr/local/bin && \
+    ln -s /usr/src/STAR-${star_ver}/source/STAR .
+```
+
 ## CMD
 
 The [CMD](https://docs.docker.com/engine/reference/builder/#cmd) instruction in a Dockerfile does not execute anything at build time but specifies the intended command for the image; there can only be one CMD instruction in a Dockerfile and if you list more than one CMD then only the last CMD will take effect. The main purpose of a CMD is to provide defaults for an executing container.
