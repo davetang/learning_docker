@@ -7,6 +7,7 @@ on:
     paths:
       - 'create_readme.sh'
       - 'readme.Rmd'
+      - '.github/workflows/create_readme.yml'
 
 # a list of the jobs that run as part of the workflow
 jobs:
@@ -38,7 +39,7 @@ jobs:
           git config --global user.email 'me@davetang.org'
           git add "README.md"
           git commit -m "Build README.md"
-          git push origin master
+          git push origin main
 
       - name: Install MkDocs
         run: python -m pip install --upgrade pip && pip install mkdocs pymdown-extensions
