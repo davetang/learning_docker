@@ -34,6 +34,16 @@ RUN apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN cmake_ver=3.23.1 && \
+   cd /tmp/ && \
+   wget https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}.tar.gz && \
+   tar -zxf cmake-${cmake_ver}.tar.gz && \
+   cd cmake-${cmake_ver} && \
+   ./bootstrap && \
+   make && \
+   make install && \
+   rm -rf /tmp/*
+
 RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse'));"
 RUN pip install --upgrade pip && pip install mkdocs
 
