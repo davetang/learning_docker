@@ -13,5 +13,5 @@ RUN apt-get clean all && \
     apt-get purge && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-CMD ["sl"]
+CMD ["/usr/games/sl"]
 
