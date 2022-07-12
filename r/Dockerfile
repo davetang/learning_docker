@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.1.3
+FROM rocker/r-ver:4.2.1
 
 MAINTAINER Dave Tang <me@davetang.org>
 
