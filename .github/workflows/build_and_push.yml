@@ -3,6 +3,10 @@ name: Build and push test
 on:
   workflow_dispatch:
   push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
     paths:
       - 'github_actions/Dockerfile'
       - '.github/workflows/build_and_push.yml'

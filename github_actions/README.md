@@ -2,7 +2,7 @@
 
 Automatically build and push Docker images using [Build and push Docker images](https://github.com/marketplace/actions/build-and-push-docker-images). The following works and the image is pushed to [Docker Hub](https://hub.docker.com/repository/docker/davetang/from_github).
 
-In order to automatically set a version for your Docker image use [metadata-action](https://github.com/docker/metadata-action) but you will need use [Git tags](https://git-scm.com/book/en/v2/Git-Basics-Tagging). The idea is that tagged Git commit is associated with the Docker image version. This works fine if the GitHub repository contains only one Docker image to build but not this repository, which has multiple Dockerfiles and images to build.
+In order to automatically set a version for your Docker image use [metadata-action](https://github.com/docker/metadata-action) but you will need use [Git tags](https://git-scm.com/book/en/v2/Git-Basics-Tagging). The idea is that tagged Git commit is associated with the Docker image version. This works fine if the GitHub repository contains only one Docker image to build but not this repository, which has multiple Dockerfiles and images to build. Remember when pushing to Github to include the tag (`git push origin tag`) or else the version tag will not be populated correctly.
 
 ```
 name: Build and push test
