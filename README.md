@@ -35,7 +35,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Fri Apr 15 05:33:38 UTC 2022
+Wed Jul 13 05:24:40 UTC 2022
 
 Learning Docker
 ================
@@ -78,7 +78,7 @@ To see if everything is working, try to obtain the Docker version.
 docker --version
 ```
 
-    ## Docker version 20.10.14+azure-1, build a224086349269551becacce16e5842ceeb2a98d6
+    ## Docker version 20.10.17+azure-1, build 100c70180fde3601def79a59cc3e996aa553c9b9
 
 And run the `hello-world` image. (The `--rm` parameter is used to
 automatically remove the container when it exits.)
@@ -92,7 +92,7 @@ docker run --rm hello-world
     ## 2db29710123e: Pulling fs layer
     ## 2db29710123e: Download complete
     ## 2db29710123e: Pull complete
-    ## Digest: sha256:10d7d58d5ebd2a652f4d93fdd86da8f265f5318c6a73cc5b6a9798ff6d2b2e67
+    ## Digest: sha256:13e367d31ae85359f42d637adf6da428f76d75dc9afeb3c21faea0d976f5c651
     ## Status: Downloaded newer image for hello-world:latest
     ## 
     ## Hello from Docker!
@@ -139,7 +139,7 @@ docker pull ubuntu:18.04
 ```
 
     ## 18.04: Pulling from library/ubuntu
-    ## Digest: sha256:982d72c16416b09ffd2f71aa381f761422085eda1379dc66b668653607969e38
+    ## Digest: sha256:478caf1bec1afd54a58435ec681c8755883b7eb843a8630091890130b15a79af
     ## Status: Image is up to date for ubuntu:18.04
     ## docker.io/library/ubuntu:18.04
 
@@ -367,7 +367,6 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
-    ## 5f22362f8660: Verifying Checksum
     ## 5f22362f8660: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
@@ -517,15 +516,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.20 sec
+    ## [bwa_index] Pack FASTA... 0.19 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 3.55 seconds elapse.
-    ## [bwa_index] Update BWT... 0.08 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.14 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 1.69 sec
+    ## [bwa_index] 3.96 seconds elapse.
+    ## [bwa_index] Update BWT... 0.09 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.15 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 1.74 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 5.735 sec; CPU: 5.697 sec
+    ## [main] Real time: 6.205 sec; CPU: 6.161 sec
 
 We can see the newly created index files.
 
@@ -534,13 +533,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Apr 15 05:26 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Apr 15 05:26 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Apr 15 05:33 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Apr 15 05:33 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Apr 15 05:33 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Apr 15 05:33 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Apr 15 05:33 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Jul 13 05:18 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Jul 13 05:18 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Jul 13 05:24 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Jul 13 05:24 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Jul 13 05:24 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Jul 13 05:24 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Jul 13 05:24 chrI.fa.gz.sa
 
 ### File permissions
 
@@ -669,11 +668,11 @@ docker pull busybox
 
     ## Using default tag: latest
     ## latest: Pulling from library/busybox
-    ## 50e8d59317eb: Pulling fs layer
-    ## 50e8d59317eb: Verifying Checksum
-    ## 50e8d59317eb: Download complete
-    ## 50e8d59317eb: Pull complete
-    ## Digest: sha256:d2b53584f580310186df7a2055ce3ff83cc0df6caacf1e3489bff8cf5d0af5d8
+    ## 19d511225f94: Pulling fs layer
+    ## 19d511225f94: Verifying Checksum
+    ## 19d511225f94: Download complete
+    ## 19d511225f94: Pull complete
+    ## Digest: sha256:3614ca5eacf0a3a1bcc361c939202a974b4902b9334ff36eb29ffe9011aaad83
     ## Status: Downloaded newer image for busybox:latest
     ## docker.io/library/busybox:latest
 
@@ -683,8 +682,8 @@ Check out `busybox`.
 docker images busybox
 ```
 
-    ## REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
-    ## busybox      latest    1a80408de790   27 hours ago   1.24MB
+    ## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+    ## busybox      latest    62aedd01bd85   5 weeks ago   1.24MB
 
 Remove `busybox`.
 
@@ -693,9 +692,9 @@ docker rmi busybox
 ```
 
     ## Untagged: busybox:latest
-    ## Untagged: busybox@sha256:d2b53584f580310186df7a2055ce3ff83cc0df6caacf1e3489bff8cf5d0af5d8
-    ## Deleted: sha256:1a80408de790c0b1075d0a7e23ff7da78b311f85f36ea10098e4a6184c200964
-    ## Deleted: sha256:eb6b01329ebe73e209e44a616a0e16c2b8e91de6f719df9c35e6cdadadbe5965
+    ## Untagged: busybox@sha256:3614ca5eacf0a3a1bcc361c939202a974b4902b9334ff36eb29ffe9011aaad83
+    ## Deleted: sha256:62aedd01bd8520c43d06b09f7a0f67ba9720bdc04631a8242c65ea995f3ecac8
+    ## Deleted: sha256:7ad00cd55506625f2afad262de6002c8cef20d214b353e51d1025e40e8646e18
 
 ## Committing changes
 
@@ -771,8 +770,8 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                              PORTS     NAMES
-    ## c42e0288ce7a   hello-world   "/hello"   1 second ago   Exited (0) Less than a second ago             angry_joliot
+    ## CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS                              PORTS     NAMES
+    ## c8855e8ee114   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             kind_jones
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -781,7 +780,7 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## c42e0288ce7a
+    ## c8855e8ee114
 
 Check to see if the container still exists.
 
@@ -894,29 +893,24 @@ docker run --rm rocker/r-ver:4.1.0
 
     ## Unable to find image 'rocker/r-ver:4.1.0' locally
     ## 4.1.0: Pulling from rocker/r-ver
-    ## 7c3b88808835: Pulling fs layer
-    ## 1cb7623729da: Pulling fs layer
-    ## 480e79aa95a7: Pulling fs layer
-    ## 3c84bfc13d4a: Pulling fs layer
-    ## f0fbb0d3d0c7: Pulling fs layer
-    ## 3c84bfc13d4a: Waiting
-    ## f0fbb0d3d0c7: Waiting
-    ## 1cb7623729da: Verifying Checksum
-    ## 1cb7623729da: Download complete
-    ## 3c84bfc13d4a: Verifying Checksum
-    ## 3c84bfc13d4a: Download complete
-    ## 7c3b88808835: Verifying Checksum
-    ## 7c3b88808835: Download complete
-    ## f0fbb0d3d0c7: Verifying Checksum
-    ## f0fbb0d3d0c7: Download complete
-    ## 7c3b88808835: Pull complete
-    ## 480e79aa95a7: Verifying Checksum
-    ## 480e79aa95a7: Download complete
-    ## 1cb7623729da: Pull complete
-    ## 480e79aa95a7: Pull complete
-    ## 3c84bfc13d4a: Pull complete
-    ## f0fbb0d3d0c7: Pull complete
-    ## Digest: sha256:542eafcf270a1ec563b82c089650193335d59f0d8eb448cabc52b56fe47dc22d
+    ## d7bfe07ed847: Already exists
+    ## 2f0a3d0b8e42: Pulling fs layer
+    ## 0310efd86b0a: Pulling fs layer
+    ## a29431c95dea: Pulling fs layer
+    ## 762d9e41bf9b: Pulling fs layer
+    ## 762d9e41bf9b: Waiting
+    ## 2f0a3d0b8e42: Download complete
+    ## a29431c95dea: Verifying Checksum
+    ## a29431c95dea: Download complete
+    ## 2f0a3d0b8e42: Pull complete
+    ## 762d9e41bf9b: Verifying Checksum
+    ## 762d9e41bf9b: Download complete
+    ## 0310efd86b0a: Verifying Checksum
+    ## 0310efd86b0a: Download complete
+    ## 0310efd86b0a: Pull complete
+    ## a29431c95dea: Pull complete
+    ## 762d9e41bf9b: Pull complete
+    ## Digest: sha256:cbdecb371ce4576ca2ed5939585dcc544bf5e8c56a651092854fa0b430396d02
     ## Status: Downloaded newer image for rocker/r-ver:4.1.0
     ## 
     ## R version 4.1.0 (2021-05-18) -- "Camp Pontanezen"
