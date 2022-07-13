@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'github_actions/Dockerfile'
+      - '.github/workflows/build_and_push.yml'
 
 jobs:
   docker:
@@ -32,10 +33,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
       -
-        name: Testing
+        name: Echo tags
         run: |
           echo ${{ steps.meta.outputs.tags }}
-          echo ${{ steps.meta.outputs.labels }}
       -
         name: Build and push
         uses: docker/build-push-action@v3
