@@ -33,14 +33,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
       -
-        name: Echo tags
-        run: |
-          echo ${{ steps.meta.outputs.tags }}
-      -
         name: Build and push
         uses: docker/build-push-action@v3
         with:
           context: github_actions
           push: true
-          tags: davetang/from_github:latest
-
+          tags: ${{ steps.meta.outputs.tags }}
