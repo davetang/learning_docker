@@ -4,6 +4,8 @@ name: Create README.md
 # execute workflow only when these files are modified
 on:
   push:
+    branches:
+      - 'main'
     paths:
       - 'create_readme.sh'
       - 'readme.Rmd'
