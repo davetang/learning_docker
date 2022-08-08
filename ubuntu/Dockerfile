@@ -29,6 +29,7 @@ RUN apt-get clean all && \
       pigz \
       wget \
       python3 \
+      python3-pip \
       zlib1g-dev \
    && apt-get clean all && \
    apt-get purge && \
@@ -43,6 +44,9 @@ RUN cmake_ver=3.22.1 && cd /tmp/ && \
    make && \
    make install && \
    rm -rf /tmp/*
+
+# pandas
+RUN pip install pandas
 
 WORKDIR /work
 

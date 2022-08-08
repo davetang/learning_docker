@@ -3,7 +3,7 @@
 set -euo pipefail
 
 image=build
-ver=1.2
+ver=1.2.1
 
 docker build -t davetang/${image}:${ver} .
 
