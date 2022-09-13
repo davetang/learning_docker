@@ -31,6 +31,7 @@ RUN apt-get clean all && \
       python3 \
       python3-pip \
       zlib1g-dev \
+      libboost-all-dev \
    && apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
