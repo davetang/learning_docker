@@ -46,8 +46,8 @@ RUN cmake_ver=3.22.1 && cd /tmp/ && \
    make install && \
    rm -rf /tmp/*
 
-# pandas
-RUN pip install pandas
+# commonly used bioinfo packages
+RUN pip install pandas pysam pyvcf
 
 WORKDIR /work
 
