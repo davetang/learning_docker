@@ -32,12 +32,13 @@ RUN apt-get clean all && \
       python3-pip \
       zlib1g-dev \
       libboost-all-dev \
+      pkg-config \
    && apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # CMake
-RUN cmake_ver=3.22.1 && cd /tmp/ && \
+RUN cmake_ver=3.24.2 && cd /tmp/ && \
    wget https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}.tar.gz && \
    tar -zxf cmake-${cmake_ver}.tar.gz && \
    cd cmake-${cmake_ver} && \
