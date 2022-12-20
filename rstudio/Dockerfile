@@ -1,8 +1,10 @@
-FROM rocker/rstudio:4.2.0
+FROM rocker/rstudio:4.2.2
 
 LABEL source="https://github.com/davetang/learning_docker/blob/main/rstudio/Dockerfile"
 
 MAINTAINER Dave Tang <me@davetang.org>
+
+ARG bioc_ver=3.16
 
 RUN apt-get clean all && \
 	apt-get update && \
@@ -24,10 +26,9 @@ RUN apt-get clean all && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse', 'workflowr', 'BiocManager'));"
-RUN Rscript -e "BiocManager::install(version = '3.15')"
+RUN Rscript -e "BiocManager::install(version = '${bioc_ver}')"
 
 COPY user-settings /home/rstudio/.rstudio/monitored/user-settings/user-settings
 COPY .Rprofile /home/rstudio/
 
 WORKDIR /home/rstudio
-
