@@ -22,7 +22,7 @@ else
    fi
 fi
 
-docker build -t ${iname}:${ver} ${infile}
+docker build -t ${iname}:${ver} -f ${infile} .
 
 >&2 cat <<EOF
 
