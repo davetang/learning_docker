@@ -1,5 +1,7 @@
 ## Running RStudio Server from Docker
 
+![Build Dockerfile](https://github.com/davetang/learning_docker/actions/workflows/build_rstudio.yml/badge.svg)
+
 The [Rocker project](https://www.rocker-project.org/) provides various Docker images for the R environment. Here's one way of using the [RStudio Server image](https://hub.docker.com/r/rocker/rstudio/) to enable reproducibility.
 
 First use `docker` to pull the RStudio Server image; remember to specify a version to promote reproducibility.
