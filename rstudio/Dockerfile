@@ -20,7 +20,7 @@ RUN apt-get clean all && \
 		libbz2-dev \
 		liblzma-dev \
 		libglpk40 \
-		libgit2-28 \
+		libgit2-dev \
 	&& apt-get clean all && \
 	apt-get purge && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
