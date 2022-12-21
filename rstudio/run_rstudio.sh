@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-version=4.2.0
+version=4.2.2
 rstudio_image=davetang/rstudio:${version}
 container_name=rstudio_ml
 port=8889
@@ -28,4 +28,3 @@ docker run \
 >&2 echo $container_name listening on port $port
 
 exit 0
-
