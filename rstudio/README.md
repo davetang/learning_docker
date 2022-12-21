@@ -118,9 +118,11 @@ You can create another Docker image from `rocker/rstudio` so that you don't have
 
 I have some specific preferences for RStudio Server that are absolutely necessary, such as using Vim key bindings. These preferences are set via the `Tools` menu bar and then selecting `Global Options...`. Each time we start a new container, we will lose our preferences and I don't want to manually change them each time. Luckily, the settings are saved in a specific file, which we can use to save our settings; the `user-settings` file is stored in the location below:
 
-```
-/home/rstudio/.rstudio/monitored/user-settings/user-settings
-```
+    /home/rstudio/.rstudio/monitored/user-settings/user-settings
+
+In newer versions of RStudio Server, the settings are now saved in `rstudio-prefs.json` located in:
+
+    /home/rstudio/.config/rstudio
 
 Once you have made all your settings, save this file back to your local computer and use it to rewrite the default file next time you start a new instance. For example:
 
@@ -128,6 +130,9 @@ Once you have made all your settings, save this file back to your local computer
 # once you have the container running in the background, log into Docker container
 # I have mounted this directory to /data
 cp /data/user-settings /home/rstudio/.rstudio/monitored/user-settings/user-settings
+
+# for newer version of RStudio Server
+cp /data/rstudio-prefs.json /home/rstudio/.config/rstudio
 ```
 
 Now you can have persistent RStudio Server preferences!
