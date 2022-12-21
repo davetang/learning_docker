@@ -29,7 +29,7 @@ RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse', 'workflowr', 'BiocM
 RUN Rscript -e "BiocManager::install(version = '${bioc_ver}')"
 
 # the rstudio/ path is set for building with GitHub Actions
-COPY rstudio/user-settings /home/rstudio/.rstudio/monitored/user-settings/user-settings
-COPY rstudio/.Rprofile /home/rstudio/
+COPY --chown=rstudio:rstudio rstudio/rstudio-prefs.json /home/rstudio/.config/rstudio
+COPY --chown=rstudio:rstudio rstudio/.Rprofile /home/rstudio/
 
 WORKDIR /home/rstudio
