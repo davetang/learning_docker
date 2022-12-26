@@ -33,6 +33,7 @@ RUN apt-get clean all && \
       zlib1g-dev \
       libboost-all-dev \
       pkg-config \
+      libgit2-dev \
    && apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -51,4 +52,3 @@ RUN cmake_ver=3.24.2 && cd /tmp/ && \
 RUN pip install pandas pysam pyvcf
 
 WORKDIR /work
-
