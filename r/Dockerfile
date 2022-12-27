@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.2.1
+FROM rocker/r-ver:4.2.2
 
 MAINTAINER Dave Tang <me@davetang.org>
 
@@ -50,4 +50,3 @@ RUN pip install --upgrade pip && pip install mkdocs
 WORKDIR /work
 
 CMD ["R", "--version"]
-
