@@ -21,8 +21,6 @@ docker run \
    -v ~/github/:/home/rstudio/work \
    -v ~/analysis/:/analysis \
    -e PASSWORD=password \
-   -e USERID=$(id -u) \
-   -e GROUPID=$(id -g) \
    $rstudio_image
 
 >&2 echo $container_name listening on port $port
