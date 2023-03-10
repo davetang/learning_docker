@@ -44,7 +44,7 @@ RUN cmake_ver=3.23.1 && \
    make install && \
    rm -rf /tmp/*
 
-RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse'));"
+RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse', 'tidymodels'));"
 RUN pip install --upgrade pip && pip install mkdocs
 
 WORKDIR /work
