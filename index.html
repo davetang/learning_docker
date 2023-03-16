@@ -54,12 +54,14 @@
     <li class="toctree-l2"><a class="reference internal" href="#start-containers-automatically">Start containers automatically</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#dockerfile">Dockerfile</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#arg">ARG</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#arg">ARG</a>
+    <li class="toctree-l3"><a class="reference internal" href="#cmd">CMD</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#cmd">CMD</a>
+    <li class="toctree-l3"><a class="reference internal" href="#entrypoint">ENTRYPOINT</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#entrypoint">ENTRYPOINT</a>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#building-an-image">Building an image</a>
     </li>
@@ -119,13 +121,13 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Home</li>
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Home</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
   <hr/>
 </div>
-
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
@@ -157,7 +159,7 @@ that I prepared for BioC Asia 2019.</p>
 <p>To see if everything is working, try to obtain the Docker version.</p>
 <pre><code class="language-bash">docker --version
 </code></pre>
-<pre><code>## Docker version 20.10.17+azure-1, build 100c70180fde3601def79a59cc3e996aa553c9b9
+<pre><code>## Docker version 20.10.23+azure-2, build 715524332ff91d0f9ec5ab2ec95f051456ed1dba
 </code></pre>
 <p>And run the <code>hello-world</code> image. (The <code>--rm</code> parameter is used to
 automatically remove the container when it exits.)</p>
@@ -166,9 +168,10 @@ automatically remove the container when it exits.)</p>
 <pre><code>## Unable to find image 'hello-world:latest' locally
 ## latest: Pulling from library/hello-world
 ## 2db29710123e: Pulling fs layer
+## 2db29710123e: Verifying Checksum
 ## 2db29710123e: Download complete
 ## 2db29710123e: Pull complete
-## Digest: sha256:13e367d31ae85359f42d637adf6da428f76d75dc9afeb3c21faea0d976f5c651
+## Digest: sha256:63421b18c1443a9a85139225293fae7541fb40b7832d9deff80b6a9a75ce3604
 ## Status: Downloaded newer image for hello-world:latest
 ## 
 ## Hello from Docker!
@@ -210,8 +213,12 @@ repository</a> from Docker Hub by running
 <pre><code class="language-bash">docker pull ubuntu:18.04
 </code></pre>
 <pre><code>## 18.04: Pulling from library/ubuntu
-## Digest: sha256:478caf1bec1afd54a58435ec681c8755883b7eb843a8630091890130b15a79af
-## Status: Image is up to date for ubuntu:18.04
+## 0c5227665c11: Pulling fs layer
+## 0c5227665c11: Verifying Checksum
+## 0c5227665c11: Download complete
+## 0c5227665c11: Pull complete
+## Digest: sha256:d8e140ad8a0bbe4c30f341c83eda9747032c5d344cad955d4a0be7dc4c209a4d
+## Status: Downloaded newer image for ubuntu:18.04
 ## docker.io/library/ubuntu:18.04
 </code></pre>
 <p>To run Ubuntu using Docker, we use <code>docker run</code>.</p>
@@ -244,24 +251,22 @@ system and that is by using a Dockerfile.</p>
 <p>When hosting a service using Docker (such as running <a href="https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/">RStudio
 Server</a>),
 it would be nice if the container automatically starts up again when the
-server (and Docker) restarts. If you use <code>--restart flag</code> with <code>docker
-run</code>, Docker will <a href="https://docs.docker.com/config/containers/start-containers-automatically/">restart your
+server (and Docker) restarts. If you use <code>--restart flag</code> with
+<code>docker run</code>, Docker will <a href="https://docs.docker.com/config/containers/start-containers-automatically/">restart your
 container</a>
 when your container has exited or when Docker restarts. The value of the
 <code>--restart</code> flag can be the following:</p>
 <ul>
 <li><code>no</code> - do not automatically restart (default)</li>
 <li><code>on-failure[:max-retries]</code> - restarts if it exits due to an error
-    (non-zero exit code) and the number of attempts is limited using the
-    <code>max-retries</code> option</li>
+  (non-zero exit code) and the number of attempts is limited using the
+  <code>max-retries</code> option</li>
 <li><code>always</code> - always restarts the container; if it is manually stopped,
-    it is restarted only when the Docker daemon restarts (or when the
-    container is manually restarted)</li>
+  it is restarted only when the Docker daemon restarts (or when the
+  container is manually restarted)</li>
 <li><code>unless-stopped</code> - similar to <code>always</code> but when the container is
-    stopped, it is not restarted even after the Docker daemon restarts.</li>
+  stopped, it is not restarted even after the Docker daemon restarts.</li>
 </ul>
-<!-- end list -->
-
 <pre><code class="language-bash">docker run -d \
    --restart always \
    -p 8888:8787 \
@@ -278,6 +283,28 @@ reference</a>. There is
 also a <a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Best practices
 guide</a>
 for writing Dockerfiles.</p>
+<p>A Docker image is made up of different layers and they act like
+snapshots. Each layer, or intermediate image, is created each time an
+instruction in the Dockerfile is executed. Each layer is assigned a
+unique hash and are cached by default. This means that you do not need
+to rebuild a layer again from scratch if it has not changed. Keep this
+in mind when creating a Dockerfile.</p>
+<p>Some commonly used instructions include:</p>
+<ul>
+<li><code>FROM</code> - Specifies the parent or base image to use for building an
+  image and must be the first command in the file.</li>
+<li><code>COPY</code> - Copies files from the current directory (of where the
+  Dockerfile is) to the image filesystem.</li>
+<li><code>RUN</code> - Executes a command inside the image.</li>
+<li><code>ADD</code> - Adds new files or directories from a source or URL to the
+  image filesystem.</li>
+<li><code>ENTRYPOINT</code> - Makes the container run like an executable.</li>
+<li><code>CMD</code> - The default command or parameter/s for the container and can
+  be used with <code>ENTRYPOINT</code>.</li>
+<li><code>WORKDIR</code> - Sets the working directory for the image. Any <code>CMD</code>,
+  <code>RUN</code>, <code>COPY</code>, or <code>ENTRYPOINT</code> instruction after the <code>WORKDIR</code>
+  declaration will be executed in the context of the working directory.</li>
+</ul>
 <p>I have an example Dockerfile that uses the Ubuntu 18.04 image to build
 <a href="https://github.com/lh3/bwa">BWA</a>, a popular short read alignment tool
 used in bioinformatics.</p>
@@ -313,7 +340,7 @@ used in bioinformatics.</p>
 ## 
 ## CMD ["bwa"]
 </code></pre>
-<h2 id="arg">ARG</h2>
+<h3 id="arg">ARG</h3>
 <p>To define variables in your Dockerfile use <code>ARG name=value</code>. For
 example, you can use <code>ARG</code> to create a new variable that stores a
 version number of a program. When a new version of the program is
@@ -328,25 +355,22 @@ RUN cd /usr/src &amp;&amp; \
     cd /usr/local/bin &amp;&amp; \
     ln -s /usr/src/STAR-${star_ver}/source/STAR .
 </code></pre>
-<h2 id="cmd">CMD</h2>
+<h3 id="cmd">CMD</h3>
 <p>The <a href="https://docs.docker.com/engine/reference/builder/#cmd">CMD</a>
 instruction in a Dockerfile does not execute anything at build time but
 specifies the intended command for the image; there can only be one CMD
 instruction in a Dockerfile and if you list more than one CMD then only
 the last CMD will take effect. The main purpose of a CMD is to provide
 defaults for an executing container.</p>
-<h2 id="entrypoint">ENTRYPOINT</h2>
+<h3 id="entrypoint">ENTRYPOINT</h3>
 <p>An
 <a href="https://docs.docker.com/engine/reference/builder/#entrypoint">ENTRYPOINT</a>
 allows you to configure a container that will run as an executable.
 ENTRYPOINT has two forms:</p>
 <ul>
-<li>ENTRYPOINT [“executable”, “param1”, “param2”] (exec form,
-    preferred)</li>
+<li>ENTRYPOINT [“executable”, “param1”, “param2”] (exec form, preferred)</li>
 <li>ENTRYPOINT command param1 param2 (shell form)</li>
 </ul>
-<!-- end list -->
-
 <pre><code class="language-bash">FROM ubuntu
 ENTRYPOINT [&quot;top&quot;, &quot;-b&quot;]
 CMD [&quot;-c&quot;]
@@ -398,11 +422,12 @@ documentation</a>.</p>
 ## 5f22362f8660: Pulling fs layer
 ## 3836f06c7ac7: Pulling fs layer
 ## 3836f06c7ac7: Waiting
+## feac53061382: Verifying Checksum
+## feac53061382: Download complete
+## 5f22362f8660: Verifying Checksum
 ## 5f22362f8660: Download complete
 ## 3836f06c7ac7: Verifying Checksum
 ## 3836f06c7ac7: Download complete
-## feac53061382: Verifying Checksum
-## feac53061382: Download complete
 ## feac53061382: Pull complete
 ## 549f86662946: Verifying Checksum
 ## 549f86662946: Download complete
@@ -526,27 +551,27 @@ inside <code>data</code> on the host. The command below will create BWA index fi
 for <code>data/chrI.fa.gz</code>.</p>
 <pre><code class="language-bash">docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 </code></pre>
-<pre><code>## [bwa_index] Pack FASTA... 0.19 sec
+<pre><code>## [bwa_index] Pack FASTA... 0.20 sec
 ## [bwa_index] Construct BWT for the packed sequence...
-## [bwa_index] 3.96 seconds elapse.
+## [bwa_index] 4.02 seconds elapse.
 ## [bwa_index] Update BWT... 0.09 sec
 ## [bwa_index] Pack forward-only FASTA... 0.15 sec
-## [bwa_index] Construct SA from BWT and Occ... 1.74 sec
+## [bwa_index] Construct SA from BWT and Occ... 2.35 sec
 ## [main] Version: 0.7.17-r1188
 ## [main] CMD: bwa index chrI.fa.gz
-## [main] Real time: 6.205 sec; CPU: 6.161 sec
+## [main] Real time: 6.866 sec; CPU: 6.828 sec
 </code></pre>
 <p>We can see the newly created index files.</p>
 <pre><code class="language-bash">ls -lrt data
 </code></pre>
 <pre><code>## total 30436
-## -rw-r--r-- 1 runner docker      194 Jul 13 05:18 README.md
-## -rw-r--r-- 1 runner docker  4772981 Jul 13 05:18 chrI.fa.gz
-## -rw-r--r-- 1 root   root   15072516 Jul 13 05:24 chrI.fa.gz.bwt
-## -rw-r--r-- 1 root   root    3768110 Jul 13 05:24 chrI.fa.gz.pac
-## -rw-r--r-- 1 root   root         41 Jul 13 05:24 chrI.fa.gz.ann
-## -rw-r--r-- 1 root   root         13 Jul 13 05:24 chrI.fa.gz.amb
-## -rw-r--r-- 1 root   root    7536272 Jul 13 05:24 chrI.fa.gz.sa
+## -rw-r--r-- 1 runner docker      194 Mar 16 01:43 README.md
+## -rw-r--r-- 1 runner docker  4772981 Mar 16 01:43 chrI.fa.gz
+## -rw-r--r-- 1 root   root   15072516 Mar 16 01:50 chrI.fa.gz.bwt
+## -rw-r--r-- 1 root   root    3768110 Mar 16 01:50 chrI.fa.gz.pac
+## -rw-r--r-- 1 root   root         41 Mar 16 01:50 chrI.fa.gz.ann
+## -rw-r--r-- 1 root   root         13 Mar 16 01:50 chrI.fa.gz.amb
+## -rw-r--r-- 1 root   root    7536272 Mar 16 01:50 chrI.fa.gz.sa
 </code></pre>
 <h3 id="file-permissions">File permissions</h3>
 <p>On newer version of Docker, you no longer have to worry about this.
@@ -648,27 +673,27 @@ find stopped containers and <code>docker rm</code> to remove these containers.</
 </code></pre>
 <pre><code>## Using default tag: latest
 ## latest: Pulling from library/busybox
-## 19d511225f94: Pulling fs layer
-## 19d511225f94: Verifying Checksum
-## 19d511225f94: Download complete
-## 19d511225f94: Pull complete
-## Digest: sha256:3614ca5eacf0a3a1bcc361c939202a974b4902b9334ff36eb29ffe9011aaad83
+## 1487bff95222: Pulling fs layer
+## 1487bff95222: Verifying Checksum
+## 1487bff95222: Download complete
+## 1487bff95222: Pull complete
+## Digest: sha256:c118f538365369207c12e5794c3cbfb7b042d950af590ae6c287ede74f29b7d4
 ## Status: Downloaded newer image for busybox:latest
 ## docker.io/library/busybox:latest
 </code></pre>
 <p>Check out <code>busybox</code>.</p>
 <pre><code class="language-bash">docker images busybox
 </code></pre>
-<pre><code>## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-## busybox      latest    62aedd01bd85   5 weeks ago   1.24MB
+<pre><code>## REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
+## busybox      latest    bab98d58e29e   9 days ago   4.86MB
 </code></pre>
 <p>Remove <code>busybox</code>.</p>
 <pre><code class="language-bash">docker rmi busybox
 </code></pre>
 <pre><code>## Untagged: busybox:latest
-## Untagged: busybox@sha256:3614ca5eacf0a3a1bcc361c939202a974b4902b9334ff36eb29ffe9011aaad83
-## Deleted: sha256:62aedd01bd8520c43d06b09f7a0f67ba9720bdc04631a8242c65ea995f3ecac8
-## Deleted: sha256:7ad00cd55506625f2afad262de6002c8cef20d214b353e51d1025e40e8646e18
+## Untagged: busybox@sha256:c118f538365369207c12e5794c3cbfb7b042d950af590ae6c287ede74f29b7d4
+## Deleted: sha256:bab98d58e29e4eb5744a69057a7b3d6ce99b19363a0e52c40301a5db43abf83c
+## Deleted: sha256:427701cb9c9623cab51dcec9cfd66d7a88d189a14961120f4b2c62ce2e439b9d
 </code></pre>
 <h2 id="committing-changes">Committing changes</h2>
 <p>Generally, it is better to use a Dockerfile to manage your images in a
@@ -676,8 +701,8 @@ documented and maintainable way but if you still want to <a href="https://docs.d
 changes</a>
 to your container (like you would for Git), read on.</p>
 <p>When you log out of a container, the changes made are still stored; type
-<code>docker ps -a</code> to see all containers and the latest changes. Use <code>docker
-commit</code> to commit your changes.</p>
+<code>docker ps -a</code> to see all containers and the latest changes. Use
+<code>docker commit</code> to commit your changes.</p>
 <pre><code class="language-bash">docker ps -a
 
 # git style commit
@@ -728,13 +753,13 @@ container exits. For example:</p>
 <pre><code class="language-bash">docker ps -a
 </code></pre>
 <pre><code>## CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS                              PORTS     NAMES
-## c8855e8ee114   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             kind_jones
+## 0a5fadcefd65   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             gracious_diffie
 </code></pre>
 <p>We can use a sub-shell to get all (<code>-a</code>) container IDs (<code>-q</code>) that have
 exited (<code>-f status=exited</code>) and then remove them (<code>docker rm -v</code>).</p>
 <pre><code class="language-bash">docker rm -v $(docker ps -a -q -f status=exited)
 </code></pre>
-<pre><code>## c8855e8ee114
+<pre><code>## 0a5fadcefd65
 </code></pre>
 <p>Check to see if the container still exists.</p>
 <pre><code class="language-bash">docker ps -a
@@ -820,24 +845,25 @@ for example <code>rocker/r-ver:4.1.0</code>.</p>
 </code></pre>
 <pre><code>## Unable to find image 'rocker/r-ver:4.1.0' locally
 ## 4.1.0: Pulling from rocker/r-ver
-## d7bfe07ed847: Already exists
-## 2f0a3d0b8e42: Pulling fs layer
-## 0310efd86b0a: Pulling fs layer
-## a29431c95dea: Pulling fs layer
-## 762d9e41bf9b: Pulling fs layer
-## 762d9e41bf9b: Waiting
-## 2f0a3d0b8e42: Download complete
-## a29431c95dea: Verifying Checksum
-## a29431c95dea: Download complete
-## 2f0a3d0b8e42: Pull complete
-## 762d9e41bf9b: Verifying Checksum
-## 762d9e41bf9b: Download complete
-## 0310efd86b0a: Verifying Checksum
-## 0310efd86b0a: Download complete
-## 0310efd86b0a: Pull complete
-## a29431c95dea: Pull complete
-## 762d9e41bf9b: Pull complete
-## Digest: sha256:cbdecb371ce4576ca2ed5939585dcc544bf5e8c56a651092854fa0b430396d02
+## 47c764472391: Already exists
+## a62aac15af1b: Pulling fs layer
+## 3ef104191697: Pulling fs layer
+## 51164e9cded3: Pulling fs layer
+## fe687534b7a1: Pulling fs layer
+## fe687534b7a1: Waiting
+## 51164e9cded3: Verifying Checksum
+## 51164e9cded3: Download complete
+## a62aac15af1b: Verifying Checksum
+## a62aac15af1b: Download complete
+## a62aac15af1b: Pull complete
+## fe687534b7a1: Verifying Checksum
+## fe687534b7a1: Download complete
+## 3ef104191697: Verifying Checksum
+## 3ef104191697: Download complete
+## 3ef104191697: Pull complete
+## 51164e9cded3: Pull complete
+## fe687534b7a1: Pull complete
+## Digest: sha256:d165d8e7da614a2b7182eb6f296417588e122e089235fe76cd67f85a0e62df21
 ## Status: Downloaded newer image for rocker/r-ver:4.1.0
 ## 
 ## R version 4.1.0 (2021-05-18) -- "Camp Pontanezen"
@@ -934,21 +960,21 @@ also added the <code>-u</code> option, which sets the user to
 <h2 id="useful-links">Useful links</h2>
 <ul>
 <li><a href="http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/">A quick introduction to
-    Docker</a></li>
-<li><a href="https://github.com/BioDocker/biodocker">The BioDocker project</a>;
-    check out their <a href="https://github.com/BioDocker/biodocker/wiki">Wiki</a>,
-    which has a lot of useful information</li>
+  Docker</a></li>
+<li><a href="https://github.com/BioDocker/biodocker">The BioDocker project</a>; check
+  out their <a href="https://github.com/BioDocker/biodocker/wiki">Wiki</a>, which
+  has a lot of useful information</li>
 <li><a href="http://www.ncbi.nlm.nih.gov/pubmed/26421241">The impact of Docker containers on the performance of genomic
-    pipelines</a></li>
+  pipelines</a></li>
 <li><a href="https://towardsdatascience.com/learn-enough-docker-to-be-useful-b0b44222eef5">Learn enough Docker to be
-    useful</a></li>
+  useful</a></li>
 <li><a href="http://developers.redhat.com/blog/2016/02/24/10-things-to-avoid-in-docker-containers/">10 things to avoid in Docker
-    containers</a></li>
+  containers</a></li>
 <li>The <a href="https://training.play-with-docker.com/">Play with Docker
-    classroom</a> brings you labs
-    and tutorials that help you get hands-on experience using Docker</li>
+  classroom</a> brings you labs and
+  tutorials that help you get hands-on experience using Docker</li>
 <li><a href="https://github.com/NERSC/shifter">Shifter</a> enables container images
-    for HPC</li>
+  for HPC</li>
 <li><a href="http://biocworkshops2019.bioconductor.org.s3-website-us-east-1.amazonaws.com/page/BioconductorOnContainers__Bioconductor_Containers_Workshop/">http://biocworkshops2019.bioconductor.org.s3-website-us-east-1.amazonaws.com/page/BioconductorOnContainers__Bioconductor_Containers_Workshop/</a></li>
 </ul>
               
@@ -992,6 +1018,6 @@ also added the <code>-u</code> option, which sets the user to
 </html>
 
 <!--
-MkDocs version : 1.3.0
-Build Date UTC : 2022-07-13 05:24:47.668669+00:00
+MkDocs version : 1.4.2
+Build Date UTC : 2023-03-16 01:50:43.364138+00:00
 -->
