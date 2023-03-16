@@ -82,15 +82,45 @@ docker run -d \
 
 ## Dockerfile
 
-A Dockerfile is a text file that contains instructions for building Docker images. A Dockerfile adheres to a specific format and set of instructions, which you can find at [Dockerfile reference](https://docs.docker.com/engine/reference/builder/). There is also a [Best practices guide](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/) for writing Dockerfiles.
+A Dockerfile is a text file that contains instructions for building Docker
+images. A Dockerfile adheres to a specific format and set of instructions,
+which you can find at [Dockerfile
+reference](https://docs.docker.com/engine/reference/builder/). There is also a
+[Best practices
+guide](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
+for writing Dockerfiles.
 
-I have an example Dockerfile that uses the Ubuntu 18.04 image to build [BWA](https://github.com/lh3/bwa), a popular short read alignment tool used in bioinformatics.
+A Docker image is made up of different layers and they act like snapshots. Each
+layer, or intermediate image, is created each time an instruction in the
+Dockerfile is executed. Each layer is assigned a unique hash and are cached by
+default. This means that you do not need to rebuild a layer again from scratch
+if it has not changed. Keep this in mind when creating a Dockerfile.
+
+Some commonly used instructions include:
+
+* `FROM` - Specifies the parent or base image to use for building an image and
+  must be the first command in the file.
+* `COPY` - Copies files from the current directory (of where the Dockerfile is)
+  to the image filesystem.
+* `RUN` - Executes a command inside the image.
+* `ADD` - Adds new files or directories from a source or URL to the image
+  filesystem.
+* `ENTRYPOINT` - Makes the container run like an executable.
+* `CMD` - The default command or parameter/s for the container and can be used
+  with `ENTRYPOINT`.
+* `WORKDIR` - Sets the working directory for the image. Any `CMD`, `RUN`,
+  `COPY`, or `ENTRYPOINT` instruction after the `WORKDIR` declaration will be
+  executed in the context of the working directory.
+
+I have an example Dockerfile that uses the Ubuntu 18.04 image to build
+[BWA](https://github.com/lh3/bwa), a popular short read alignment tool used in
+bioinformatics.
 
 ```{bash engine.opts='-l'}
 cat Dockerfile
 ```
 
-## ARG
+### ARG
 
 To define variables in your Dockerfile use `ARG name=value`. For example, you can use `ARG` to create a new variable that stores a version number of a program. When a new version of the program is released, you can simply change the `ARG` and re-build your Dockerfile.
 
@@ -106,11 +136,11 @@ RUN cd /usr/src && \
     ln -s /usr/src/STAR-${star_ver}/source/STAR .
 ```
 
-## CMD
+### CMD
 
 The [CMD](https://docs.docker.com/engine/reference/builder/#cmd) instruction in a Dockerfile does not execute anything at build time but specifies the intended command for the image; there can only be one CMD instruction in a Dockerfile and if you list more than one CMD then only the last CMD will take effect. The main purpose of a CMD is to provide defaults for an executing container.
 
-## ENTRYPOINT
+### ENTRYPOINT
 
 An [ENTRYPOINT](https://docs.docker.com/engine/reference/builder/#entrypoint) allows you to configure a container that will run as an executable. ENTRYPOINT has two forms:
 
