@@ -9,9 +9,9 @@ Table of Contents
    * [Basics](#basics)
    * [Start containers automatically](#start-containers-automatically)
    * [Dockerfile](#dockerfile)
-   * [ARG](#arg)
-   * [CMD](#cmd)
-   * [ENTRYPOINT](#entrypoint)
+      * [ARG](#arg)
+      * [CMD](#cmd)
+      * [ENTRYPOINT](#entrypoint)
    * [Building an image](#building-an-image)
    * [Renaming an image](#renaming-an-image)
    * [Running an image](#running-an-image)
@@ -35,7 +35,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Wed Jul 13 05:24:40 UTC 2022
+Thu Mar 16 01:50:35 UTC 2023
 
 Learning Docker
 ================
@@ -53,7 +53,7 @@ everything that is needed for an application to run including the code,
 system tools, and the necessary dependencies. If you wanted to test an
 application, all you need to do is to download the Docker image and run
 it in a new container. No more compiling and installing missing
-dependencies\!
+dependencies!
 
 The [overview](https://docs.docker.com/get-started/overview/) at
 <https://docs.docker.com/> provides more information. For more a more
@@ -78,7 +78,7 @@ To see if everything is working, try to obtain the Docker version.
 docker --version
 ```
 
-    ## Docker version 20.10.17+azure-1, build 100c70180fde3601def79a59cc3e996aa553c9b9
+    ## Docker version 20.10.23+azure-2, build 715524332ff91d0f9ec5ab2ec95f051456ed1dba
 
 And run the `hello-world` image. (The `--rm` parameter is used to
 automatically remove the container when it exits.)
@@ -90,9 +90,10 @@ docker run --rm hello-world
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
     ## 2db29710123e: Pulling fs layer
+    ## 2db29710123e: Verifying Checksum
     ## 2db29710123e: Download complete
     ## 2db29710123e: Pull complete
-    ## Digest: sha256:13e367d31ae85359f42d637adf6da428f76d75dc9afeb3c21faea0d976f5c651
+    ## Digest: sha256:63421b18c1443a9a85139225293fae7541fb40b7832d9deff80b6a9a75ce3604
     ## Status: Downloaded newer image for hello-world:latest
     ## 
     ## Hello from Docker!
@@ -139,8 +140,12 @@ docker pull ubuntu:18.04
 ```
 
     ## 18.04: Pulling from library/ubuntu
-    ## Digest: sha256:478caf1bec1afd54a58435ec681c8755883b7eb843a8630091890130b15a79af
-    ## Status: Image is up to date for ubuntu:18.04
+    ## 0c5227665c11: Pulling fs layer
+    ## 0c5227665c11: Verifying Checksum
+    ## 0c5227665c11: Download complete
+    ## 0c5227665c11: Pull complete
+    ## Digest: sha256:d8e140ad8a0bbe4c30f341c83eda9747032c5d344cad955d4a0be7dc4c209a4d
+    ## Status: Downloaded newer image for ubuntu:18.04
     ## docker.io/library/ubuntu:18.04
 
 To run Ubuntu using Docker, we use `docker run`.
@@ -181,23 +186,21 @@ system and that is by using a Dockerfile.
 When hosting a service using Docker (such as running [RStudio
 Server](https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/https://davetang.org/muse/2021/04/24/running-rstudio-server-with-docker/)),
 it would be nice if the container automatically starts up again when the
-server (and Docker) restarts. If you use `--restart flag` with `docker
-run`, Docker will [restart your
+server (and Docker) restarts. If you use `--restart flag` with
+`docker run`, Docker will [restart your
 container](https://docs.docker.com/config/containers/start-containers-automatically/)
 when your container has exited or when Docker restarts. The value of the
 `--restart` flag can be the following:
 
-  - `no` - do not automatically restart (default)
-  - `on-failure[:max-retries]` - restarts if it exits due to an error
-    (non-zero exit code) and the number of attempts is limited using the
-    `max-retries` option
-  - `always` - always restarts the container; if it is manually stopped,
-    it is restarted only when the Docker daemon restarts (or when the
-    container is manually restarted)
-  - `unless-stopped` - similar to `always` but when the container is
-    stopped, it is not restarted even after the Docker daemon restarts.
-
-<!-- end list -->
+- `no` - do not automatically restart (default)
+- `on-failure[:max-retries]` - restarts if it exits due to an error
+  (non-zero exit code) and the number of attempts is limited using the
+  `max-retries` option
+- `always` - always restarts the container; if it is manually stopped,
+  it is restarted only when the Docker daemon restarts (or when the
+  container is manually restarted)
+- `unless-stopped` - similar to `always` but when the container is
+  stopped, it is not restarted even after the Docker daemon restarts.
 
 ``` bash
 docker run -d \
@@ -218,6 +221,29 @@ reference](https://docs.docker.com/engine/reference/builder/). There is
 also a [Best practices
 guide](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 for writing Dockerfiles.
+
+A Docker image is made up of different layers and they act like
+snapshots. Each layer, or intermediate image, is created each time an
+instruction in the Dockerfile is executed. Each layer is assigned a
+unique hash and are cached by default. This means that you do not need
+to rebuild a layer again from scratch if it has not changed. Keep this
+in mind when creating a Dockerfile.
+
+Some commonly used instructions include:
+
+- `FROM` - Specifies the parent or base image to use for building an
+  image and must be the first command in the file.
+- `COPY` - Copies files from the current directory (of where the
+  Dockerfile is) to the image filesystem.
+- `RUN` - Executes a command inside the image.
+- `ADD` - Adds new files or directories from a source or URL to the
+  image filesystem.
+- `ENTRYPOINT` - Makes the container run like an executable.
+- `CMD` - The default command or parameter/s for the container and can
+  be used with `ENTRYPOINT`.
+- `WORKDIR` - Sets the working directory for the image. Any `CMD`,
+  `RUN`, `COPY`, or `ENTRYPOINT` instruction after the `WORKDIR`
+  declaration will be executed in the context of the working directory.
 
 I have an example Dockerfile that uses the Ubuntu 18.04 image to build
 [BWA](https://github.com/lh3/bwa), a popular short read alignment tool
@@ -257,7 +283,7 @@ cat Dockerfile
     ## 
     ## CMD ["bwa"]
 
-## ARG
+### ARG
 
 To define variables in your Dockerfile use `ARG name=value`. For
 example, you can use `ARG` to create a new variable that stores a
@@ -274,7 +300,7 @@ released, you can simply change the `ARG` and re-build your Dockerfile.
         cd /usr/local/bin && \
         ln -s /usr/src/STAR-${star_ver}/source/STAR .
 
-## CMD
+### CMD
 
 The [CMD](https://docs.docker.com/engine/reference/builder/#cmd)
 instruction in a Dockerfile does not execute anything at build time but
@@ -283,18 +309,15 @@ instruction in a Dockerfile and if you list more than one CMD then only
 the last CMD will take effect. The main purpose of a CMD is to provide
 defaults for an executing container.
 
-## ENTRYPOINT
+### ENTRYPOINT
 
 An
 [ENTRYPOINT](https://docs.docker.com/engine/reference/builder/#entrypoint)
 allows you to configure a container that will run as an executable.
 ENTRYPOINT has two forms:
 
-  - ENTRYPOINT \[“executable”, “param1”, “param2”\] (exec form,
-    preferred)
-  - ENTRYPOINT command param1 param2 (shell form)
-
-<!-- end list -->
+- ENTRYPOINT \[“executable”, “param1”, “param2”\] (exec form, preferred)
+- ENTRYPOINT command param1 param2 (shell form)
 
 ``` bash
 FROM ubuntu
@@ -367,11 +390,12 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
+    ## feac53061382: Verifying Checksum
+    ## feac53061382: Download complete
+    ## 5f22362f8660: Verifying Checksum
     ## 5f22362f8660: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
-    ## feac53061382: Verifying Checksum
-    ## feac53061382: Download complete
     ## feac53061382: Pull complete
     ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
@@ -417,7 +441,7 @@ amount of memory the container can use.
 
 We can confirm the limited CPU usage by running an endless while loop
 and using `docker stats` to confirm the CPU usage. *Remember to use
-`docker stop` to stop the container after confirming the usage\!*
+`docker stop` to stop the container after confirming the usage!*
 
 Restrict to 1 CPU.
 
@@ -516,15 +540,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.19 sec
+    ## [bwa_index] Pack FASTA... 0.20 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 3.96 seconds elapse.
+    ## [bwa_index] 4.02 seconds elapse.
     ## [bwa_index] Update BWT... 0.09 sec
     ## [bwa_index] Pack forward-only FASTA... 0.15 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 1.74 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 2.35 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 6.205 sec; CPU: 6.161 sec
+    ## [main] Real time: 6.866 sec; CPU: 6.828 sec
 
 We can see the newly created index files.
 
@@ -533,13 +557,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Jul 13 05:18 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Jul 13 05:18 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Jul 13 05:24 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Jul 13 05:24 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Jul 13 05:24 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Jul 13 05:24 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Jul 13 05:24 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Mar 16 01:43 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Mar 16 01:43 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Mar 16 01:50 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Mar 16 01:50 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Mar 16 01:50 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Mar 16 01:50 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Mar 16 01:50 chrI.fa.gz.sa
 
 ### File permissions
 
@@ -668,11 +692,11 @@ docker pull busybox
 
     ## Using default tag: latest
     ## latest: Pulling from library/busybox
-    ## 19d511225f94: Pulling fs layer
-    ## 19d511225f94: Verifying Checksum
-    ## 19d511225f94: Download complete
-    ## 19d511225f94: Pull complete
-    ## Digest: sha256:3614ca5eacf0a3a1bcc361c939202a974b4902b9334ff36eb29ffe9011aaad83
+    ## 1487bff95222: Pulling fs layer
+    ## 1487bff95222: Verifying Checksum
+    ## 1487bff95222: Download complete
+    ## 1487bff95222: Pull complete
+    ## Digest: sha256:c118f538365369207c12e5794c3cbfb7b042d950af590ae6c287ede74f29b7d4
     ## Status: Downloaded newer image for busybox:latest
     ## docker.io/library/busybox:latest
 
@@ -682,8 +706,8 @@ Check out `busybox`.
 docker images busybox
 ```
 
-    ## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-    ## busybox      latest    62aedd01bd85   5 weeks ago   1.24MB
+    ## REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
+    ## busybox      latest    bab98d58e29e   9 days ago   4.86MB
 
 Remove `busybox`.
 
@@ -692,9 +716,9 @@ docker rmi busybox
 ```
 
     ## Untagged: busybox:latest
-    ## Untagged: busybox@sha256:3614ca5eacf0a3a1bcc361c939202a974b4902b9334ff36eb29ffe9011aaad83
-    ## Deleted: sha256:62aedd01bd8520c43d06b09f7a0f67ba9720bdc04631a8242c65ea995f3ecac8
-    ## Deleted: sha256:7ad00cd55506625f2afad262de6002c8cef20d214b353e51d1025e40e8646e18
+    ## Untagged: busybox@sha256:c118f538365369207c12e5794c3cbfb7b042d950af590ae6c287ede74f29b7d4
+    ## Deleted: sha256:bab98d58e29e4eb5744a69057a7b3d6ce99b19363a0e52c40301a5db43abf83c
+    ## Deleted: sha256:427701cb9c9623cab51dcec9cfd66d7a88d189a14961120f4b2c62ce2e439b9d
 
 ## Committing changes
 
@@ -704,8 +728,8 @@ changes](https://docs.docker.com/engine/reference/commandline/commit/)
 to your container (like you would for Git), read on.
 
 When you log out of a container, the changes made are still stored; type
-`docker ps -a` to see all containers and the latest changes. Use `docker
-commit` to commit your changes.
+`docker ps -a` to see all containers and the latest changes. Use
+`docker commit` to commit your changes.
 
 ``` bash
 docker ps -a
@@ -771,7 +795,7 @@ docker ps -a
 ```
 
     ## CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS                              PORTS     NAMES
-    ## c8855e8ee114   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             kind_jones
+    ## 0a5fadcefd65   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             gracious_diffie
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -780,7 +804,7 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## c8855e8ee114
+    ## 0a5fadcefd65
 
 Check to see if the container still exists.
 
@@ -893,24 +917,25 @@ docker run --rm rocker/r-ver:4.1.0
 
     ## Unable to find image 'rocker/r-ver:4.1.0' locally
     ## 4.1.0: Pulling from rocker/r-ver
-    ## d7bfe07ed847: Already exists
-    ## 2f0a3d0b8e42: Pulling fs layer
-    ## 0310efd86b0a: Pulling fs layer
-    ## a29431c95dea: Pulling fs layer
-    ## 762d9e41bf9b: Pulling fs layer
-    ## 762d9e41bf9b: Waiting
-    ## 2f0a3d0b8e42: Download complete
-    ## a29431c95dea: Verifying Checksum
-    ## a29431c95dea: Download complete
-    ## 2f0a3d0b8e42: Pull complete
-    ## 762d9e41bf9b: Verifying Checksum
-    ## 762d9e41bf9b: Download complete
-    ## 0310efd86b0a: Verifying Checksum
-    ## 0310efd86b0a: Download complete
-    ## 0310efd86b0a: Pull complete
-    ## a29431c95dea: Pull complete
-    ## 762d9e41bf9b: Pull complete
-    ## Digest: sha256:cbdecb371ce4576ca2ed5939585dcc544bf5e8c56a651092854fa0b430396d02
+    ## 47c764472391: Already exists
+    ## a62aac15af1b: Pulling fs layer
+    ## 3ef104191697: Pulling fs layer
+    ## 51164e9cded3: Pulling fs layer
+    ## fe687534b7a1: Pulling fs layer
+    ## fe687534b7a1: Waiting
+    ## 51164e9cded3: Verifying Checksum
+    ## 51164e9cded3: Download complete
+    ## a62aac15af1b: Verifying Checksum
+    ## a62aac15af1b: Download complete
+    ## a62aac15af1b: Pull complete
+    ## fe687534b7a1: Verifying Checksum
+    ## fe687534b7a1: Download complete
+    ## 3ef104191697: Verifying Checksum
+    ## 3ef104191697: Download complete
+    ## 3ef104191697: Pull complete
+    ## 51164e9cded3: Pull complete
+    ## fe687534b7a1: Pull complete
+    ## Digest: sha256:d165d8e7da614a2b7182eb6f296417588e122e089235fe76cd67f85a0e62df21
     ## Status: Downloaded newer image for rocker/r-ver:4.1.0
     ## 
     ## R version 4.1.0 (2021-05-18) -- "Camp Pontanezen"
@@ -1024,20 +1049,20 @@ docker run --rm -it -u $(stat -c "%u:%g" ${HOME}) -v $(pwd):$(pwd) -w $(pwd) dav
 
 ## Useful links
 
-  - [A quick introduction to
-    Docker](http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/)
-  - [The BioDocker project](https://github.com/BioDocker/biodocker);
-    check out their [Wiki](https://github.com/BioDocker/biodocker/wiki),
-    which has a lot of useful information
-  - [The impact of Docker containers on the performance of genomic
-    pipelines](http://www.ncbi.nlm.nih.gov/pubmed/26421241)
-  - [Learn enough Docker to be
-    useful](https://towardsdatascience.com/learn-enough-docker-to-be-useful-b0b44222eef5)
-  - [10 things to avoid in Docker
-    containers](http://developers.redhat.com/blog/2016/02/24/10-things-to-avoid-in-docker-containers/)
-  - The [Play with Docker
-    classroom](https://training.play-with-docker.com/) brings you labs
-    and tutorials that help you get hands-on experience using Docker
-  - [Shifter](https://github.com/NERSC/shifter) enables container images
-    for HPC
-  - <http://biocworkshops2019.bioconductor.org.s3-website-us-east-1.amazonaws.com/page/BioconductorOnContainers__Bioconductor_Containers_Workshop/>
+- [A quick introduction to
+  Docker](http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/)
+- [The BioDocker project](https://github.com/BioDocker/biodocker); check
+  out their [Wiki](https://github.com/BioDocker/biodocker/wiki), which
+  has a lot of useful information
+- [The impact of Docker containers on the performance of genomic
+  pipelines](http://www.ncbi.nlm.nih.gov/pubmed/26421241)
+- [Learn enough Docker to be
+  useful](https://towardsdatascience.com/learn-enough-docker-to-be-useful-b0b44222eef5)
+- [10 things to avoid in Docker
+  containers](http://developers.redhat.com/blog/2016/02/24/10-things-to-avoid-in-docker-containers/)
+- The [Play with Docker
+  classroom](https://training.play-with-docker.com/) brings you labs and
+  tutorials that help you get hands-on experience using Docker
+- [Shifter](https://github.com/NERSC/shifter) enables container images
+  for HPC
+- <http://biocworkshops2019.bioconductor.org.s3-website-us-east-1.amazonaws.com/page/BioconductorOnContainers__Bioconductor_Containers_Workshop/>
