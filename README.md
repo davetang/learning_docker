@@ -35,7 +35,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Thu Mar 16 01:50:35 UTC 2023
+Mon Apr 10 04:42:44 UTC 2023
 
 Learning Docker
 ================
@@ -93,7 +93,7 @@ docker run --rm hello-world
     ## 2db29710123e: Verifying Checksum
     ## 2db29710123e: Download complete
     ## 2db29710123e: Pull complete
-    ## Digest: sha256:63421b18c1443a9a85139225293fae7541fb40b7832d9deff80b6a9a75ce3604
+    ## Digest: sha256:ffb13da98453e0f04d33a6eee5bb8e46ee50d08ebe17735fc0779d0349e889e9
     ## Status: Downloaded newer image for hello-world:latest
     ## 
     ## Hello from Docker!
@@ -140,12 +140,8 @@ docker pull ubuntu:18.04
 ```
 
     ## 18.04: Pulling from library/ubuntu
-    ## 0c5227665c11: Pulling fs layer
-    ## 0c5227665c11: Verifying Checksum
-    ## 0c5227665c11: Download complete
-    ## 0c5227665c11: Pull complete
-    ## Digest: sha256:d8e140ad8a0bbe4c30f341c83eda9747032c5d344cad955d4a0be7dc4c209a4d
-    ## Status: Downloaded newer image for ubuntu:18.04
+    ## Digest: sha256:8aa9c2798215f99544d1ce7439ea9c3a6dfd82de607da1cec3a8a2fae005931b
+    ## Status: Image is up to date for ubuntu:18.04
     ## docker.io/library/ubuntu:18.04
 
 To run Ubuntu using Docker, we use `docker run`.
@@ -390,15 +386,15 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
-    ## feac53061382: Verifying Checksum
-    ## feac53061382: Download complete
     ## 5f22362f8660: Verifying Checksum
     ## 5f22362f8660: Download complete
+    ## feac53061382: Verifying Checksum
+    ## feac53061382: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
-    ## feac53061382: Pull complete
     ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
+    ## feac53061382: Pull complete
     ## 549f86662946: Pull complete
     ## 5f22362f8660: Pull complete
     ## 3836f06c7ac7: Pull complete
@@ -540,15 +536,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.20 sec
+    ## [bwa_index] Pack FASTA... 0.23 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 4.02 seconds elapse.
+    ## [bwa_index] 4.41 seconds elapse.
     ## [bwa_index] Update BWT... 0.09 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.15 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 2.35 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.16 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 2.09 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 6.866 sec; CPU: 6.828 sec
+    ## [main] Real time: 7.076 sec; CPU: 7.028 sec
 
 We can see the newly created index files.
 
@@ -557,23 +553,32 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Mar 16 01:43 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Mar 16 01:43 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Mar 16 01:50 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Mar 16 01:50 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Mar 16 01:50 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Mar 16 01:50 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Mar 16 01:50 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Apr 10 04:33 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Apr 10 04:33 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Apr 10 04:42 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Apr 10 04:42 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Apr 10 04:42 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Apr 10 04:42 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Apr 10 04:42 chrI.fa.gz.sa
+
+However note that the generated files are owned by `root`, which is
+slightly annoying because unless we have root access, we need to start a
+Docker container with the volume re-mounted to alter/delete the files.
 
 ### File permissions
 
-On newer version of Docker, you no longer have to worry about this.
-However, if you find that the file created inside your container on a
-mounted volume are owned by `root`, read on.
+As seen above, files generated inside the container on a mounted volume
+are owned by `root`. This is because the default user inside a Docker
+container is `root`. In Linux, there is typically a `root` user with the
+UID and GID of 0; this user exists in the host Linux environment (where
+the Docker engine is running) as well as inside the Docker container.
 
-The files created inside the Docker container will be owned by root;
-inside the Docker container, you are `root` and the files you produce
-will have `root` permissions.
+In the example below, the mounted volume is owned by UID 1211 and GID
+1211 (in the host environment). This UID and GID does not exist in the
+Docker container, thus the UID and GID are shown instead of a name like
+`root`. This is important to understand because to circumvent this file
+permission issue, we need to create a user that matches the UID and GID
+in the host environment.
 
 ``` bash
 ls -lrt
@@ -590,21 +595,22 @@ total 2816
 -rw-r--r-- 1 root root   56824 Apr 27 02:04 aln.sam
 ```
 
-This is problematic because when you’re back in the host environment,
-you can’t modify these files. To circumvent this, create a user that
-matches the host user by passing three environmental variables from the
-host to the container.
+As mentioned already, having `root` ownership is problematic because
+when we are back in the host environment, we can’t modify these files.
+To circumvent this, we can create a user that matches the host user by
+passing three environmental variables from the host to the container.
 
 ``` bash
 docker run -it \
--v ~/my_data:/data \
--e MYUID=`id -u` \
--e MYGID=`id -g` \
--e ME=`whoami` \
-bwa /bin/bash
+  -v ~/my_data:/data \
+  -e MYUID=$(id -u) \
+  -e MYGID=$(id -g) \
+  -e ME=$(whoami) \
+  bwa /bin/bash
 ```
 
-Use the steps below to create an identical user inside the container.
+We use the environment variables and the following steps to create an
+identical user inside the container.
 
 ``` bash
 adduser --quiet --home /home/san/$ME --no-create-home --gecos "" --shell /bin/bash --disabled-password $ME
@@ -641,7 +647,8 @@ total 2816
 exit
 ```
 
-The files will be saved in `~/my_data` on the host.
+This time when you check the file permissions in the host environment,
+they should match your username.
 
 ``` bash
 ls -lrt ~/my_data
@@ -660,12 +667,102 @@ total 2816
 
 ### File Permissions 2
 
-An easier way to set file permissions is to use the `-u` parameter.
+There is a `-u` or `--user` parameter that can be used with `docker run`
+to run a container using a specific user. This is easier than creating a
+new user.
+
+In this example we run the `touch` command as `root`.
 
 ``` bash
-# assuming blah.fa exists in /local/data/
-docker run -v /local/data:/data -u `stat -c "%u:%g" /local/data` bwa bwa index /data/blah.fa
+docker run -v $(pwd):/$(pwd) touch $(pwd)/test_root.txt
+ls -lrt
 ```
+
+    ## Unable to find image 'touch:latest' locally
+    ## docker: Error response from daemon: pull access denied for touch, repository does not exist or may require 'docker login': denied: requested access to the resource is denied.
+    ## See 'docker run --help'.
+    ## total 172
+    ## -rwxr-xr-x 1 runner docker  2432 Apr 10 04:33 create_readme.sh
+    ## -rwxr-xr-x 1 runner docker   177 Apr 10 04:33 clean_up_docker.sh
+    ## -rwxr-xr-x 1 runner docker    91 Apr 10 04:33 build.sh
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 bioperl
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 aspera_connect
+    ## -rw-r--r-- 1 runner docker 36248 Apr 10 04:33 README.md
+    ## -rw-r--r-- 1 runner docker  1066 Apr 10 04:33 LICENSE
+    ## -rw-r--r-- 1 runner docker  1098 Apr 10 04:33 Dockerfile.base
+    ## -rw-r--r-- 1 runner docker   670 Apr 10 04:33 Dockerfile
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 script
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 samtools
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 rstudio_python
+    ## drwxr-xr-x 3 runner docker  4096 Apr 10 04:33 rstudio
+    ## -rwxr-xr-x 1 runner docker 24837 Apr 10 04:33 readme.Rmd
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 r
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 mysql
+    ## drwxr-xr-x 3 runner docker  4096 Apr 10 04:33 mkdocs_site
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 mkdocs
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 igv
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 hla-la
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 gitlab
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 github_actions
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 firefox
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 fastq
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 vscode
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 ubuntu
+    ## drwxr-xr-x 4 runner docker  4096 Apr 10 04:33 shiny
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 seurat
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:42 data
+
+In this example, we run the command as a user with the same UID and GID;
+the `stat` command is used to get the UID and GID.
+
+``` bash
+docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) touch $(pwd)/test_mine.txt
+ls -lrt
+```
+
+    ## Unable to find image 'touch:latest' locally
+    ## docker: Error response from daemon: pull access denied for touch, repository does not exist or may require 'docker login': denied: requested access to the resource is denied.
+    ## See 'docker run --help'.
+    ## total 172
+    ## -rwxr-xr-x 1 runner docker  2432 Apr 10 04:33 create_readme.sh
+    ## -rwxr-xr-x 1 runner docker   177 Apr 10 04:33 clean_up_docker.sh
+    ## -rwxr-xr-x 1 runner docker    91 Apr 10 04:33 build.sh
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 bioperl
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 aspera_connect
+    ## -rw-r--r-- 1 runner docker 36248 Apr 10 04:33 README.md
+    ## -rw-r--r-- 1 runner docker  1066 Apr 10 04:33 LICENSE
+    ## -rw-r--r-- 1 runner docker  1098 Apr 10 04:33 Dockerfile.base
+    ## -rw-r--r-- 1 runner docker   670 Apr 10 04:33 Dockerfile
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 script
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 samtools
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 rstudio_python
+    ## drwxr-xr-x 3 runner docker  4096 Apr 10 04:33 rstudio
+    ## -rwxr-xr-x 1 runner docker 24837 Apr 10 04:33 readme.Rmd
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 r
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 mysql
+    ## drwxr-xr-x 3 runner docker  4096 Apr 10 04:33 mkdocs_site
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 mkdocs
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 igv
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 hla-la
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 gitlab
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 github_actions
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 firefox
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 fastq
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 vscode
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 ubuntu
+    ## drwxr-xr-x 4 runner docker  4096 Apr 10 04:33 shiny
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 seurat
+    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:42 data
+
+One issue with this method is that you may encounter the following
+warning (if running interactively):
+
+    groups: cannot find name for group ID 1000
+    I have no name!@ed9e8b6b7622:/$
+
+This is because the user in your host environment does not exist in the
+container environment. As far as I am aware, this is not a problem; we
+just want to create files/directories with matching user and group IDs.
 
 ### Read only
 
@@ -692,11 +789,11 @@ docker pull busybox
 
     ## Using default tag: latest
     ## latest: Pulling from library/busybox
-    ## 1487bff95222: Pulling fs layer
-    ## 1487bff95222: Verifying Checksum
-    ## 1487bff95222: Download complete
-    ## 1487bff95222: Pull complete
-    ## Digest: sha256:c118f538365369207c12e5794c3cbfb7b042d950af590ae6c287ede74f29b7d4
+    ## 4b35f584bb4f: Pulling fs layer
+    ## 4b35f584bb4f: Verifying Checksum
+    ## 4b35f584bb4f: Download complete
+    ## 4b35f584bb4f: Pull complete
+    ## Digest: sha256:b5d6fe0712636ceb7430189de28819e195e8966372edfc2d9409d79402a0dc16
     ## Status: Downloaded newer image for busybox:latest
     ## docker.io/library/busybox:latest
 
@@ -706,8 +803,8 @@ Check out `busybox`.
 docker images busybox
 ```
 
-    ## REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
-    ## busybox      latest    bab98d58e29e   9 days ago   4.86MB
+    ## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+    ## busybox      latest    7cfbbec8963d   3 weeks ago   4.86MB
 
 Remove `busybox`.
 
@@ -716,9 +813,9 @@ docker rmi busybox
 ```
 
     ## Untagged: busybox:latest
-    ## Untagged: busybox@sha256:c118f538365369207c12e5794c3cbfb7b042d950af590ae6c287ede74f29b7d4
-    ## Deleted: sha256:bab98d58e29e4eb5744a69057a7b3d6ce99b19363a0e52c40301a5db43abf83c
-    ## Deleted: sha256:427701cb9c9623cab51dcec9cfd66d7a88d189a14961120f4b2c62ce2e439b9d
+    ## Untagged: busybox@sha256:b5d6fe0712636ceb7430189de28819e195e8966372edfc2d9409d79402a0dc16
+    ## Deleted: sha256:7cfbbec8963d8f13e6c70416d6592e1cc10f47a348131290a55d43c3acab3fb9
+    ## Deleted: sha256:baacf561cfff825708763ce7ee4a18293716c533e6ece3bd39009a5fb3c804d2
 
 ## Committing changes
 
@@ -794,8 +891,8 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS                              PORTS     NAMES
-    ## 0a5fadcefd65   hello-world   "/hello"   Less than a second ago   Exited (0) Less than a second ago             gracious_diffie
+    ## CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                              PORTS     NAMES
+    ## 9f6fe533789e   hello-world   "/hello"   1 second ago   Exited (0) Less than a second ago             dazzling_hawking
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -804,7 +901,7 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 0a5fadcefd65
+    ## 9f6fe533789e
 
 Check to see if the container still exists.
 
@@ -917,21 +1014,25 @@ docker run --rm rocker/r-ver:4.1.0
 
     ## Unable to find image 'rocker/r-ver:4.1.0' locally
     ## 4.1.0: Pulling from rocker/r-ver
-    ## 47c764472391: Already exists
+    ## 47c764472391: Pulling fs layer
     ## a62aac15af1b: Pulling fs layer
     ## 3ef104191697: Pulling fs layer
     ## 51164e9cded3: Pulling fs layer
     ## fe687534b7a1: Pulling fs layer
+    ## 51164e9cded3: Waiting
     ## fe687534b7a1: Waiting
-    ## 51164e9cded3: Verifying Checksum
-    ## 51164e9cded3: Download complete
     ## a62aac15af1b: Verifying Checksum
     ## a62aac15af1b: Download complete
-    ## a62aac15af1b: Pull complete
+    ## 51164e9cded3: Verifying Checksum
+    ## 51164e9cded3: Download complete
+    ## 47c764472391: Verifying Checksum
+    ## 47c764472391: Download complete
     ## fe687534b7a1: Verifying Checksum
     ## fe687534b7a1: Download complete
     ## 3ef104191697: Verifying Checksum
     ## 3ef104191697: Download complete
+    ## 47c764472391: Pull complete
+    ## a62aac15af1b: Pull complete
     ## 3ef104191697: Pull complete
     ## 51164e9cded3: Pull complete
     ## fe687534b7a1: Pull complete
