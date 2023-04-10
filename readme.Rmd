@@ -296,11 +296,23 @@ We can see the newly created index files.
 ls -lrt data
 ```
 
+However note that the generated files are owned by `root`, which is slightly
+annoying because unless we have root access, we need to start a Docker
+container with the volume re-mounted to alter/delete the files.
+
 ### File permissions
 
-On newer version of Docker, you no longer have to worry about this. However, if you find that the file created inside your container on a mounted volume are owned by `root`, read on.
+As seen above, files generated inside the container on a mounted volume are
+owned by `root`. This is because the default user inside a Docker container is
+`root`. In Linux, there is typically a `root` user with the UID and GID of 0;
+this user exists in the host Linux environment (where the Docker engine is
+running) as well as inside the Docker container.
 
-The files created inside the Docker container will be owned by root; inside the Docker container, you are `root` and the files you produce will have `root` permissions. 
+In the example below, the mounted volume is owned by UID 1211 and GID 1211 (in
+the host environment). This UID and GID does not exist in the Docker container,
+thus the UID and GID are shown instead of a name like `root`. This is important
+to understand because to circumvent this file permission issue, we need to
+create a user that matches the UID and GID in the host environment.
 
 ```bash
 ls -lrt
@@ -317,18 +329,22 @@ total 2816
 -rw-r--r-- 1 root root   56824 Apr 27 02:04 aln.sam
 ```
 
-This is problematic because when you're back in the host environment, you can't modify these files. To circumvent this, create a user that matches the host user by passing three environmental variables from the host to the container.
+As mentioned already, having `root` ownership is problematic because when we
+are back in the host environment, we can't modify these files. To circumvent
+this, we can create a user that matches the host user by passing three
+environmental variables from the host to the container.
 
 ```bash
 docker run -it \
--v ~/my_data:/data \
--e MYUID=`id -u` \
--e MYGID=`id -g` \
--e ME=`whoami` \
-bwa /bin/bash
+  -v ~/my_data:/data \
+  -e MYUID=$(id -u) \
+  -e MYGID=$(id -g) \
+  -e ME=$(whoami) \
+  bwa /bin/bash
 ```
 
-Use the steps below to create an identical user inside the container.
+We use the environment variables and the following steps to create an identical
+user inside the container.
 
 ```bash
 adduser --quiet --home /home/san/$ME --no-create-home --gecos "" --shell /bin/bash --disabled-password $ME
@@ -365,7 +381,8 @@ total 2816
 exit
 ```
 
-The files will be saved in `~/my_data` on the host.
+This time when you check the file permissions in the host environment, they
+should match your username.
 
 ```bash
 ls -lrt ~/my_data
@@ -384,12 +401,35 @@ total 2816
 
 ### File Permissions 2
 
-An easier way to set file permissions is to use the `-u` parameter.
+There is a `-u` or `--user` parameter that can be used with `docker run` to run
+a container using a specific user. This is easier than creating a new user.
 
-```bash
-# assuming blah.fa exists in /local/data/
-docker run -v /local/data:/data -u `stat -c "%u:%g" /local/data` bwa bwa index /data/blah.fa
+In this example we run the `touch` command as `root`.
+
+```{bash engine.opts='-l'}
+docker run -v $(pwd):/$(pwd) touch $(pwd)/test_root.txt
+ls -lrt
 ```
+
+In this example, we run the command as a user with the same UID and GID; the
+`stat` command is used to get the UID and GID.
+
+```{bash engine.opts='-l'}
+docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) touch $(pwd)/test_mine.txt
+ls -lrt
+```
+
+One issue with this method is that you may encounter the following warning (if
+running interactively):
+
+```
+groups: cannot find name for group ID 1000
+I have no name!@ed9e8b6b7622:/$
+```
+
+This is because the user in your host environment does not exist in the
+container environment. As far as I am aware, this is not a problem; we just
+want to create files/directories with matching user and group IDs.
 
 ### Read only
 
