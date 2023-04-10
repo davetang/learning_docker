@@ -35,7 +35,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Mon Apr 10 04:42:44 UTC 2023
+Mon Apr 10 04:56:36 UTC 2023
 
 Learning Docker
 ================
@@ -90,7 +90,6 @@ docker run --rm hello-world
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
     ## 2db29710123e: Pulling fs layer
-    ## 2db29710123e: Verifying Checksum
     ## 2db29710123e: Download complete
     ## 2db29710123e: Pull complete
     ## Digest: sha256:ffb13da98453e0f04d33a6eee5bb8e46ee50d08ebe17735fc0779d0349e889e9
@@ -386,14 +385,14 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
-    ## 5f22362f8660: Verifying Checksum
-    ## 5f22362f8660: Download complete
     ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
-    ## 3836f06c7ac7: Verifying Checksum
-    ## 3836f06c7ac7: Download complete
+    ## 5f22362f8660: Verifying Checksum
+    ## 5f22362f8660: Download complete
     ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
+    ## 3836f06c7ac7: Verifying Checksum
+    ## 3836f06c7ac7: Download complete
     ## feac53061382: Pull complete
     ## 549f86662946: Pull complete
     ## 5f22362f8660: Pull complete
@@ -538,13 +537,13 @@ docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 
     ## [bwa_index] Pack FASTA... 0.23 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 4.41 seconds elapse.
-    ## [bwa_index] Update BWT... 0.09 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.16 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 2.09 sec
+    ## [bwa_index] 4.50 seconds elapse.
+    ## [bwa_index] Update BWT... 0.10 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.17 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 2.30 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 7.076 sec; CPU: 7.028 sec
+    ## [main] Real time: 7.380 sec; CPU: 7.335 sec
 
 We can see the newly created index files.
 
@@ -553,13 +552,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Apr 10 04:33 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Apr 10 04:33 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Apr 10 04:42 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Apr 10 04:42 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Apr 10 04:42 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Apr 10 04:42 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Apr 10 04:42 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Apr 10 04:46 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Apr 10 04:46 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Apr 10 04:56 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Apr 10 04:56 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Apr 10 04:56 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Apr 10 04:56 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Apr 10 04:56 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -674,85 +673,29 @@ new user.
 In this example we run the `touch` command as `root`.
 
 ``` bash
-docker run -v $(pwd):/$(pwd) touch $(pwd)/test_root.txt
-ls -lrt
+docker run -v $(pwd):/$(pwd) ubuntu:22.10 touch $(pwd)/test_root.txt
+ls -lrt $(pwd)/test_root.txt
 ```
 
-    ## Unable to find image 'touch:latest' locally
-    ## docker: Error response from daemon: pull access denied for touch, repository does not exist or may require 'docker login': denied: requested access to the resource is denied.
-    ## See 'docker run --help'.
-    ## total 172
-    ## -rwxr-xr-x 1 runner docker  2432 Apr 10 04:33 create_readme.sh
-    ## -rwxr-xr-x 1 runner docker   177 Apr 10 04:33 clean_up_docker.sh
-    ## -rwxr-xr-x 1 runner docker    91 Apr 10 04:33 build.sh
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 bioperl
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 aspera_connect
-    ## -rw-r--r-- 1 runner docker 36248 Apr 10 04:33 README.md
-    ## -rw-r--r-- 1 runner docker  1066 Apr 10 04:33 LICENSE
-    ## -rw-r--r-- 1 runner docker  1098 Apr 10 04:33 Dockerfile.base
-    ## -rw-r--r-- 1 runner docker   670 Apr 10 04:33 Dockerfile
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 script
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 samtools
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 rstudio_python
-    ## drwxr-xr-x 3 runner docker  4096 Apr 10 04:33 rstudio
-    ## -rwxr-xr-x 1 runner docker 24837 Apr 10 04:33 readme.Rmd
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 r
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 mysql
-    ## drwxr-xr-x 3 runner docker  4096 Apr 10 04:33 mkdocs_site
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 mkdocs
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 igv
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 hla-la
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 gitlab
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 github_actions
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 firefox
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 fastq
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 vscode
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 ubuntu
-    ## drwxr-xr-x 4 runner docker  4096 Apr 10 04:33 shiny
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 seurat
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:42 data
+    ## Unable to find image 'ubuntu:22.10' locally
+    ## 22.10: Pulling from library/ubuntu
+    ## 5c19388d38e1: Pulling fs layer
+    ## 5c19388d38e1: Verifying Checksum
+    ## 5c19388d38e1: Download complete
+    ## 5c19388d38e1: Pull complete
+    ## Digest: sha256:a82eebb42083a134e009a6b81a7e5d2eecc37112fa8ae40642bd3c5153b7e4f0
+    ## Status: Downloaded newer image for ubuntu:22.10
+    ## -rw-r--r-- 1 root root 0 Apr 10 04:56 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
 
 ``` bash
-docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) touch $(pwd)/test_mine.txt
-ls -lrt
+docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pwd)/test_mine.txt
+ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## Unable to find image 'touch:latest' locally
-    ## docker: Error response from daemon: pull access denied for touch, repository does not exist or may require 'docker login': denied: requested access to the resource is denied.
-    ## See 'docker run --help'.
-    ## total 172
-    ## -rwxr-xr-x 1 runner docker  2432 Apr 10 04:33 create_readme.sh
-    ## -rwxr-xr-x 1 runner docker   177 Apr 10 04:33 clean_up_docker.sh
-    ## -rwxr-xr-x 1 runner docker    91 Apr 10 04:33 build.sh
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 bioperl
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 aspera_connect
-    ## -rw-r--r-- 1 runner docker 36248 Apr 10 04:33 README.md
-    ## -rw-r--r-- 1 runner docker  1066 Apr 10 04:33 LICENSE
-    ## -rw-r--r-- 1 runner docker  1098 Apr 10 04:33 Dockerfile.base
-    ## -rw-r--r-- 1 runner docker   670 Apr 10 04:33 Dockerfile
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 script
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 samtools
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 rstudio_python
-    ## drwxr-xr-x 3 runner docker  4096 Apr 10 04:33 rstudio
-    ## -rwxr-xr-x 1 runner docker 24837 Apr 10 04:33 readme.Rmd
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 r
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 mysql
-    ## drwxr-xr-x 3 runner docker  4096 Apr 10 04:33 mkdocs_site
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 mkdocs
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 igv
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 hla-la
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 gitlab
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 github_actions
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 firefox
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 fastq
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 vscode
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 ubuntu
-    ## drwxr-xr-x 4 runner docker  4096 Apr 10 04:33 shiny
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:33 seurat
-    ## drwxr-xr-x 2 runner docker  4096 Apr 10 04:42 data
+    ## -rw-r--r-- 1 runner docker 0 Apr 10 04:56 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -891,8 +834,10 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                              PORTS     NAMES
-    ## 9f6fe533789e   hello-world   "/hello"   1 second ago   Exited (0) Less than a second ago             dazzling_hawking
+    ## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
+    ## 8dd7e7bb3d73   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             infallible_lichterman
+    ## f390d217e053   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      boring_tu
+    ## ddbdf9512758   ubuntu:22.10   "touch /home/runner/…"   5 seconds ago   Exited (0) 4 seconds ago                      stoic_tu
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -901,7 +846,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 9f6fe533789e
+    ## 8dd7e7bb3d73
+    ## f390d217e053
+    ## ddbdf9512758
 
 Check to see if the container still exists.
 
@@ -1023,10 +970,10 @@ docker run --rm rocker/r-ver:4.1.0
     ## fe687534b7a1: Waiting
     ## a62aac15af1b: Verifying Checksum
     ## a62aac15af1b: Download complete
-    ## 51164e9cded3: Verifying Checksum
-    ## 51164e9cded3: Download complete
     ## 47c764472391: Verifying Checksum
     ## 47c764472391: Download complete
+    ## 51164e9cded3: Verifying Checksum
+    ## 51164e9cded3: Download complete
     ## fe687534b7a1: Verifying Checksum
     ## fe687534b7a1: Download complete
     ## 3ef104191697: Verifying Checksum
