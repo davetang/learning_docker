@@ -407,16 +407,16 @@ a container using a specific user. This is easier than creating a new user.
 In this example we run the `touch` command as `root`.
 
 ```{bash engine.opts='-l'}
-docker run -v $(pwd):/$(pwd) touch $(pwd)/test_root.txt
-ls -lrt
+docker run -v $(pwd):/$(pwd) ubuntu:22.10 touch $(pwd)/test_root.txt
+ls -lrt $(pwd)/test_root.txt
 ```
 
 In this example, we run the command as a user with the same UID and GID; the
 `stat` command is used to get the UID and GID.
 
 ```{bash engine.opts='-l'}
-docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) touch $(pwd)/test_mine.txt
-ls -lrt
+docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pwd)/test_mine.txt
+ls -lrt $(pwd)/test_mine.txt
 ```
 
 One issue with this method is that you may encounter the following warning (if
