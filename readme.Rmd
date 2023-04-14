@@ -183,11 +183,23 @@ docker push davetang/base
 
 ## Renaming an image
 
-Use `docker image tag`.
+The `docker image tag` command will create a new tag, i.e. new image name, that
+refers to an old image. It is not quite renaming but can be considered renaming
+since you will have a new name for your image.
+
+The usage is:
+
+    Usage:  docker image tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+
+For example I have created a new tag for my RStudio Server image, so that I can
+easily push it to Quay.io.
 
 ```bash
-docker image tag old_image_name:latest new_image_name:latest
+docker image tag davetang/rstudio:4.2.2 quay.io/davetang31/rstudio:4.2.2
 ```
+
+The original image `davetang/rstudio:4.2.2` still exists, which is why tagging
+is not quite renaming.
 
 ## Running an image
 
@@ -601,9 +613,14 @@ Usage:   samtools <command> [options]
 ...
 ```
 
-## Pushing to Docker Hub
+## Sharing your image
 
-Create an account on [Docker Hub](https://hub.docker.com/); my account is `davetang`. Use `docker login` to login and use `docker push` to push to Docker Hub (run `docker tag` first if you didn't name your image in the format of `yourhubusername/newrepo`).
+### Docker Hub
+
+Create an account on [Docker Hub](https://hub.docker.com/); my account is
+`davetang`. Use `docker login` to login and use `docker push` to push to Docker
+Hub (run `docker tag` first if you didn't name your image in the format of
+`yourhubusername/newrepo`).
 
 ```bash
 docker login
@@ -614,6 +631,46 @@ docker tag bb38976d03cf yourhubusername/newrepo
 # push
 docker push yourhubusername/newrepo
 ```
+
+### Quay.io
+
+Create an account on [Quay.io](https://quay.io/); you can use Quay.io for free as
+stated in their [plans](https://quay.io/plans/):
+
+> Can I use Quay for free?
+> Yes! We offer unlimited storage and serving of public repositories. We
+> strongly believe in the open source community and will do what we can to
+> help!
+
+Use `docker login` to [login](https://docs.quay.io/guides/login.html) and use
+the credentials you set up when you created an account on Quay.io.
+
+```console
+docker login quay.io
+```
+
+Quay.io images are prefixed with `quay.io`, so I used `docker image tag` to create
+a new tag of my RStudio Server image. (Unfortunately, the username `davetang`
+was taken on RedHat [possibly by me a long time ago], so I have to use
+`davetang31` on Quay.io.)
+
+```console
+docker image tag davetang/rstudio:4.2.2 quay.io/davetang31/rstudio:4.2.2
+```
+
+Push to Quay.io.
+
+```console
+docker push quay.io/davetang31/rstudio:4.2.2
+```
+
+### GitHub Actions
+
+[login-action](https://github.com/docker/login-action) is used to automatically
+login to [Docker Hub](https://github.com/docker/login-action#docker-hub) when
+using GitHub Actions. This allows images to be automatically built and pushed
+to Docker Hub. There is also support for
+[Quay.io](https://github.com/docker/login-action#quayio).
 
 ## Tips
 
