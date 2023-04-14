@@ -99,7 +99,15 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#saving-and-transferring-a-docker-image">Saving and transferring a Docker image</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#pushing-to-docker-hub">Pushing to Docker Hub</a>
+    <li class="toctree-l2"><a class="reference internal" href="#sharing-your-image">Sharing your image</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#docker-hub">Docker Hub</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#quayio">Quay.io</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#github-actions">GitHub Actions</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#tips">Tips</a>
     </li>
@@ -168,9 +176,10 @@ automatically remove the container when it exits.)</p>
 <pre><code>## Unable to find image 'hello-world:latest' locally
 ## latest: Pulling from library/hello-world
 ## 2db29710123e: Pulling fs layer
+## 2db29710123e: Verifying Checksum
 ## 2db29710123e: Download complete
 ## 2db29710123e: Pull complete
-## Digest: sha256:ffb13da98453e0f04d33a6eee5bb8e46ee50d08ebe17735fc0779d0349e889e9
+## Digest: sha256:4e83453afed1b4fa1a3500525091dbfca6ce1e66903fd4c01ff015dbcb1ba33e
 ## Status: Downloaded newer image for hello-world:latest
 ## 
 ## Hello from Docker!
@@ -402,9 +411,18 @@ docker login
 docker push davetang/base
 </code></pre>
 <h2 id="renaming-an-image">Renaming an image</h2>
-<p>Use <code>docker image tag</code>.</p>
-<pre><code class="language-bash">docker image tag old_image_name:latest new_image_name:latest
+<p>The <code>docker image tag</code> command will create a new tag, i.e. new image
+name, that refers to an old image. It is not quite renaming but can be
+considered renaming since you will have a new name for your image.</p>
+<p>The usage is:</p>
+<pre><code>Usage:  docker image tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
 </code></pre>
+<p>For example I have created a new tag for my RStudio Server image, so
+that I can easily push it to Quay.io.</p>
+<pre><code class="language-bash">docker image tag davetang/rstudio:4.2.2 quay.io/davetang31/rstudio:4.2.2
+</code></pre>
+<p>The original image <code>davetang/rstudio:4.2.2</code> still exists, which is why
+tagging is not quite renaming.</p>
 <h2 id="running-an-image">Running an image</h2>
 <p><a href="https://docs.docker.com/engine/reference/run/">Docker run
 documentation</a>.</p>
@@ -417,15 +435,13 @@ documentation</a>.</p>
 ## 5f22362f8660: Pulling fs layer
 ## 3836f06c7ac7: Pulling fs layer
 ## 3836f06c7ac7: Waiting
-## feac53061382: Verifying Checksum
 ## feac53061382: Download complete
 ## 5f22362f8660: Verifying Checksum
 ## 5f22362f8660: Download complete
-## 549f86662946: Verifying Checksum
-## 549f86662946: Download complete
 ## 3836f06c7ac7: Verifying Checksum
 ## 3836f06c7ac7: Download complete
 ## feac53061382: Pull complete
+## 549f86662946: Download complete
 ## 549f86662946: Pull complete
 ## 5f22362f8660: Pull complete
 ## 3836f06c7ac7: Pull complete
@@ -546,27 +562,27 @@ inside <code>data</code> on the host. The command below will create BWA index fi
 for <code>data/chrI.fa.gz</code>.</p>
 <pre><code class="language-bash">docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 </code></pre>
-<pre><code>## [bwa_index] Pack FASTA... 0.23 sec
+<pre><code>## [bwa_index] Pack FASTA... 0.20 sec
 ## [bwa_index] Construct BWT for the packed sequence...
-## [bwa_index] 4.50 seconds elapse.
-## [bwa_index] Update BWT... 0.10 sec
-## [bwa_index] Pack forward-only FASTA... 0.17 sec
-## [bwa_index] Construct SA from BWT and Occ... 2.30 sec
+## [bwa_index] 4.12 seconds elapse.
+## [bwa_index] Update BWT... 0.09 sec
+## [bwa_index] Pack forward-only FASTA... 0.15 sec
+## [bwa_index] Construct SA from BWT and Occ... 1.65 sec
 ## [main] Version: 0.7.17-r1188
 ## [main] CMD: bwa index chrI.fa.gz
-## [main] Real time: 7.380 sec; CPU: 7.335 sec
+## [main] Real time: 6.279 sec; CPU: 6.235 sec
 </code></pre>
 <p>We can see the newly created index files.</p>
 <pre><code class="language-bash">ls -lrt data
 </code></pre>
 <pre><code>## total 30436
-## -rw-r--r-- 1 runner docker      194 Apr 10 04:46 README.md
-## -rw-r--r-- 1 runner docker  4772981 Apr 10 04:46 chrI.fa.gz
-## -rw-r--r-- 1 root   root   15072516 Apr 10 04:56 chrI.fa.gz.bwt
-## -rw-r--r-- 1 root   root    3768110 Apr 10 04:56 chrI.fa.gz.pac
-## -rw-r--r-- 1 root   root         41 Apr 10 04:56 chrI.fa.gz.ann
-## -rw-r--r-- 1 root   root         13 Apr 10 04:56 chrI.fa.gz.amb
-## -rw-r--r-- 1 root   root    7536272 Apr 10 04:56 chrI.fa.gz.sa
+## -rw-r--r-- 1 runner docker      194 Apr 14 01:26 README.md
+## -rw-r--r-- 1 runner docker  4772981 Apr 14 01:26 chrI.fa.gz
+## -rw-r--r-- 1 root   root   15072516 Apr 14 01:32 chrI.fa.gz.bwt
+## -rw-r--r-- 1 root   root    3768110 Apr 14 01:32 chrI.fa.gz.pac
+## -rw-r--r-- 1 root   root         41 Apr 14 01:32 chrI.fa.gz.ann
+## -rw-r--r-- 1 root   root         13 Apr 14 01:32 chrI.fa.gz.amb
+## -rw-r--r-- 1 root   root    7536272 Apr 14 01:32 chrI.fa.gz.sa
 </code></pre>
 <p>However note that the generated files are owned by <code>root</code>, which is
 slightly annoying because unless we have root access, we need to start a
@@ -673,14 +689,14 @@ ls -lrt $(pwd)/test_root.txt
 ## 5c19388d38e1: Pull complete
 ## Digest: sha256:a82eebb42083a134e009a6b81a7e5d2eecc37112fa8ae40642bd3c5153b7e4f0
 ## Status: Downloaded newer image for ubuntu:22.10
-## -rw-r--r-- 1 root root 0 Apr 10 04:56 /home/runner/work/learning_docker/learning_docker/test_root.txt
+## -rw-r--r-- 1 root root 0 Apr 14 01:33 /home/runner/work/learning_docker/learning_docker/test_root.txt
 </code></pre>
 <p>In this example, we run the command as a user with the same UID and GID;
 the <code>stat</code> command is used to get the UID and GID.</p>
 <pre><code class="language-bash">docker run -v $(pwd):/$(pwd) -u $(stat -c &quot;%u:%g&quot; $HOME) ubuntu:22.10 touch $(pwd)/test_mine.txt
 ls -lrt $(pwd)/test_mine.txt
 </code></pre>
-<pre><code>## -rw-r--r-- 1 runner docker 0 Apr 10 04:56 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+<pre><code>## -rw-r--r-- 1 runner docker 0 Apr 14 01:33 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 </code></pre>
 <p>One issue with this method is that you may encounter the following
 warning (if running interactively):</p>
@@ -718,7 +734,7 @@ find stopped containers and <code>docker rm</code> to remove these containers.</
 <pre><code class="language-bash">docker images busybox
 </code></pre>
 <pre><code>## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-## busybox      latest    7cfbbec8963d   3 weeks ago   4.86MB
+## busybox      latest    7cfbbec8963d   4 weeks ago   4.86MB
 </code></pre>
 <p>Remove <code>busybox</code>.</p>
 <pre><code class="language-bash">docker rmi busybox
@@ -786,17 +802,17 @@ container exits. For example:</p>
 <pre><code class="language-bash">docker ps -a
 </code></pre>
 <pre><code>## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
-## 8dd7e7bb3d73   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             infallible_lichterman
-## f390d217e053   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      boring_tu
-## ddbdf9512758   ubuntu:22.10   "touch /home/runner/…"   5 seconds ago   Exited (0) 4 seconds ago                      stoic_tu
+## 898c14dd99c1   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             romantic_haslett
+## dde5714c60a7   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      admiring_montalcini
+## 46c079634786   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      mystifying_mclean
 </code></pre>
 <p>We can use a sub-shell to get all (<code>-a</code>) container IDs (<code>-q</code>) that have
 exited (<code>-f status=exited</code>) and then remove them (<code>docker rm -v</code>).</p>
 <pre><code class="language-bash">docker rm -v $(docker ps -a -q -f status=exited)
 </code></pre>
-<pre><code>## 8dd7e7bb3d73
-## f390d217e053
-## ddbdf9512758
+<pre><code>## 898c14dd99c1
+## dde5714c60a7
+## 46c079634786
 </code></pre>
 <p>Check to see if the container still exists.</p>
 <pre><code class="language-bash">docker ps -a
@@ -891,15 +907,15 @@ for example <code>rocker/r-ver:4.1.0</code>.</p>
 ## fe687534b7a1: Waiting
 ## a62aac15af1b: Verifying Checksum
 ## a62aac15af1b: Download complete
-## 47c764472391: Verifying Checksum
-## 47c764472391: Download complete
 ## 51164e9cded3: Verifying Checksum
 ## 51164e9cded3: Download complete
+## 47c764472391: Verifying Checksum
+## 47c764472391: Download complete
 ## fe687534b7a1: Verifying Checksum
 ## fe687534b7a1: Download complete
+## 47c764472391: Pull complete
 ## 3ef104191697: Verifying Checksum
 ## 3ef104191697: Download complete
-## 47c764472391: Pull complete
 ## a62aac15af1b: Pull complete
 ## 3ef104191697: Pull complete
 ## 51164e9cded3: Pull complete
@@ -958,7 +974,8 @@ Version: 1.3 (using htslib 1.3)
 Usage:   samtools &lt;command&gt; [options]
 ...
 </code></pre>
-<h2 id="pushing-to-docker-hub">Pushing to Docker Hub</h2>
+<h2 id="sharing-your-image">Sharing your image</h2>
+<h3 id="docker-hub">Docker Hub</h3>
 <p>Create an account on <a href="https://hub.docker.com/">Docker Hub</a>; my account
 is <code>davetang</code>. Use <code>docker login</code> to login and use <code>docker push</code> to push
 to Docker Hub (run <code>docker tag</code> first if you didn’t name your image in
@@ -971,6 +988,35 @@ docker tag bb38976d03cf yourhubusername/newrepo
 # push
 docker push yourhubusername/newrepo
 </code></pre>
+<h3 id="quayio">Quay.io</h3>
+<p>Create an account on <a href="https://quay.io/">Quay.io</a>; you can use Quay.io
+for free as stated in their <a href="https://quay.io/plans/">plans</a>:</p>
+<blockquote>
+<p>Can I use Quay for free? Yes! We offer unlimited storage and serving
+of public repositories. We strongly believe in the open source
+community and will do what we can to help!</p>
+</blockquote>
+<p>Use <code>docker login</code> to <a href="https://docs.quay.io/guides/login.html">login</a>
+and use the credentials you set up when you created an account on
+Quay.io.</p>
+<pre><code class="language-console">docker login quay.io
+</code></pre>
+<p>Quay.io images are prefixed with <code>quay.io</code>, so I used <code>docker image tag</code>
+to create a new tag of my RStudio Server image. (Unfortunately, the
+username <code>davetang</code> was taken on RedHat [possibly by me a long time
+ago], so I have to use <code>davetang31</code> on Quay.io.)</p>
+<pre><code class="language-console">docker image tag davetang/rstudio:4.2.2 quay.io/davetang31/rstudio:4.2.2
+</code></pre>
+<p>Push to Quay.io.</p>
+<pre><code class="language-console">docker push quay.io/davetang31/rstudio:4.2.2
+</code></pre>
+<h3 id="github-actions">GitHub Actions</h3>
+<p><a href="https://github.com/docker/login-action">login-action</a> is used to
+automatically login to <a href="https://github.com/docker/login-action#docker-hub">Docker
+Hub</a> when using
+GitHub Actions. This allows images to be automatically built and pushed
+to Docker Hub. There is also support for
+<a href="https://github.com/docker/login-action#quayio">Quay.io</a>.</p>
 <h2 id="tips">Tips</h2>
 <p>Tip from
 <a href="https://support.pawsey.org.au/documentation/display/US/Containers">https://support.pawsey.org.au/documentation/display/US/Containers</a>:
@@ -1060,5 +1106,5 @@ also added the <code>-u</code> option, which sets the user to
 
 <!--
 MkDocs version : 1.4.2
-Build Date UTC : 2023-04-10 04:56:46.197607+00:00
+Build Date UTC : 2023-04-14 01:33:27.270317+00:00
 -->
