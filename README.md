@@ -29,13 +29,16 @@ Table of Contents
    * [Creating a data container](#creating-a-data-container)
    * [R](#r)
    * [Saving and transferring a Docker image](#saving-and-transferring-a-docker-image)
-   * [Pushing to Docker Hub](#pushing-to-docker-hub)
+   * [Sharing your image](#sharing-your-image)
+      * [Docker Hub](#docker-hub)
+      * [Quay.io](#quayio)
+      * [GitHub Actions](#github-actions)
    * [Tips](#tips)
    * [Useful links](#useful-links)
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Mon Apr 10 04:56:36 UTC 2023
+Fri Apr 14 01:33:20 UTC 2023
 
 Learning Docker
 ================
@@ -90,9 +93,10 @@ docker run --rm hello-world
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
     ## 2db29710123e: Pulling fs layer
+    ## 2db29710123e: Verifying Checksum
     ## 2db29710123e: Download complete
     ## 2db29710123e: Pull complete
-    ## Digest: sha256:ffb13da98453e0f04d33a6eee5bb8e46ee50d08ebe17735fc0779d0349e889e9
+    ## Digest: sha256:4e83453afed1b4fa1a3500525091dbfca6ce1e66903fd4c01ff015dbcb1ba33e
     ## Status: Downloaded newer image for hello-world:latest
     ## 
     ## Hello from Docker!
@@ -363,11 +367,23 @@ docker push davetang/base
 
 ## Renaming an image
 
-Use `docker image tag`.
+The `docker image tag` command will create a new tag, i.e. new image
+name, that refers to an old image. It is not quite renaming but can be
+considered renaming since you will have a new name for your image.
+
+The usage is:
+
+    Usage:  docker image tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+
+For example I have created a new tag for my RStudio Server image, so
+that I can easily push it to Quay.io.
 
 ``` bash
-docker image tag old_image_name:latest new_image_name:latest
+docker image tag davetang/rstudio:4.2.2 quay.io/davetang31/rstudio:4.2.2
 ```
+
+The original image `davetang/rstudio:4.2.2` still exists, which is why
+tagging is not quite renaming.
 
 ## Running an image
 
@@ -385,15 +401,13 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
-    ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
     ## 5f22362f8660: Verifying Checksum
     ## 5f22362f8660: Download complete
-    ## 549f86662946: Verifying Checksum
-    ## 549f86662946: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
     ## feac53061382: Pull complete
+    ## 549f86662946: Download complete
     ## 549f86662946: Pull complete
     ## 5f22362f8660: Pull complete
     ## 3836f06c7ac7: Pull complete
@@ -535,15 +549,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.23 sec
+    ## [bwa_index] Pack FASTA... 0.20 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 4.50 seconds elapse.
-    ## [bwa_index] Update BWT... 0.10 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.17 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 2.30 sec
+    ## [bwa_index] 4.12 seconds elapse.
+    ## [bwa_index] Update BWT... 0.09 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.15 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 1.65 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 7.380 sec; CPU: 7.335 sec
+    ## [main] Real time: 6.279 sec; CPU: 6.235 sec
 
 We can see the newly created index files.
 
@@ -552,13 +566,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Apr 10 04:46 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Apr 10 04:46 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Apr 10 04:56 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Apr 10 04:56 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Apr 10 04:56 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Apr 10 04:56 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Apr 10 04:56 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Apr 14 01:26 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Apr 14 01:26 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Apr 14 01:32 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Apr 14 01:32 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Apr 14 01:32 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Apr 14 01:32 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Apr 14 01:32 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -685,7 +699,7 @@ ls -lrt $(pwd)/test_root.txt
     ## 5c19388d38e1: Pull complete
     ## Digest: sha256:a82eebb42083a134e009a6b81a7e5d2eecc37112fa8ae40642bd3c5153b7e4f0
     ## Status: Downloaded newer image for ubuntu:22.10
-    ## -rw-r--r-- 1 root root 0 Apr 10 04:56 /home/runner/work/learning_docker/learning_docker/test_root.txt
+    ## -rw-r--r-- 1 root root 0 Apr 14 01:33 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
@@ -695,7 +709,7 @@ docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pw
 ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## -rw-r--r-- 1 runner docker 0 Apr 10 04:56 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+    ## -rw-r--r-- 1 runner docker 0 Apr 14 01:33 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -747,7 +761,7 @@ docker images busybox
 ```
 
     ## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-    ## busybox      latest    7cfbbec8963d   3 weeks ago   4.86MB
+    ## busybox      latest    7cfbbec8963d   4 weeks ago   4.86MB
 
 Remove `busybox`.
 
@@ -835,9 +849,9 @@ docker ps -a
 ```
 
     ## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
-    ## 8dd7e7bb3d73   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             infallible_lichterman
-    ## f390d217e053   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      boring_tu
-    ## ddbdf9512758   ubuntu:22.10   "touch /home/runner/…"   5 seconds ago   Exited (0) 4 seconds ago                      stoic_tu
+    ## 898c14dd99c1   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             romantic_haslett
+    ## dde5714c60a7   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      admiring_montalcini
+    ## 46c079634786   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      mystifying_mclean
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -846,9 +860,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 8dd7e7bb3d73
-    ## f390d217e053
-    ## ddbdf9512758
+    ## 898c14dd99c1
+    ## dde5714c60a7
+    ## 46c079634786
 
 Check to see if the container still exists.
 
@@ -970,15 +984,15 @@ docker run --rm rocker/r-ver:4.1.0
     ## fe687534b7a1: Waiting
     ## a62aac15af1b: Verifying Checksum
     ## a62aac15af1b: Download complete
-    ## 47c764472391: Verifying Checksum
-    ## 47c764472391: Download complete
     ## 51164e9cded3: Verifying Checksum
     ## 51164e9cded3: Download complete
+    ## 47c764472391: Verifying Checksum
+    ## 47c764472391: Download complete
     ## fe687534b7a1: Verifying Checksum
     ## fe687534b7a1: Download complete
+    ## 47c764472391: Pull complete
     ## 3ef104191697: Verifying Checksum
     ## 3ef104191697: Download complete
-    ## 47c764472391: Pull complete
     ## a62aac15af1b: Pull complete
     ## 3ef104191697: Pull complete
     ## 51164e9cded3: Pull complete
@@ -1044,7 +1058,9 @@ Usage:   samtools <command> [options]
 ...
 ```
 
-## Pushing to Docker Hub
+## Sharing your image
+
+### Docker Hub
 
 Create an account on [Docker Hub](https://hub.docker.com/); my account
 is `davetang`. Use `docker login` to login and use `docker push` to push
@@ -1060,6 +1076,47 @@ docker tag bb38976d03cf yourhubusername/newrepo
 # push
 docker push yourhubusername/newrepo
 ```
+
+### Quay.io
+
+Create an account on [Quay.io](https://quay.io/); you can use Quay.io
+for free as stated in their [plans](https://quay.io/plans/):
+
+> Can I use Quay for free? Yes! We offer unlimited storage and serving
+> of public repositories. We strongly believe in the open source
+> community and will do what we can to help!
+
+Use `docker login` to [login](https://docs.quay.io/guides/login.html)
+and use the credentials you set up when you created an account on
+Quay.io.
+
+``` console
+docker login quay.io
+```
+
+Quay.io images are prefixed with `quay.io`, so I used `docker image tag`
+to create a new tag of my RStudio Server image. (Unfortunately, the
+username `davetang` was taken on RedHat \[possibly by me a long time
+ago\], so I have to use `davetang31` on Quay.io.)
+
+``` console
+docker image tag davetang/rstudio:4.2.2 quay.io/davetang31/rstudio:4.2.2
+```
+
+Push to Quay.io.
+
+``` console
+docker push quay.io/davetang31/rstudio:4.2.2
+```
+
+### GitHub Actions
+
+[login-action](https://github.com/docker/login-action) is used to
+automatically login to [Docker
+Hub](https://github.com/docker/login-action#docker-hub) when using
+GitHub Actions. This allows images to be automatically built and pushed
+to Docker Hub. There is also support for
+[Quay.io](https://github.com/docker/login-action#quayio).
 
 ## Tips
 
