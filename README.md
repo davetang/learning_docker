@@ -11,6 +11,7 @@ Table of Contents
    * [Dockerfile](#dockerfile)
       * [ARG](#arg)
       * [CMD](#cmd)
+      * [COPY](#copy)
       * [ENTRYPOINT](#entrypoint)
    * [Building an image](#building-an-image)
    * [Renaming an image](#renaming-an-image)
@@ -38,7 +39,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Fri Apr 14 01:33:20 UTC 2023
+Tue Apr 25 00:18:49 UTC 2023
 
 Learning Docker
 ================
@@ -93,7 +94,6 @@ docker run --rm hello-world
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
     ## 2db29710123e: Pulling fs layer
-    ## 2db29710123e: Verifying Checksum
     ## 2db29710123e: Download complete
     ## 2db29710123e: Pull complete
     ## Digest: sha256:4e83453afed1b4fa1a3500525091dbfca6ce1e66903fd4c01ff015dbcb1ba33e
@@ -169,7 +169,7 @@ docker run --rm ubuntu:18.04 cat /etc/os-release
 You can work interactively with the Ubuntu image by specifying the `-it`
 option.
 
-``` bash
+``` console
 docker run --rm -it ubuntu:18:04 /bin/bash
 ```
 
@@ -201,7 +201,7 @@ when your container has exited or when Docker restarts. The value of the
 - `unless-stopped` - similar to `always` but when the container is
   stopped, it is not restarted even after the Docker daemon restarts.
 
-``` bash
+``` console
 docker run -d \
    --restart always \
    -p 8888:8787 \
@@ -308,6 +308,36 @@ instruction in a Dockerfile and if you list more than one CMD then only
 the last CMD will take effect. The main purpose of a CMD is to provide
 defaults for an executing container.
 
+### COPY
+
+The [COPY](https://docs.docker.com/engine/reference/builder/#copy)
+instruction copies new files or directories from `<src>` and adds them
+to the filesystem of the container at the path `<dest>`. It has two
+forms:
+
+    COPY [--chown=<user>:<group>] [--chmod=<perms>] <src>... <dest>
+    COPY [--chown=<user>:<group>] [--chmod=<perms>] ["<src>",... "<dest>"]
+
+Note the `--chown` parameter, which can be used to set the ownership of
+the copied files/directories. If this is not specified, the default
+ownership is `root`, which can be a problem.
+
+For example in the RStudio Server
+[Dockerfile](https://github.com/davetang/learning_docker/blob/main/rstudio/Dockerfile),
+there are two `COPY` instructions that set the ownership to the
+`rstudio` user.
+
+    COPY --chown=rstudio:rstudio rstudio/rstudio-prefs.json /home/rstudio/.config/rstudio
+    COPY --chown=rstudio:rstudio rstudio/.Rprofile /home/rstudio/
+
+The two files that are copied are config files and therefore need to be
+writable by `rstudio` if settings are changed in RStudio Server.
+
+Usually the root path of `<src>` is set to the directory where the
+Dockerfile exists. The example above is different because the RStudio
+Server image is built by GitHub Actions, and the root path of `<src>` is
+the GitHub repository.
+
 ### ENTRYPOINT
 
 An
@@ -318,7 +348,7 @@ ENTRYPOINT has two forms:
 - ENTRYPOINT \[“executable”, “param1”, “param2”\] (exec form, preferred)
 - ENTRYPOINT command param1 param2 (shell form)
 
-``` bash
+``` console
 FROM ubuntu
 ENTRYPOINT ["top", "-b"]
 CMD ["-c"]
@@ -326,7 +356,7 @@ CMD ["-c"]
 
 Use `--entrypoint` to override ENTRYPOINT instruction.
 
-``` bash
+``` console
 docker run --entrypoint
 ```
 
@@ -353,7 +383,7 @@ You can push the built image to [Docker Hub](https://hub.docker.com/) if
 you have an account. I have used my Docker Hub account name to name my
 Docker image.
 
-``` bash
+``` console
 # use -f to specify the Dockerfile to use
 # the period indicates that the Dockerfile is in the current directory
 docker build -f Dockerfile.base -t davetang/base .
@@ -378,7 +408,7 @@ The usage is:
 For example I have created a new tag for my RStudio Server image, so
 that I can easily push it to Quay.io.
 
-``` bash
+``` console
 docker image tag davetang/rstudio:4.2.2 quay.io/davetang31/rstudio:4.2.2
 ```
 
@@ -401,12 +431,14 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
-    ## feac53061382: Download complete
     ## 5f22362f8660: Verifying Checksum
     ## 5f22362f8660: Download complete
+    ## feac53061382: Verifying Checksum
+    ## feac53061382: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
     ## feac53061382: Pull complete
+    ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
     ## 549f86662946: Pull complete
     ## 5f22362f8660: Pull complete
@@ -454,7 +486,7 @@ and using `docker stats` to confirm the CPU usage. *Remember to use
 
 Restrict to 1 CPU.
 
-``` bash
+``` console
 # run in detached mode
 docker run --rm -d --cpus=1 davetang/bwa:0.7.17 perl -le 'while(1){ }'
 
@@ -468,7 +500,7 @@ docker stop 8cc20bcfa4f4
 
 Restrict to 1/2 CPU.
 
-``` bash
+``` console
 # run in detached mode
 docker run --rm -d --cpus=0.5 davetang/bwa:0.7.17 perl -le 'while(1){ }'
 
@@ -486,7 +518,7 @@ docker stop af6e812a94da
 Use `docker cp` but I recommend mounting a volume to a Docker container
 (see next section).
 
-``` bash
+``` console
 docker cp --help
 
 Usage:  docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
@@ -551,13 +583,13 @@ docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 
     ## [bwa_index] Pack FASTA... 0.20 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 4.12 seconds elapse.
+    ## [bwa_index] 3.61 seconds elapse.
     ## [bwa_index] Update BWT... 0.09 sec
     ## [bwa_index] Pack forward-only FASTA... 0.15 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 1.65 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 1.58 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 6.279 sec; CPU: 6.235 sec
+    ## [main] Real time: 5.694 sec; CPU: 5.650 sec
 
 We can see the newly created index files.
 
@@ -566,13 +598,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Apr 14 01:26 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Apr 14 01:26 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Apr 14 01:32 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Apr 14 01:32 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Apr 14 01:32 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Apr 14 01:32 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Apr 14 01:32 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Apr 25 00:12 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Apr 25 00:12 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Apr 25 00:18 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Apr 25 00:18 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Apr 25 00:18 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Apr 25 00:18 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Apr 25 00:18 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -593,19 +625,19 @@ Docker container, thus the UID and GID are shown instead of a name like
 permission issue, we need to create a user that matches the UID and GID
 in the host environment.
 
-``` bash
+``` console
 ls -lrt
-total 2816
--rw-r--r-- 1 1211 1211 1000015 Apr 27 02:00 ref.fa
--rw-r--r-- 1 1211 1211   21478 Apr 27 02:00 l100_n100_d400_31_2.fq
--rw-r--r-- 1 1211 1211   21478 Apr 27 02:00 l100_n100_d400_31_1.fq
--rw-r--r-- 1 1211 1211     119 Apr 27 02:01 run.sh
--rw-r--r-- 1 root root 1000072 Apr 27 02:03 ref.fa.bwt
--rw-r--r-- 1 root root  250002 Apr 27 02:03 ref.fa.pac
--rw-r--r-- 1 root root      40 Apr 27 02:03 ref.fa.ann
--rw-r--r-- 1 root root      12 Apr 27 02:03 ref.fa.amb
--rw-r--r-- 1 root root  500056 Apr 27 02:03 ref.fa.sa
--rw-r--r-- 1 root root   56824 Apr 27 02:04 aln.sam
+# total 2816
+# -rw-r--r-- 1 1211 1211 1000015 Apr 27 02:00 ref.fa
+# -rw-r--r-- 1 1211 1211   21478 Apr 27 02:00 l100_n100_d400_31_2.fq
+# -rw-r--r-- 1 1211 1211   21478 Apr 27 02:00 l100_n100_d400_31_1.fq
+# -rw-r--r-- 1 1211 1211     119 Apr 27 02:01 run.sh
+# -rw-r--r-- 1 root root 1000072 Apr 27 02:03 ref.fa.bwt
+# -rw-r--r-- 1 root root  250002 Apr 27 02:03 ref.fa.pac
+# -rw-r--r-- 1 root root      40 Apr 27 02:03 ref.fa.ann
+# -rw-r--r-- 1 root root      12 Apr 27 02:03 ref.fa.amb
+# -rw-r--r-- 1 root root  500056 Apr 27 02:03 ref.fa.sa
+# -rw-r--r-- 1 root root   56824 Apr 27 02:04 aln.sam
 ```
 
 As mentioned already, having `root` ownership is problematic because
@@ -613,7 +645,7 @@ when we are back in the host environment, we can’t modify these files.
 To circumvent this, we can create a user that matches the host user by
 passing three environmental variables from the host to the container.
 
-``` bash
+``` console
 docker run -it \
   -v ~/my_data:/data \
   -e MYUID=$(id -u) \
@@ -625,7 +657,7 @@ docker run -it \
 We use the environment variables and the following steps to create an
 identical user inside the container.
 
-``` bash
+``` console
 adduser --quiet --home /home/san/$ME --no-create-home --gecos "" --shell /bin/bash --disabled-password $ME
 
 # optional: give yourself admin privileges
@@ -644,17 +676,17 @@ bwa mem ref.fa l100_n100_d400_31_1.fq l100_n100_d400_31_2.fq > aln.sam
 
 # check output
 ls -lrt
-total 2816
--rw-r--r-- 1 dtang dtang 1000015 Apr 27 02:00 ref.fa
--rw-r--r-- 1 dtang dtang   21478 Apr 27 02:00 l100_n100_d400_31_2.fq
--rw-r--r-- 1 dtang dtang   21478 Apr 27 02:00 l100_n100_d400_31_1.fq
--rw-r--r-- 1 dtang dtang     119 Apr 27 02:01 run.sh
--rw-rw-r-- 1 dtang dtang 1000072 Apr 27 02:12 ref.fa.bwt
--rw-rw-r-- 1 dtang dtang  250002 Apr 27 02:12 ref.fa.pac
--rw-rw-r-- 1 dtang dtang      40 Apr 27 02:12 ref.fa.ann
--rw-rw-r-- 1 dtang dtang      12 Apr 27 02:12 ref.fa.amb
--rw-rw-r-- 1 dtang dtang  500056 Apr 27 02:12 ref.fa.sa
--rw-rw-r-- 1 dtang dtang   56824 Apr 27 02:12 aln.sam
+# total 2816
+# -rw-r--r-- 1 dtang dtang 1000015 Apr 27 02:00 ref.fa
+# -rw-r--r-- 1 dtang dtang   21478 Apr 27 02:00 l100_n100_d400_31_2.fq
+# -rw-r--r-- 1 dtang dtang   21478 Apr 27 02:00 l100_n100_d400_31_1.fq
+# -rw-r--r-- 1 dtang dtang     119 Apr 27 02:01 run.sh
+# -rw-rw-r-- 1 dtang dtang 1000072 Apr 27 02:12 ref.fa.bwt
+# -rw-rw-r-- 1 dtang dtang  250002 Apr 27 02:12 ref.fa.pac
+# -rw-rw-r-- 1 dtang dtang      40 Apr 27 02:12 ref.fa.ann
+# -rw-rw-r-- 1 dtang dtang      12 Apr 27 02:12 ref.fa.amb
+# -rw-rw-r-- 1 dtang dtang  500056 Apr 27 02:12 ref.fa.sa
+# -rw-rw-r-- 1 dtang dtang   56824 Apr 27 02:12 aln.sam
 
 # exit container
 exit
@@ -663,19 +695,19 @@ exit
 This time when you check the file permissions in the host environment,
 they should match your username.
 
-``` bash
+``` console
 ls -lrt ~/my_data
-total 2816
--rw-r--r-- 1 dtang dtang 1000015 Apr 27 10:00 ref.fa
--rw-r--r-- 1 dtang dtang   21478 Apr 27 10:00 l100_n100_d400_31_2.fq
--rw-r--r-- 1 dtang dtang   21478 Apr 27 10:00 l100_n100_d400_31_1.fq
--rw-r--r-- 1 dtang dtang     119 Apr 27 10:01 run.sh
--rw-rw-r-- 1 dtang dtang 1000072 Apr 27 10:12 ref.fa.bwt
--rw-rw-r-- 1 dtang dtang  250002 Apr 27 10:12 ref.fa.pac
--rw-rw-r-- 1 dtang dtang      40 Apr 27 10:12 ref.fa.ann
--rw-rw-r-- 1 dtang dtang      12 Apr 27 10:12 ref.fa.amb
--rw-rw-r-- 1 dtang dtang  500056 Apr 27 10:12 ref.fa.sa
--rw-rw-r-- 1 dtang dtang   56824 Apr 27 10:12 aln.sam
+# total 2816
+# -rw-r--r-- 1 dtang dtang 1000015 Apr 27 10:00 ref.fa
+# -rw-r--r-- 1 dtang dtang   21478 Apr 27 10:00 l100_n100_d400_31_2.fq
+# -rw-r--r-- 1 dtang dtang   21478 Apr 27 10:00 l100_n100_d400_31_1.fq
+# -rw-r--r-- 1 dtang dtang     119 Apr 27 10:01 run.sh
+# -rw-rw-r-- 1 dtang dtang 1000072 Apr 27 10:12 ref.fa.bwt
+# -rw-rw-r-- 1 dtang dtang  250002 Apr 27 10:12 ref.fa.pac
+# -rw-rw-r-- 1 dtang dtang      40 Apr 27 10:12 ref.fa.ann
+# -rw-rw-r-- 1 dtang dtang      12 Apr 27 10:12 ref.fa.amb
+# -rw-rw-r-- 1 dtang dtang  500056 Apr 27 10:12 ref.fa.sa
+# -rw-rw-r-- 1 dtang dtang   56824 Apr 27 10:12 aln.sam
 ```
 
 ### File Permissions 2
@@ -693,13 +725,13 @@ ls -lrt $(pwd)/test_root.txt
 
     ## Unable to find image 'ubuntu:22.10' locally
     ## 22.10: Pulling from library/ubuntu
-    ## 5c19388d38e1: Pulling fs layer
-    ## 5c19388d38e1: Verifying Checksum
-    ## 5c19388d38e1: Download complete
-    ## 5c19388d38e1: Pull complete
-    ## Digest: sha256:a82eebb42083a134e009a6b81a7e5d2eecc37112fa8ae40642bd3c5153b7e4f0
+    ## 0963d61c5d36: Pulling fs layer
+    ## 0963d61c5d36: Verifying Checksum
+    ## 0963d61c5d36: Download complete
+    ## 0963d61c5d36: Pull complete
+    ## Digest: sha256:a9a425d086dbb34c1b5b99765596e2a3cc79b33826866c51cd4508d8eb327d2b
     ## Status: Downloaded newer image for ubuntu:22.10
-    ## -rw-r--r-- 1 root root 0 Apr 14 01:33 /home/runner/work/learning_docker/learning_docker/test_root.txt
+    ## -rw-r--r-- 1 root root 0 Apr 25 00:18 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
@@ -709,7 +741,7 @@ docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pw
 ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## -rw-r--r-- 1 runner docker 0 Apr 14 01:33 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+    ## -rw-r--r-- 1 runner docker 0 Apr 25 00:18 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -761,7 +793,7 @@ docker images busybox
 ```
 
     ## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-    ## busybox      latest    7cfbbec8963d   4 weeks ago   4.86MB
+    ## busybox      latest    7cfbbec8963d   5 weeks ago   4.86MB
 
 Remove `busybox`.
 
@@ -785,7 +817,7 @@ When you log out of a container, the changes made are still stored; type
 `docker ps -a` to see all containers and the latest changes. Use
 `docker commit` to commit your changes.
 
-``` bash
+``` console
 docker ps -a
 
 # git style commit
@@ -805,7 +837,7 @@ the name of the container and then use `docker exec`.
 
 In the example below, my container name is `rstudio_dtang`.
 
-``` bash
+``` console
 docker exec -it rstudio_dtang /bin/bash
 ```
 
@@ -849,9 +881,9 @@ docker ps -a
 ```
 
     ## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
-    ## 898c14dd99c1   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             romantic_haslett
-    ## dde5714c60a7   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      admiring_montalcini
-    ## 46c079634786   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      mystifying_mclean
+    ## 21dd2bd40c8f   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             flamboyant_williams
+    ## c621b14335ba   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago   Exited (0) 2 seconds ago                      determined_fermat
+    ## 355aaf5180f9   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      cranky_shaw
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -860,9 +892,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 898c14dd99c1
-    ## dde5714c60a7
-    ## 46c079634786
+    ## 21dd2bd40c8f
+    ## c621b14335ba
+    ## 355aaf5180f9
 
 Check to see if the container still exists.
 
@@ -936,7 +968,7 @@ docker ps -a
 
 Use `cpanminus`.
 
-``` bash
+``` console
 apt-get install -y cpanminus
 
 # install some Perl modules
@@ -952,7 +984,7 @@ data container; the `-v` indicates the directory for the data container;
 the `--name data_container` indicates the name of the data container;
 and `ubuntu` is the image to be used for the container.
 
-``` bash
+``` console
 docker create -v /tmp --name data_container ubuntu
 ```
 
@@ -960,48 +992,44 @@ If we run a new Ubuntu container with the `--volumes-from` flag, output
 written to the `/tmp` directory will be saved to the `/tmp` directory of
 the `data_container` container.
 
-``` bash
+``` console
 docker run -it --volumes-from data_container ubuntu /bin/bash
 ```
 
 ## R
 
 Use images from [The Rocker Project](https://www.rocker-project.org/),
-for example `rocker/r-ver:4.1.0`.
+for example `rocker/r-ver:4.3.0`.
 
 ``` bash
-docker run --rm rocker/r-ver:4.1.0
+docker run --rm rocker/r-ver:4.3.0
 ```
 
-    ## Unable to find image 'rocker/r-ver:4.1.0' locally
-    ## 4.1.0: Pulling from rocker/r-ver
-    ## 47c764472391: Pulling fs layer
-    ## a62aac15af1b: Pulling fs layer
-    ## 3ef104191697: Pulling fs layer
-    ## 51164e9cded3: Pulling fs layer
-    ## fe687534b7a1: Pulling fs layer
-    ## 51164e9cded3: Waiting
-    ## fe687534b7a1: Waiting
-    ## a62aac15af1b: Verifying Checksum
-    ## a62aac15af1b: Download complete
-    ## 51164e9cded3: Verifying Checksum
-    ## 51164e9cded3: Download complete
-    ## 47c764472391: Verifying Checksum
-    ## 47c764472391: Download complete
-    ## fe687534b7a1: Verifying Checksum
-    ## fe687534b7a1: Download complete
-    ## 47c764472391: Pull complete
-    ## 3ef104191697: Verifying Checksum
-    ## 3ef104191697: Download complete
-    ## a62aac15af1b: Pull complete
-    ## 3ef104191697: Pull complete
-    ## 51164e9cded3: Pull complete
-    ## fe687534b7a1: Pull complete
-    ## Digest: sha256:d165d8e7da614a2b7182eb6f296417588e122e089235fe76cd67f85a0e62df21
-    ## Status: Downloaded newer image for rocker/r-ver:4.1.0
+    ## Unable to find image 'rocker/r-ver:4.3.0' locally
+    ## 4.3.0: Pulling from rocker/r-ver
+    ## 2ab09b027e7f: Already exists
+    ## 8f4cc724b470: Pulling fs layer
+    ## 0d6fd93f3db5: Pulling fs layer
+    ## 907dfb8173fd: Pulling fs layer
+    ## 6ff4c16ea6ef: Pulling fs layer
+    ## 6ff4c16ea6ef: Waiting
+    ## 907dfb8173fd: Verifying Checksum
+    ## 907dfb8173fd: Download complete
+    ## 8f4cc724b470: Verifying Checksum
+    ## 8f4cc724b470: Download complete
+    ## 8f4cc724b470: Pull complete
+    ## 6ff4c16ea6ef: Verifying Checksum
+    ## 6ff4c16ea6ef: Download complete
+    ## 0d6fd93f3db5: Verifying Checksum
+    ## 0d6fd93f3db5: Download complete
+    ## 0d6fd93f3db5: Pull complete
+    ## 907dfb8173fd: Pull complete
+    ## 6ff4c16ea6ef: Pull complete
+    ## Digest: sha256:b0c46683bab88029ba1941fc60ea7e356889858814feafc33e10b16eac26b8c1
+    ## Status: Downloaded newer image for rocker/r-ver:4.3.0
     ## 
-    ## R version 4.1.0 (2021-05-18) -- "Camp Pontanezen"
-    ## Copyright (C) 2021 The R Foundation for Statistical Computing
+    ## R version 4.3.0 (2023-04-21) -- "Already Tomorrow"
+    ## Copyright (C) 2023 The R Foundation for Statistical Computing
     ## Platform: x86_64-pc-linux-gnu (64-bit)
     ## 
     ## R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -1023,18 +1051,18 @@ docker run --rm rocker/r-ver:4.1.0
 ## Saving and transferring a Docker image
 
 You should just share the Dockerfile used to create your image but if
-you need another way to save and share an iamge, see [this
+you need another way to save and share an image, see [this
 post](http://stackoverflow.com/questions/23935141/how-to-copy-docker-images-from-one-host-to-another-without-via-repository)
 on Stack Overflow.
 
-``` bash
+``` console
 docker save -o <save image to path> <image name>
 docker load -i <path to image tar file>
 ```
 
 Here’s an example.
 
-``` bash
+``` console
 # save on Unix server
 docker save -o davebox.tar davebox
 
@@ -1067,7 +1095,7 @@ is `davetang`. Use `docker login` to login and use `docker push` to push
 to Docker Hub (run `docker tag` first if you didn’t name your image in
 the format of `yourhubusername/newrepo`).
 
-``` bash
+``` console
 docker login
 
 # create repo on Docker Hub then tag your image
@@ -1126,7 +1154,7 @@ each RUN, COPY, and ADD command in a Dockerfile generates another layer
 in the container thus increasing its size; use multi-line commands and
 clean up package manager caches to minimise image size:
 
-``` bash
+``` console
 RUN apt-get update \
       && apt-get install -y \
          autoconf \
@@ -1148,12 +1176,40 @@ conveniently be in my current directory. In the command below I have
 also added the `-u` option, which sets the user to
 `<name|uid>[:<group|gid>]`.
 
-``` bash
+``` console
 docker run --rm -it -u $(stat -c "%u:%g" ${HOME}) -v $(pwd):$(pwd) -w $(pwd) davetang/build:1.1 /bin/bash
 ```
 
+If you do not want to preface `docker` with `sudo`, create a Unix group
+called `docker` and add users to it. On some Linux distributions, the
+system automatically creates this group when installing Docker Engine
+using a package manager. In that case, there is no need for you to
+manually create the group. Check `/etc/group` to see if the `docker`
+group exists.
+
+``` console
+cat /etc/group | grep docker
+```
+
+If the `docker` group does not exist, create the group:
+
+``` console
+sudo groupadd docker
+```
+
+Add users to the group.
+
+``` console
+sudo usermod -aG docker $USER
+```
+
+The user will need to log out and log back in, before the changes take
+effect.
+
 ## Useful links
 
+- [Post installation
+  steps](https://docs.docker.com/engine/install/linux-postinstall/)
 - [A quick introduction to
   Docker](http://blog.scottlowe.org/2014/03/11/a-quick-introduction-to-docker/)
 - [The BioDocker project](https://github.com/BioDocker/biodocker); check
