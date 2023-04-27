@@ -2,14 +2,14 @@
 
 set -euo pipefail
 
-version=4.1.2
+version=4.3.0
 me=$(whoami)
 tool=shiny
 image=davetang/${tool}:${version}
 container_name=${tool}_${me}
 port=3838
-# shinyapp=$(pwd)/test_app
-shinyapp=$(pwd)/deseq2_app
+shinyapp=$(pwd)/test_app
+# shinyapp=$(pwd)/deseq2_app
 shinylog=$(pwd)/shinylog
 
 if [[ ! -d ${shinylog} ]]; then
@@ -29,4 +29,3 @@ docker run -d \
 >&2 echo "docker stop ${container_name} && docker rm ${container_name}"
 
 exit 0
-

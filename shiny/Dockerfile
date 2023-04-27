@@ -1,4 +1,4 @@
-FROM rocker/shiny:4.1.2
+FROM rocker/shiny:4.3.0
 
 LABEL source="https://github.com/davetang/learning_docker/blob/main/shiny/Dockerfile"
 
@@ -18,7 +18,6 @@ RUN apt-get clean all && \
 		libbz2-dev \
 		liblzma-dev \
 		libglpk40 \
-		libgit2-28 \
 		locales \
 	&& apt-get clean all && \
 	apt-get purge && \
@@ -30,7 +29,6 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 RUN Rscript -e "install.packages(c('tidyverse', 'circlize', 'shinydashboard', 'DT', 'GetoptLong', 'BiocManager'));"
-RUN Rscript -e "BiocManager::install(c('airway', 'DESeq2', 'ComplexHeatmap', 'InteractiveComplexHeatmap'), version = '3.14')"
+RUN Rscript -e "BiocManager::install(c('airway', 'DESeq2', 'ComplexHeatmap', 'InteractiveComplexHeatmap'), version = '3.17')"
 
 WORKDIR /home/shiny
-
