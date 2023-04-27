@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:23.04
 
 MAINTAINER Dave Tang <me@davetang.org>
 LABEL source="https://github.com/davetang/learning_docker/blob/main/ubuntu/Dockerfile"
