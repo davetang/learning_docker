@@ -1,5 +1,16 @@
 # README
 
+Use
+[biocontainers/samtools](https://quay.io/repository/biocontainers/samtools?tab=tags&tag=latest)
+if you want a Docker image for `samtools`. It is only 61.8MB in size.
+
+```console
+docker pull quay.io/biocontainers/samtools:1.17--h00cdaf9_0
+docker images quay.io/biocontainers/samtools:1.17--h00cdaf9_0
+# REPOSITORY                       TAG                IMAGE ID       CREATED       SIZE
+# quay.io/biocontainers/samtools   1.17--h00cdaf9_0   57a71725cb8a   3 weeks ago   61.8MB
+```
+
 Build a Docker image for [samtools](https://github.com/samtools/samtools) using
 a [multistage build](https://docs.docker.com/build/building/multi-stage/) for
 testing purposes only. Do not use this image for any other reason because it
