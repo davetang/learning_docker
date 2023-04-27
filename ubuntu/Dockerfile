@@ -28,8 +28,9 @@ RUN apt-get clean all && \
       vim \
       pigz \
       wget \
-      python3 \
+      python3-full \
       python3-pip \
+      python3-pandas \
       zlib1g-dev \
       libboost-all-dev \
       pkg-config \
@@ -47,8 +48,5 @@ RUN cmake_ver=3.24.2 && cd /tmp/ && \
    make && \
    make install && \
    rm -rf /tmp/*
-
-# commonly used bioinfo packages
-RUN pip install pandas pysam pyvcf
 
 WORKDIR /work
