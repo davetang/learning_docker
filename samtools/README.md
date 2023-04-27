@@ -1,77 +1,61 @@
-## README
+# README
 
-Install [SAMtools](http://www.htslib.org/) 1.5 in a Docker image.
+Build a Docker image for [samtools](https://github.com/samtools/samtools) using
+a [multistage build](https://docs.docker.com/build/building/multi-stage/) for
+testing purposes only. Do not use this image for any other reason because it
+includes a lot of unnecessary libraries.
 
-```bash
-# change image name from davebox to name of your choice
-docker build -t davebox .
+Ideally the image should only contain these dependencies:
+
+Samtools:
+* zlib
+* curses or GNU ncurses (optional, for the 'tview' command)
+
+HTSlib:
+* zlib
+* libbz2
+* liblzma
+* libcurl (optional but strongly recommended, for network access)
+* libcrypto (optional, for Amazon S3 support; not needed on MacOS)
+
+Or is there a way to build `samtools` such that all libraries are statically
+linked, where a multistage build makes more sense.
+
+## Build
+
+Use Ubuntu build image to build `samtools`.
+
+```console
+docker pull davetang/build:23.04
 ```
 
-Convert SAM to BAM.
+Run `build.sh`.
 
-```bash
-# download example SAM file
-wget https://github.com/davetang/learning_bam_file/raw/master/aln.sam
-
-# run SAMtools
-docker run -v `pwd`:/data davebox samtools view -bS /data/aln.sam > aln.bam
+```console
+./build.sh
 ```
 
-Setup alias for samtools by including this line in your `.profile` or `.bash_profile` file.
+## Testing
 
-```bash
-alias samtools="docker run -v `pwd`:/data davebox samtools"
+Run `test.sh`.
 
-samtools
-
-Program: samtools (Tools for alignments in the SAM format)
-Version: 1.5 (using htslib 1.5)
-
-Usage:   samtools <command> [options]
-
-Commands:
-  -- Indexing
-     dict           create a sequence dictionary file
-     faidx          index/extract FASTA
-     index          index alignment
-
-  -- Editing
-     calmd          recalculate MD/NM tags and '=' bases
-     fixmate        fix mate information
-     reheader       replace BAM header
-     rmdup          remove PCR duplicates
-     targetcut      cut fosmid regions (for fosmid pool only)
-     addreplacerg   adds or replaces RG tags
-
-  -- File operations
-     collate        shuffle and group alignments by name
-     cat            concatenate BAMs
-     merge          merge sorted alignments
-     mpileup        multi-way pileup
-     sort           sort alignment file
-     split          splits a file by read group
-     quickcheck     quickly check if SAM/BAM/CRAM file appears intact
-     fastq          converts a BAM to a FASTQ
-     fasta          converts a BAM to a FASTA
-
-  -- Statistics
-     bedcov         read depth per BED region
-     depth          compute the depth
-     flagstat       simple stats
-     idxstats       BAM index stats
-     phase          phase heterozygotes
-     stats          generate stats (former bamcheck)
-
-  -- Viewing
-     flags          explain BAM flags
-     tview          text alignment viewer
-     view           SAM<->BAM<->CRAM conversion
-     depad          convert padded BAM to unpadded BAM
-
-
-# remember to include /data/, where the current directory is mounted
-samtools view -bS /data/aln.sam > aln.bam
+```console
+./test.sh
+# 1176360 + 0 in total (QC-passed reads + QC-failed reads)
+# 1160084 + 0 primary
+# 16276 + 0 secondary
+# 0 + 0 supplementary
+# 0 + 0 duplicates
+# 0 + 0 primary duplicates
+# 1126961 + 0 mapped (95.80% : N/A)
+# 1110685 + 0 primary mapped (95.74% : N/A)
+# 1160084 + 0 paired in sequencing
+# 580042 + 0 read1
+# 580042 + 0 read2
+# 1060858 + 0 properly paired (91.45% : N/A)
+# 1065618 + 0 with itself and mate mapped
+# 45067 + 0 singletons (3.88% : N/A)
+# 0 + 0 with mate mapped to a different chr
+# 0 + 0 with mate mapped to a different chr (mapQ>=5)
+# Done
 ```
-
-Finally I have a [clean up script](https://github.com/davetang/learning_docker#cleaning-up-exited-containers) that I run to remove all the exited containers.
-
