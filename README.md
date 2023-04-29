@@ -39,7 +39,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Tue Apr 25 00:18:49 UTC 2023
+Sat Apr 29 14:31:22 UTC 2023
 
 Learning Docker
 ================
@@ -82,7 +82,7 @@ To see if everything is working, try to obtain the Docker version.
 docker --version
 ```
 
-    ## Docker version 20.10.23+azure-2, build 715524332ff91d0f9ec5ab2ec95f051456ed1dba
+    ## Docker version 20.10.24+azure-1, build 297e1284d3bd092e9bc96076c3ddc4bb33f8c7ab
 
 And run the `hello-world` image. (The `--rm` parameter is used to
 automatically remove the container when it exits.)
@@ -94,6 +94,7 @@ docker run --rm hello-world
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
     ## 2db29710123e: Pulling fs layer
+    ## 2db29710123e: Verifying Checksum
     ## 2db29710123e: Download complete
     ## 2db29710123e: Pull complete
     ## Digest: sha256:4e83453afed1b4fa1a3500525091dbfca6ce1e66903fd4c01ff015dbcb1ba33e
@@ -437,9 +438,9 @@ docker run --rm davetang/bwa:0.7.17
     ## feac53061382: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
-    ## feac53061382: Pull complete
     ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
+    ## feac53061382: Pull complete
     ## 549f86662946: Pull complete
     ## 5f22362f8660: Pull complete
     ## 3836f06c7ac7: Pull complete
@@ -583,13 +584,13 @@ docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 
     ## [bwa_index] Pack FASTA... 0.20 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 3.61 seconds elapse.
-    ## [bwa_index] Update BWT... 0.09 sec
+    ## [bwa_index] 4.72 seconds elapse.
+    ## [bwa_index] Update BWT... 0.10 sec
     ## [bwa_index] Pack forward-only FASTA... 0.15 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 1.58 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 2.89 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 5.694 sec; CPU: 5.650 sec
+    ## [main] Real time: 8.145 sec; CPU: 8.073 sec
 
 We can see the newly created index files.
 
@@ -598,13 +599,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Apr 25 00:12 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Apr 25 00:12 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Apr 25 00:18 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Apr 25 00:18 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Apr 25 00:18 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Apr 25 00:18 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Apr 25 00:18 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Apr 29 14:23 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Apr 29 14:23 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Apr 29 14:30 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Apr 29 14:30 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Apr 29 14:30 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Apr 29 14:30 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Apr 29 14:30 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -726,12 +727,11 @@ ls -lrt $(pwd)/test_root.txt
     ## Unable to find image 'ubuntu:22.10' locally
     ## 22.10: Pulling from library/ubuntu
     ## 0963d61c5d36: Pulling fs layer
-    ## 0963d61c5d36: Verifying Checksum
     ## 0963d61c5d36: Download complete
     ## 0963d61c5d36: Pull complete
     ## Digest: sha256:a9a425d086dbb34c1b5b99765596e2a3cc79b33826866c51cd4508d8eb327d2b
     ## Status: Downloaded newer image for ubuntu:22.10
-    ## -rw-r--r-- 1 root root 0 Apr 25 00:18 /home/runner/work/learning_docker/learning_docker/test_root.txt
+    ## -rw-r--r-- 1 root root 0 Apr 29 14:31 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
@@ -741,7 +741,7 @@ docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pw
 ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## -rw-r--r-- 1 runner docker 0 Apr 25 00:18 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+    ## -rw-r--r-- 1 runner docker 0 Apr 29 14:31 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -793,7 +793,7 @@ docker images busybox
 ```
 
     ## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-    ## busybox      latest    7cfbbec8963d   5 weeks ago   4.86MB
+    ## busybox      latest    7cfbbec8963d   6 weeks ago   4.86MB
 
 Remove `busybox`.
 
@@ -881,9 +881,9 @@ docker ps -a
 ```
 
     ## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
-    ## 21dd2bd40c8f   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             flamboyant_williams
-    ## c621b14335ba   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago   Exited (0) 2 seconds ago                      determined_fermat
-    ## 355aaf5180f9   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      cranky_shaw
+    ## 42b27a751c5e   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             determined_robinson
+    ## b65b04490e9c   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      sharp_perlman
+    ## d648711f3dec   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      busy_saha
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -892,9 +892,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 21dd2bd40c8f
-    ## c621b14335ba
-    ## 355aaf5180f9
+    ## 42b27a751c5e
+    ## b65b04490e9c
+    ## d648711f3dec
 
 Check to see if the container still exists.
 
@@ -1013,10 +1013,9 @@ docker run --rm rocker/r-ver:4.3.0
     ## 907dfb8173fd: Pulling fs layer
     ## 6ff4c16ea6ef: Pulling fs layer
     ## 6ff4c16ea6ef: Waiting
-    ## 907dfb8173fd: Verifying Checksum
-    ## 907dfb8173fd: Download complete
     ## 8f4cc724b470: Verifying Checksum
     ## 8f4cc724b470: Download complete
+    ## 907dfb8173fd: Download complete
     ## 8f4cc724b470: Pull complete
     ## 6ff4c16ea6ef: Verifying Checksum
     ## 6ff4c16ea6ef: Download complete
@@ -1205,6 +1204,34 @@ sudo usermod -aG docker $USER
 
 The user will need to log out and log back in, before the changes take
 effect.
+
+On Linux, Docker is installed in `/var/lib/docker`.
+
+``` console
+docker info -f '{{ .DockerRootDir }}'
+# /var/lib/docker
+```
+
+This may not be ideal depending on your partitioning. To change the
+default root directory update the daemon configuration file; the default
+location on Linux is `/etc/docker/daemon.json`.
+
+The example below makes `/home/docker` the Docker root directory.
+
+``` console
+cat /etc/docker/daemon.json
+# {
+#    "data-root": "/home/docker"
+# }
+```
+
+Restart the Docker server and check the Docker root directory.
+
+``` console
+sudo systemctl restart docker
+docker info -f '{{ .DockerRootDir}}'
+# /home/docker
+```
 
 ## Useful links
 
