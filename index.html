@@ -169,7 +169,7 @@ that I prepared for BioC Asia 2019.</p>
 <p>To see if everything is working, try to obtain the Docker version.</p>
 <pre><code class="language-bash">docker --version
 </code></pre>
-<pre><code>## Docker version 20.10.23+azure-2, build 715524332ff91d0f9ec5ab2ec95f051456ed1dba
+<pre><code>## Docker version 20.10.24+azure-1, build 297e1284d3bd092e9bc96076c3ddc4bb33f8c7ab
 </code></pre>
 <p>And run the <code>hello-world</code> image. (The <code>--rm</code> parameter is used to
 automatically remove the container when it exits.)</p>
@@ -178,6 +178,7 @@ automatically remove the container when it exits.)</p>
 <pre><code>## Unable to find image 'hello-world:latest' locally
 ## latest: Pulling from library/hello-world
 ## 2db29710123e: Pulling fs layer
+## 2db29710123e: Verifying Checksum
 ## 2db29710123e: Download complete
 ## 2db29710123e: Pull complete
 ## Digest: sha256:4e83453afed1b4fa1a3500525091dbfca6ce1e66903fd4c01ff015dbcb1ba33e
@@ -466,9 +467,9 @@ documentation</a>.</p>
 ## feac53061382: Download complete
 ## 3836f06c7ac7: Verifying Checksum
 ## 3836f06c7ac7: Download complete
-## feac53061382: Pull complete
 ## 549f86662946: Verifying Checksum
 ## 549f86662946: Download complete
+## feac53061382: Pull complete
 ## 549f86662946: Pull complete
 ## 5f22362f8660: Pull complete
 ## 3836f06c7ac7: Pull complete
@@ -591,25 +592,25 @@ for <code>data/chrI.fa.gz</code>.</p>
 </code></pre>
 <pre><code>## [bwa_index] Pack FASTA... 0.20 sec
 ## [bwa_index] Construct BWT for the packed sequence...
-## [bwa_index] 3.61 seconds elapse.
-## [bwa_index] Update BWT... 0.09 sec
+## [bwa_index] 4.72 seconds elapse.
+## [bwa_index] Update BWT... 0.10 sec
 ## [bwa_index] Pack forward-only FASTA... 0.15 sec
-## [bwa_index] Construct SA from BWT and Occ... 1.58 sec
+## [bwa_index] Construct SA from BWT and Occ... 2.89 sec
 ## [main] Version: 0.7.17-r1188
 ## [main] CMD: bwa index chrI.fa.gz
-## [main] Real time: 5.694 sec; CPU: 5.650 sec
+## [main] Real time: 8.145 sec; CPU: 8.073 sec
 </code></pre>
 <p>We can see the newly created index files.</p>
 <pre><code class="language-bash">ls -lrt data
 </code></pre>
 <pre><code>## total 30436
-## -rw-r--r-- 1 runner docker      194 Apr 25 00:12 README.md
-## -rw-r--r-- 1 runner docker  4772981 Apr 25 00:12 chrI.fa.gz
-## -rw-r--r-- 1 root   root   15072516 Apr 25 00:18 chrI.fa.gz.bwt
-## -rw-r--r-- 1 root   root    3768110 Apr 25 00:18 chrI.fa.gz.pac
-## -rw-r--r-- 1 root   root         41 Apr 25 00:18 chrI.fa.gz.ann
-## -rw-r--r-- 1 root   root         13 Apr 25 00:18 chrI.fa.gz.amb
-## -rw-r--r-- 1 root   root    7536272 Apr 25 00:18 chrI.fa.gz.sa
+## -rw-r--r-- 1 runner docker      194 Apr 29 14:23 README.md
+## -rw-r--r-- 1 runner docker  4772981 Apr 29 14:23 chrI.fa.gz
+## -rw-r--r-- 1 root   root   15072516 Apr 29 14:30 chrI.fa.gz.bwt
+## -rw-r--r-- 1 root   root    3768110 Apr 29 14:30 chrI.fa.gz.pac
+## -rw-r--r-- 1 root   root         41 Apr 29 14:30 chrI.fa.gz.ann
+## -rw-r--r-- 1 root   root         13 Apr 29 14:30 chrI.fa.gz.amb
+## -rw-r--r-- 1 root   root    7536272 Apr 29 14:30 chrI.fa.gz.sa
 </code></pre>
 <p>However note that the generated files are owned by <code>root</code>, which is
 slightly annoying because unless we have root access, we need to start a
@@ -711,19 +712,18 @@ ls -lrt $(pwd)/test_root.txt
 <pre><code>## Unable to find image 'ubuntu:22.10' locally
 ## 22.10: Pulling from library/ubuntu
 ## 0963d61c5d36: Pulling fs layer
-## 0963d61c5d36: Verifying Checksum
 ## 0963d61c5d36: Download complete
 ## 0963d61c5d36: Pull complete
 ## Digest: sha256:a9a425d086dbb34c1b5b99765596e2a3cc79b33826866c51cd4508d8eb327d2b
 ## Status: Downloaded newer image for ubuntu:22.10
-## -rw-r--r-- 1 root root 0 Apr 25 00:18 /home/runner/work/learning_docker/learning_docker/test_root.txt
+## -rw-r--r-- 1 root root 0 Apr 29 14:31 /home/runner/work/learning_docker/learning_docker/test_root.txt
 </code></pre>
 <p>In this example, we run the command as a user with the same UID and GID;
 the <code>stat</code> command is used to get the UID and GID.</p>
 <pre><code class="language-bash">docker run -v $(pwd):/$(pwd) -u $(stat -c &quot;%u:%g&quot; $HOME) ubuntu:22.10 touch $(pwd)/test_mine.txt
 ls -lrt $(pwd)/test_mine.txt
 </code></pre>
-<pre><code>## -rw-r--r-- 1 runner docker 0 Apr 25 00:18 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+<pre><code>## -rw-r--r-- 1 runner docker 0 Apr 29 14:31 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 </code></pre>
 <p>One issue with this method is that you may encounter the following
 warning (if running interactively):</p>
@@ -761,7 +761,7 @@ find stopped containers and <code>docker rm</code> to remove these containers.</
 <pre><code class="language-bash">docker images busybox
 </code></pre>
 <pre><code>## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-## busybox      latest    7cfbbec8963d   5 weeks ago   4.86MB
+## busybox      latest    7cfbbec8963d   6 weeks ago   4.86MB
 </code></pre>
 <p>Remove <code>busybox</code>.</p>
 <pre><code class="language-bash">docker rmi busybox
@@ -829,17 +829,17 @@ container exits. For example:</p>
 <pre><code class="language-bash">docker ps -a
 </code></pre>
 <pre><code>## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
-## 21dd2bd40c8f   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             flamboyant_williams
-## c621b14335ba   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago   Exited (0) 2 seconds ago                      determined_fermat
-## 355aaf5180f9   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      cranky_shaw
+## 42b27a751c5e   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             determined_robinson
+## b65b04490e9c   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      sharp_perlman
+## d648711f3dec   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      busy_saha
 </code></pre>
 <p>We can use a sub-shell to get all (<code>-a</code>) container IDs (<code>-q</code>) that have
 exited (<code>-f status=exited</code>) and then remove them (<code>docker rm -v</code>).</p>
 <pre><code class="language-bash">docker rm -v $(docker ps -a -q -f status=exited)
 </code></pre>
-<pre><code>## 21dd2bd40c8f
-## c621b14335ba
-## 355aaf5180f9
+<pre><code>## 42b27a751c5e
+## b65b04490e9c
+## d648711f3dec
 </code></pre>
 <p>Check to see if the container still exists.</p>
 <pre><code class="language-bash">docker ps -a
@@ -931,10 +931,9 @@ for example <code>rocker/r-ver:4.3.0</code>.</p>
 ## 907dfb8173fd: Pulling fs layer
 ## 6ff4c16ea6ef: Pulling fs layer
 ## 6ff4c16ea6ef: Waiting
-## 907dfb8173fd: Verifying Checksum
-## 907dfb8173fd: Download complete
 ## 8f4cc724b470: Verifying Checksum
 ## 8f4cc724b470: Download complete
+## 907dfb8173fd: Download complete
 ## 8f4cc724b470: Pull complete
 ## 6ff4c16ea6ef: Verifying Checksum
 ## 6ff4c16ea6ef: Download complete
@@ -1083,6 +1082,24 @@ group exists.</p>
 </code></pre>
 <p>The user will need to log out and log back in, before the changes take
 effect.</p>
+<p>On Linux, Docker is installed in <code>/var/lib/docker</code>.</p>
+<pre><code class="language-console">docker info -f '{{ .DockerRootDir }}'
+# /var/lib/docker
+</code></pre>
+<p>This may not be ideal depending on your partitioning. To change the
+default root directory update the daemon configuration file; the default
+location on Linux is <code>/etc/docker/daemon.json</code>.</p>
+<p>The example below makes <code>/home/docker</code> the Docker root directory.</p>
+<pre><code class="language-console">cat /etc/docker/daemon.json
+# {
+#    &quot;data-root&quot;: &quot;/home/docker&quot;
+# }
+</code></pre>
+<p>Restart the Docker server and check the Docker root directory.</p>
+<pre><code class="language-console">sudo systemctl restart docker
+docker info -f '{{ .DockerRootDir}}'
+# /home/docker
+</code></pre>
 <h2 id="useful-links">Useful links</h2>
 <ul>
 <li><a href="https://docs.docker.com/engine/install/linux-postinstall/">Post installation
@@ -1147,5 +1164,5 @@ effect.</p>
 
 <!--
 MkDocs version : 1.4.2
-Build Date UTC : 2023-04-25 00:18:55.951820+00:00
+Build Date UTC : 2023-04-29 14:31:33.870920+00:00
 -->
