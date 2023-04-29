@@ -856,6 +856,34 @@ sudo usermod -aG docker $USER
 
 The user will need to log out and log back in, before the changes take effect.
 
+On Linux, Docker is installed in `/var/lib/docker`.
+
+```console
+docker info -f '{{ .DockerRootDir }}'
+# /var/lib/docker
+```
+
+This may not be ideal depending on your partitioning. To change the default
+root directory update the daemon configuration file; the default location on
+Linux is `/etc/docker/daemon.json`.
+
+The example below makes `/home/docker` the Docker root directory.
+
+```console
+cat /etc/docker/daemon.json
+# {
+#    "data-root": "/home/docker"
+# }
+```
+
+Restart the Docker server and check the Docker root directory.
+
+```console
+sudo systemctl restart docker
+docker info -f '{{ .DockerRootDir}}'
+# /home/docker
+```
+
 ## Useful links
 
 * [Post installation steps](https://docs.docker.com/engine/install/linux-postinstall/)
