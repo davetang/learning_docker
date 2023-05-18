@@ -28,9 +28,6 @@ RUN apt-get clean all && \
       vim \
       pigz \
       wget \
-      python3-full \
-      python3-pip \
-      python3-pandas \
       zlib1g-dev \
       libboost-all-dev \
       pkg-config \
@@ -48,5 +45,12 @@ RUN cmake_ver=3.24.2 && cd /tmp/ && \
    make && \
    make install && \
    rm -rf /tmp/*
+
+# Miniconda3
+RUN cd /tmp/ && \
+   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+   bash Miniconda3-latest-Linux-x86_64.sh -b -p ${HOME}/miniconda3
+ENV PATH=${PATH}:${HOME}/miniconda3/bin
+RUN rm /tmp/Miniconda3-latest-Linux-x86_64.sh
 
 WORKDIR /work
