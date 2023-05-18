@@ -14,8 +14,8 @@ fi
 
 docker run \
    --name ${container_name} \
-   --rm \
    -d \
+   --restart always \
    -p ${port}:8787 \
    -v ${package_dir}:/packages \
    -v ${HOME}/github/:/home/rstudio/work \
