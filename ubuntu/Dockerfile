@@ -49,8 +49,11 @@ RUN cmake_ver=3.24.2 && cd /tmp/ && \
 # Miniconda3
 RUN cd /tmp/ && \
    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-   bash Miniconda3-latest-Linux-x86_64.sh -b -p ${HOME}/miniconda3
-ENV PATH=${PATH}:${HOME}/miniconda3/bin
+   bash Miniconda3-latest-Linux-x86_64.sh -b -p ${HOME}/miniconda3 && \
+   ${HOME}/miniconda3/condabin/conda install -y -c conda-forge mamba
+
+# not sure why I cannot use ${HOME} with ENV
+ENV PATH=/root/miniconda3/bin:${PATH}
 RUN rm /tmp/Miniconda3-latest-Linux-x86_64.sh
 
 WORKDIR /work
