@@ -21,6 +21,7 @@ RUN apt-get clean all && \
 		liblzma-dev \
 		libglpk40 \
 		libgit2-dev \
+		patch \
 	&& apt-get clean all && \
 	apt-get purge && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
