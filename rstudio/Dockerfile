@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.3.0
+FROM rocker/rstudio:4.3.1
 
 LABEL source="https://github.com/davetang/learning_docker/blob/main/rstudio/Dockerfile"
 
@@ -26,7 +26,7 @@ RUN apt-get clean all && \
 	apt-get purge && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse', 'workflowr', 'BiocManager'));"
+RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse', 'workflowr', 'BiocManager', 'quarto'));"
 RUN Rscript -e "BiocManager::install(version = '${bioc_ver}')"
 
 # the rstudio/ path is set for building with GitHub Actions
