@@ -42,4 +42,5 @@ COPY --chown=${user}:${user} asperaweb_id_dsa.openssh.pub ${home}
 RUN echo "export PATH=$PATH:${home}/.aspera/connect/bin/" >> ${home}/.bashrc
 RUN chmod -R 777 ${home}
 WORKDIR ${home}
-ENTRYPOINT ["/home/parasite/.aspera/connect/bin/ascp", "-QT", "-l 300m", "-P33001", "-i", "/home/parasite/asperaweb_id_dsa.openssh"]
+ENTRYPOINT ["/home/parasite/.aspera/connect/bin/ascp", "-P33001", "-i", "/home/parasite/asperaweb_id_dsa.openssh"]
+CMD ["-QT", "-l 300m"]
