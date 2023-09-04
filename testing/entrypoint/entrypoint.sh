@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-whoami
+id
 
 if [[ -z ${MY_EXPORT} ]]; then
    echo \$MY_EXPORT is not defined
