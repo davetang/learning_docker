@@ -1,0 +1,20 @@
+FROM ubuntu:22.10
+
+ARG user=voltaire
+RUN useradd \
+    --create-home \
+    --home-dir /home/${user} \
+    --base-dir /home/${user} \
+    --shell /bin/bash ${user} && \
+    echo "${user}:freedom" | chpasswd && \
+    usermod -d /home/${user} ${user}
+
+COPY --chown=${user}:${user} ./hello /home/${user}/bin/
+
+# this will not set the path for a user specified by -u
+# ENV PATH=$PATH:/home/${user}/bin
+
+# hack but need to source /etc/environment
+RUN echo "PATH=\$PATH:/home/${user}/bin" >> /etc/environment
+
+USER ${user}
