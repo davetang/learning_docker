@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-version=4.7.1
+source .version
 image=codercom/code-server:${version}
 container_name=vscode_server
 port=8883
@@ -25,4 +25,3 @@ docker run \
 
 >&2 echo $container_name listening on port $port
 exit 0
-

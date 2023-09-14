@@ -2,14 +2,15 @@
 
 Run [VS Code](https://github.com/Microsoft/vscode) on any machine anywhere and
 access it through the browser using
-[Docker](https://hub.docker.com/r/codercom/code-server).
+[Docker](https://hub.docker.com/r/codercom/code-server) and the [code-server
+image](https://hub.docker.com/r/codercom/code-server).
 
 ```bash
 #!/usr/bin/env bash
 
 set -euo pipefail
 
-version=4.7.1
+source .version
 image=codercom/code-server:${version}
 container_name=vscode_server
 port=8883
@@ -40,4 +41,3 @@ Visit `localhost:8883` and check the config file at
 ```bash
 cat ${HOME}/.config/code-server/config.yaml | grep ^password | awk '{print $2}'
 ```
-
