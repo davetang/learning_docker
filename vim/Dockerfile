@@ -31,9 +31,13 @@ RUN curl -sL install-node.vercel.app/lts | bash -s -- -y
 # https://github.com/fannheyward/coc-rust-analyzer
 RUN vim +'CocInstall -sync coc-rust-analyzer' +qall
 
+ARG rust_ver=2023-09-25
+# no interpolation, type version manually
+RUN printf '{\n  "coc-rust-analyzer|global": {\n    "release": "2023-09-25"\n  }\n}' > /root/.config/coc/memos.json
+
 # install rust-analyzer
 RUN cd /tmp && \
-   curl -L -o rust-analyzer.gz https://github.com/rust-lang/rust-analyzer/releases/download/2023-09-25/rust-analyzer-x86_64-unknown-linux-gnu.gz && \
+   curl -L -o rust-analyzer.gz https://github.com/rust-lang/rust-analyzer/releases/download/${rust_ver}/rust-analyzer-x86_64-unknown-linux-gnu.gz && \
    gunzip rust-analyzer.gz && \
    chmod 755 rust-analyzer && \
    mkdir -p /root/.config/coc/extensions/coc-rust-analyzer-data/ && \
