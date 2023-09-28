@@ -1,7 +1,7 @@
 FROM thinca/vim:v9.0.1946-full-ubuntu
 
 MAINTAINER Dave Tang <me@davetang.org>
-LABEL source="https://github.com/davetang/learning_docker/blob/main/ubuntu/Dockerfile"
+LABEL source="https://github.com/davetang/learning_docker/blob/main/vim/Dockerfile"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
