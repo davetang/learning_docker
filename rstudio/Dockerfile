@@ -1,10 +1,10 @@
-FROM rocker/rstudio:4.3.1
+FROM rocker/rstudio:4.3.2
 
 LABEL source="https://github.com/davetang/learning_docker/blob/main/rstudio/Dockerfile"
 
 MAINTAINER Dave Tang <me@davetang.org>
 
-ARG bioc_ver=3.17
+ARG bioc_ver=3.18
 
 RUN apt-get clean all && \
 	apt-get update && \
