@@ -40,7 +40,7 @@ Table of Contents
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Fri Jan  5 04:35:05 UTC 2024
+Fri Jan  5 04:58:25 UTC 2024
 
 Learning Docker
 ================
@@ -95,7 +95,6 @@ docker run --rm hello-world
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
     ## c1ec31eb5944: Pulling fs layer
-    ## c1ec31eb5944: Verifying Checksum
     ## c1ec31eb5944: Download complete
     ## c1ec31eb5944: Pull complete
     ## Digest: sha256:ac69084025c660510933cca701f615283cdbb3aa0963188770b54c31c8962493
@@ -214,7 +213,7 @@ docker info
     ##  Architecture: x86_64
     ##  CPUs: 4
     ##  Total Memory: 15.61GiB
-    ##  Name: fv-az1567-133
+    ##  Name: fv-az1200-423
     ##  ID: 475e7ed5-e838-42ee-a486-2e6cf60dc459
     ##  Docker Root Dir: /var/lib/docker
     ##  Debug Mode: false
@@ -539,10 +538,9 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
+    ## 5f22362f8660: Download complete
     ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
-    ## 5f22362f8660: Verifying Checksum
-    ## 5f22362f8660: Download complete
     ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
     ## feac53061382: Pull complete
@@ -689,15 +687,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.15 sec
+    ## [bwa_index] Pack FASTA... 0.14 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 2.99 seconds elapse.
+    ## [bwa_index] 3.05 seconds elapse.
     ## [bwa_index] Update BWT... 0.06 sec
     ## [bwa_index] Pack forward-only FASTA... 0.11 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 0.91 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 0.93 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 4.258 sec; CPU: 4.242 sec
+    ## [main] Real time: 4.335 sec; CPU: 4.319 sec
 
 We can see the newly created index files.
 
@@ -706,13 +704,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Jan  5 04:28 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Jan  5 04:28 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Jan  5 04:34 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Jan  5 04:34 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Jan  5 04:34 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Jan  5 04:34 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Jan  5 04:34 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Jan  5 04:52 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Jan  5 04:52 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Jan  5 04:58 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Jan  5 04:58 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Jan  5 04:58 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Jan  5 04:58 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Jan  5 04:58 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -839,7 +837,7 @@ ls -lrt $(pwd)/test_root.txt
     ## 3ad6ea492c35: Pull complete
     ## Digest: sha256:e322f4808315c387868a9135beeb11435b5b83130a8599fd7d0014452c34f489
     ## Status: Downloaded newer image for ubuntu:22.10
-    ## -rw-r--r-- 1 root root 0 Jan  5 04:34 /home/runner/work/learning_docker/learning_docker/test_root.txt
+    ## -rw-r--r-- 1 root root 0 Jan  5 04:58 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
@@ -849,7 +847,7 @@ docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pw
 ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## -rw-r--r-- 1 runner docker 0 Jan  5 04:34 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+    ## -rw-r--r-- 1 runner docker 0 Jan  5 04:58 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -988,10 +986,10 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
-    ## e8db3aa7ce4e   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             nostalgic_banzai
-    ## 8836a045c54b   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      silly_yonath
-    ## ad760bcebde2   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      funny_noether
+    ## CONTAINER ID   IMAGE          COMMAND                  CREATED                  STATUS                              PORTS     NAMES
+    ## 1eac44f6b795   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             nostalgic_ramanujan
+    ## ef01f31be0af   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 2 seconds ago                      trusting_shannon
+    ## b9368ab4d63e   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago            Exited (0) 2 seconds ago                      nice_merkle
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -1000,9 +998,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## e8db3aa7ce4e
-    ## 8836a045c54b
-    ## ad760bcebde2
+    ## 1eac44f6b795
+    ## ef01f31be0af
+    ## b9368ab4d63e
 
 Check to see if the container still exists.
 
@@ -1124,16 +1122,14 @@ docker run --rm rocker/r-ver:4.3.0
     ## 0adeb784dbf6: Waiting
     ## 1a2aeff73bde: Verifying Checksum
     ## 1a2aeff73bde: Download complete
-    ## aece8493d397: Verifying Checksum
-    ## aece8493d397: Download complete
     ## 63342e24998f: Verifying Checksum
     ## 63342e24998f: Download complete
+    ## aece8493d397: Download complete
     ## 0adeb784dbf6: Verifying Checksum
     ## 0adeb784dbf6: Download complete
     ## aece8493d397: Pull complete
     ## 1a2aeff73bde: Pull complete
     ## 4c728e1acfd1: Verifying Checksum
-    ## 4c728e1acfd1: Download complete
     ## 4c728e1acfd1: Pull complete
     ## 63342e24998f: Pull complete
     ## 0adeb784dbf6: Pull complete
@@ -1367,3 +1363,5 @@ docker info -f '{{ .DockerRootDir}}'
 - [Shifter](https://github.com/NERSC/shifter) enables container images
   for HPC
 - <http://biocworkshops2019.bioconductor.org.s3-website-us-east-1.amazonaws.com/page/BioconductorOnContainers__Bioconductor_Containers_Workshop/>
+- Run the Docker daemon as a non-root user ([Rootless
+  mode](https://docs.docker.com/engine/security/rootless/))
