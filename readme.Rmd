@@ -52,6 +52,20 @@ remove the container when it exits.)
 docker run --rm hello-world
 ```
 
+## Docker information
+
+Get more version information.
+
+```{bash engine.opts='-l'}
+docker version
+```
+
+Even more information.
+
+```{bash engine.opts='-l'}
+docker info
+```
+
 ## Basics
 
 The two guides linked in the introduction section provide some information on
