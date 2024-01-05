@@ -8,21 +8,20 @@
     <title>Learning how to use Docker</title>
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Home";
+        var mkdocs_page_name = "Learning Docker";
         var mkdocs_page_input_path = "index.md";
         var mkdocs_page_url = null;
       </script>
     
-    <script src="js/jquery-3.6.0.min.js" defer></script>
     <!--[if lt IE 9]>
       <script src="js/html5shiv.min.js"></script>
     <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script> 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -34,20 +33,22 @@
           <a href="." class="icon icon-home"> Learning how to use Docker
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
-      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Learning Docker</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#installing-the-docker-engine">Installing the Docker Engine</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#checking-your-installation">Checking your installation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#docker-information">Docker information</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#basics">Basics</a>
     </li>
@@ -131,8 +132,8 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-      <li>Home</li>
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Learning Docker</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -169,7 +170,7 @@ that I prepared for BioC Asia 2019.</p>
 <p>To see if everything is working, try to obtain the Docker version.</p>
 <pre><code class="language-bash">docker --version
 </code></pre>
-<pre><code>## Docker version 20.10.24+azure-1, build 297e1284d3bd092e9bc96076c3ddc4bb33f8c7ab
+<pre><code>## Docker version 24.0.7, build afdd53b
 </code></pre>
 <p>And run the <code>hello-world</code> image. (The <code>--rm</code> parameter is used to
 automatically remove the container when it exits.)</p>
@@ -177,11 +178,11 @@ automatically remove the container when it exits.)</p>
 </code></pre>
 <pre><code>## Unable to find image 'hello-world:latest' locally
 ## latest: Pulling from library/hello-world
-## 2db29710123e: Pulling fs layer
-## 2db29710123e: Verifying Checksum
-## 2db29710123e: Download complete
-## 2db29710123e: Pull complete
-## Digest: sha256:4e83453afed1b4fa1a3500525091dbfca6ce1e66903fd4c01ff015dbcb1ba33e
+## c1ec31eb5944: Pulling fs layer
+## c1ec31eb5944: Verifying Checksum
+## c1ec31eb5944: Download complete
+## c1ec31eb5944: Pull complete
+## Digest: sha256:ac69084025c660510933cca701f615283cdbb3aa0963188770b54c31c8962493
 ## Status: Downloaded newer image for hello-world:latest
 ## 
 ## Hello from Docker!
@@ -205,6 +206,101 @@ automatically remove the container when it exits.)</p>
 ## For more examples and ideas, visit:
 ##  https://docs.docker.com/get-started/
 </code></pre>
+<h2 id="docker-information">Docker information</h2>
+<p>Get more version information.</p>
+<pre><code class="language-bash">docker version
+</code></pre>
+<pre><code>## Client: Docker Engine - Community
+##  Version:           24.0.7
+##  API version:       1.43
+##  Go version:        go1.20.10
+##  Git commit:        afdd53b
+##  Built:             Thu Oct 26 09:07:41 2023
+##  OS/Arch:           linux/amd64
+##  Context:           default
+## 
+## Server: Docker Engine - Community
+##  Engine:
+##   Version:          24.0.7
+##   API version:      1.43 (minimum version 1.12)
+##   Go version:       go1.20.10
+##   Git commit:       311b9ff
+##   Built:            Thu Oct 26 09:07:41 2023
+##   OS/Arch:          linux/amd64
+##   Experimental:     false
+##  containerd:
+##   Version:          1.6.26
+##   GitCommit:        3dd1e886e55dd695541fdcd67420c2888645a495
+##  runc:
+##   Version:          1.1.10
+##   GitCommit:        v1.1.10-0-g18a0cb0
+##  docker-init:
+##   Version:          0.19.0
+##   GitCommit:        de40ad0
+</code></pre>
+<p>Even more information.</p>
+<pre><code class="language-bash">docker info
+</code></pre>
+<pre><code>## Client: Docker Engine - Community
+##  Version:    24.0.7
+##  Context:    default
+##  Debug Mode: false
+##  Plugins:
+##   buildx: Docker Buildx (Docker Inc.)
+##     Version:  v0.11.2
+##     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+##   compose: Docker Compose (Docker Inc.)
+##     Version:  v2.23.3
+##     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+## 
+## Server:
+##  Containers: 0
+##   Running: 0
+##   Paused: 0
+##   Stopped: 0
+##  Images: 17
+##  Server Version: 24.0.7
+##  Storage Driver: overlay2
+##   Backing Filesystem: extfs
+##   Supports d_type: true
+##   Using metacopy: false
+##   Native Overlay Diff: false
+##   userxattr: false
+##  Logging Driver: json-file
+##  Cgroup Driver: cgroupfs
+##  Cgroup Version: 2
+##  Plugins:
+##   Volume: local
+##   Network: bridge host ipvlan macvlan null overlay
+##   Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog
+##  Swarm: inactive
+##  Runtimes: io.containerd.runc.v2 runc
+##  Default Runtime: runc
+##  Init Binary: docker-init
+##  containerd version: 3dd1e886e55dd695541fdcd67420c2888645a495
+##  runc version: v1.1.10-0-g18a0cb0
+##  init version: de40ad0
+##  Security Options:
+##   apparmor
+##   seccomp
+##    Profile: builtin
+##   cgroupns
+##  Kernel Version: 6.2.0-1018-azure
+##  Operating System: Ubuntu 22.04.3 LTS
+##  OSType: linux
+##  Architecture: x86_64
+##  CPUs: 4
+##  Total Memory: 15.61GiB
+##  Name: fv-az1567-133
+##  ID: 475e7ed5-e838-42ee-a486-2e6cf60dc459
+##  Docker Root Dir: /var/lib/docker
+##  Debug Mode: false
+##  Username: githubactions
+##  Experimental: false
+##  Insecure Registries:
+##   127.0.0.0/8
+##  Live Restore Enabled: false
+</code></pre>
 <h2 id="basics">Basics</h2>
 <p>The two guides linked in the introduction section provide some
 information on the basic commands but I’ll include some here as well.
@@ -223,8 +319,12 @@ repository</a> from Docker Hub by running
 <pre><code class="language-bash">docker pull ubuntu:18.04
 </code></pre>
 <pre><code>## 18.04: Pulling from library/ubuntu
-## Digest: sha256:8aa9c2798215f99544d1ce7439ea9c3a6dfd82de607da1cec3a8a2fae005931b
-## Status: Image is up to date for ubuntu:18.04
+## 7c457f213c76: Pulling fs layer
+## 7c457f213c76: Verifying Checksum
+## 7c457f213c76: Download complete
+## 7c457f213c76: Pull complete
+## Digest: sha256:152dc042452c496007f07ca9127571cb9c29697f42acbfad72324b2bb2e43c98
+## Status: Downloaded newer image for ubuntu:18.04
 ## docker.io/library/ubuntu:18.04
 </code></pre>
 <p>To run Ubuntu using Docker, we use <code>docker run</code>.</p>
@@ -461,15 +561,15 @@ documentation</a>.</p>
 ## 5f22362f8660: Pulling fs layer
 ## 3836f06c7ac7: Pulling fs layer
 ## 3836f06c7ac7: Waiting
-## 5f22362f8660: Verifying Checksum
-## 5f22362f8660: Download complete
 ## feac53061382: Verifying Checksum
 ## feac53061382: Download complete
+## 5f22362f8660: Verifying Checksum
+## 5f22362f8660: Download complete
 ## 3836f06c7ac7: Verifying Checksum
 ## 3836f06c7ac7: Download complete
+## feac53061382: Pull complete
 ## 549f86662946: Verifying Checksum
 ## 549f86662946: Download complete
-## feac53061382: Pull complete
 ## 549f86662946: Pull complete
 ## 5f22362f8660: Pull complete
 ## 3836f06c7ac7: Pull complete
@@ -590,27 +690,27 @@ inside <code>data</code> on the host. The command below will create BWA index fi
 for <code>data/chrI.fa.gz</code>.</p>
 <pre><code class="language-bash">docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 </code></pre>
-<pre><code>## [bwa_index] Pack FASTA... 0.20 sec
+<pre><code>## [bwa_index] Pack FASTA... 0.15 sec
 ## [bwa_index] Construct BWT for the packed sequence...
-## [bwa_index] 4.72 seconds elapse.
-## [bwa_index] Update BWT... 0.10 sec
-## [bwa_index] Pack forward-only FASTA... 0.15 sec
-## [bwa_index] Construct SA from BWT and Occ... 2.89 sec
+## [bwa_index] 2.99 seconds elapse.
+## [bwa_index] Update BWT... 0.06 sec
+## [bwa_index] Pack forward-only FASTA... 0.11 sec
+## [bwa_index] Construct SA from BWT and Occ... 0.91 sec
 ## [main] Version: 0.7.17-r1188
 ## [main] CMD: bwa index chrI.fa.gz
-## [main] Real time: 8.145 sec; CPU: 8.073 sec
+## [main] Real time: 4.258 sec; CPU: 4.242 sec
 </code></pre>
 <p>We can see the newly created index files.</p>
 <pre><code class="language-bash">ls -lrt data
 </code></pre>
 <pre><code>## total 30436
-## -rw-r--r-- 1 runner docker      194 Apr 29 14:23 README.md
-## -rw-r--r-- 1 runner docker  4772981 Apr 29 14:23 chrI.fa.gz
-## -rw-r--r-- 1 root   root   15072516 Apr 29 14:30 chrI.fa.gz.bwt
-## -rw-r--r-- 1 root   root    3768110 Apr 29 14:30 chrI.fa.gz.pac
-## -rw-r--r-- 1 root   root         41 Apr 29 14:30 chrI.fa.gz.ann
-## -rw-r--r-- 1 root   root         13 Apr 29 14:30 chrI.fa.gz.amb
-## -rw-r--r-- 1 root   root    7536272 Apr 29 14:30 chrI.fa.gz.sa
+## -rw-r--r-- 1 runner docker      194 Jan  5 04:28 README.md
+## -rw-r--r-- 1 runner docker  4772981 Jan  5 04:28 chrI.fa.gz
+## -rw-r--r-- 1 root   root   15072516 Jan  5 04:34 chrI.fa.gz.bwt
+## -rw-r--r-- 1 root   root    3768110 Jan  5 04:34 chrI.fa.gz.pac
+## -rw-r--r-- 1 root   root         41 Jan  5 04:34 chrI.fa.gz.ann
+## -rw-r--r-- 1 root   root         13 Jan  5 04:34 chrI.fa.gz.amb
+## -rw-r--r-- 1 root   root    7536272 Jan  5 04:34 chrI.fa.gz.sa
 </code></pre>
 <p>However note that the generated files are owned by <code>root</code>, which is
 slightly annoying because unless we have root access, we need to start a
@@ -711,19 +811,20 @@ ls -lrt $(pwd)/test_root.txt
 </code></pre>
 <pre><code>## Unable to find image 'ubuntu:22.10' locally
 ## 22.10: Pulling from library/ubuntu
-## 0963d61c5d36: Pulling fs layer
-## 0963d61c5d36: Download complete
-## 0963d61c5d36: Pull complete
-## Digest: sha256:a9a425d086dbb34c1b5b99765596e2a3cc79b33826866c51cd4508d8eb327d2b
+## 3ad6ea492c35: Pulling fs layer
+## 3ad6ea492c35: Verifying Checksum
+## 3ad6ea492c35: Download complete
+## 3ad6ea492c35: Pull complete
+## Digest: sha256:e322f4808315c387868a9135beeb11435b5b83130a8599fd7d0014452c34f489
 ## Status: Downloaded newer image for ubuntu:22.10
-## -rw-r--r-- 1 root root 0 Apr 29 14:31 /home/runner/work/learning_docker/learning_docker/test_root.txt
+## -rw-r--r-- 1 root root 0 Jan  5 04:34 /home/runner/work/learning_docker/learning_docker/test_root.txt
 </code></pre>
 <p>In this example, we run the command as a user with the same UID and GID;
 the <code>stat</code> command is used to get the UID and GID.</p>
 <pre><code class="language-bash">docker run -v $(pwd):/$(pwd) -u $(stat -c &quot;%u:%g&quot; $HOME) ubuntu:22.10 touch $(pwd)/test_mine.txt
 ls -lrt $(pwd)/test_mine.txt
 </code></pre>
-<pre><code>## -rw-r--r-- 1 runner docker 0 Apr 29 14:31 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+<pre><code>## -rw-r--r-- 1 runner docker 0 Jan  5 04:34 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 </code></pre>
 <p>One issue with this method is that you may encounter the following
 warning (if running interactively):</p>
@@ -749,11 +850,11 @@ find stopped containers and <code>docker rm</code> to remove these containers.</
 </code></pre>
 <pre><code>## Using default tag: latest
 ## latest: Pulling from library/busybox
-## 4b35f584bb4f: Pulling fs layer
-## 4b35f584bb4f: Verifying Checksum
-## 4b35f584bb4f: Download complete
-## 4b35f584bb4f: Pull complete
-## Digest: sha256:b5d6fe0712636ceb7430189de28819e195e8966372edfc2d9409d79402a0dc16
+## a307d6ecc620: Pulling fs layer
+## a307d6ecc620: Verifying Checksum
+## a307d6ecc620: Download complete
+## a307d6ecc620: Pull complete
+## Digest: sha256:ba76950ac9eaa407512c9d859cea48114eeff8a6f12ebaa5d32ce79d4a017dd8
 ## Status: Downloaded newer image for busybox:latest
 ## docker.io/library/busybox:latest
 </code></pre>
@@ -761,15 +862,15 @@ find stopped containers and <code>docker rm</code> to remove these containers.</
 <pre><code class="language-bash">docker images busybox
 </code></pre>
 <pre><code>## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-## busybox      latest    7cfbbec8963d   6 weeks ago   4.86MB
+## busybox      latest    9211bbaa0dbd   2 weeks ago   4.26MB
 </code></pre>
 <p>Remove <code>busybox</code>.</p>
 <pre><code class="language-bash">docker rmi busybox
 </code></pre>
 <pre><code>## Untagged: busybox:latest
-## Untagged: busybox@sha256:b5d6fe0712636ceb7430189de28819e195e8966372edfc2d9409d79402a0dc16
-## Deleted: sha256:7cfbbec8963d8f13e6c70416d6592e1cc10f47a348131290a55d43c3acab3fb9
-## Deleted: sha256:baacf561cfff825708763ce7ee4a18293716c533e6ece3bd39009a5fb3c804d2
+## Untagged: busybox@sha256:ba76950ac9eaa407512c9d859cea48114eeff8a6f12ebaa5d32ce79d4a017dd8
+## Deleted: sha256:9211bbaa0dbd68fed073065eb9f0a6ed00a75090a9235eca2554c62d1e75c58f
+## Deleted: sha256:82ae998286b2bba64ce571578647adcabef93d53867748d6046cc844ff193a83
 </code></pre>
 <h2 id="committing-changes">Committing changes</h2>
 <p>Generally, it is better to use a Dockerfile to manage your images in a
@@ -829,17 +930,17 @@ container exits. For example:</p>
 <pre><code class="language-bash">docker ps -a
 </code></pre>
 <pre><code>## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
-## 42b27a751c5e   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             determined_robinson
-## b65b04490e9c   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      sharp_perlman
-## d648711f3dec   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      busy_saha
+## e8db3aa7ce4e   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             nostalgic_banzai
+## 8836a045c54b   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      silly_yonath
+## ad760bcebde2   ubuntu:22.10   "touch /home/runner/…"   4 seconds ago   Exited (0) 3 seconds ago                      funny_noether
 </code></pre>
 <p>We can use a sub-shell to get all (<code>-a</code>) container IDs (<code>-q</code>) that have
 exited (<code>-f status=exited</code>) and then remove them (<code>docker rm -v</code>).</p>
 <pre><code class="language-bash">docker rm -v $(docker ps -a -q -f status=exited)
 </code></pre>
-<pre><code>## 42b27a751c5e
-## b65b04490e9c
-## d648711f3dec
+<pre><code>## e8db3aa7ce4e
+## 8836a045c54b
+## ad760bcebde2
 </code></pre>
 <p>Check to see if the container still exists.</p>
 <pre><code class="language-bash">docker ps -a
@@ -925,24 +1026,29 @@ for example <code>rocker/r-ver:4.3.0</code>.</p>
 </code></pre>
 <pre><code>## Unable to find image 'rocker/r-ver:4.3.0' locally
 ## 4.3.0: Pulling from rocker/r-ver
-## 2ab09b027e7f: Already exists
-## 8f4cc724b470: Pulling fs layer
-## 0d6fd93f3db5: Pulling fs layer
-## 907dfb8173fd: Pulling fs layer
-## 6ff4c16ea6ef: Pulling fs layer
-## 6ff4c16ea6ef: Waiting
-## 8f4cc724b470: Verifying Checksum
-## 8f4cc724b470: Download complete
-## 907dfb8173fd: Download complete
-## 8f4cc724b470: Pull complete
-## 6ff4c16ea6ef: Verifying Checksum
-## 6ff4c16ea6ef: Download complete
-## 0d6fd93f3db5: Verifying Checksum
-## 0d6fd93f3db5: Download complete
-## 0d6fd93f3db5: Pull complete
-## 907dfb8173fd: Pull complete
-## 6ff4c16ea6ef: Pull complete
-## Digest: sha256:b0c46683bab88029ba1941fc60ea7e356889858814feafc33e10b16eac26b8c1
+## aece8493d397: Pulling fs layer
+## 1a2aeff73bde: Pulling fs layer
+## 4c728e1acfd1: Pulling fs layer
+## 63342e24998f: Pulling fs layer
+## 0adeb784dbf6: Pulling fs layer
+## 63342e24998f: Waiting
+## 0adeb784dbf6: Waiting
+## 1a2aeff73bde: Verifying Checksum
+## 1a2aeff73bde: Download complete
+## aece8493d397: Verifying Checksum
+## aece8493d397: Download complete
+## 63342e24998f: Verifying Checksum
+## 63342e24998f: Download complete
+## 0adeb784dbf6: Verifying Checksum
+## 0adeb784dbf6: Download complete
+## aece8493d397: Pull complete
+## 1a2aeff73bde: Pull complete
+## 4c728e1acfd1: Verifying Checksum
+## 4c728e1acfd1: Download complete
+## 4c728e1acfd1: Pull complete
+## 63342e24998f: Pull complete
+## 0adeb784dbf6: Pull complete
+## Digest: sha256:98aca4b23ca834aca25598bbb34fdc3fde7bc9ebf98e61625203551ade03c462
 ## Status: Downloaded newer image for rocker/r-ver:4.3.0
 ## 
 ## R version 4.3.0 (2023-04-21) -- "Already Tomorrow"
@@ -1149,20 +1255,21 @@ docker info -f '{{ .DockerRootDir}}'
     
   </span>
 </div>
-    <script>var base_url = '.';</script>
-    <script src="js/theme_extra.js" defer></script>
-    <script src="js/theme.js" defer></script>
-      <script src="search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>
 </html>
 
 <!--
-MkDocs version : 1.4.2
-Build Date UTC : 2023-04-29 14:31:33.870920+00:00
+MkDocs version : 1.5.3
+Build Date UTC : 2024-01-05 04:35:12.862174+00:00
 -->
