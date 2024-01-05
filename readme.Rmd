@@ -917,3 +917,4 @@ docker info -f '{{ .DockerRootDir}}'
   Docker
 * [Shifter](https://github.com/NERSC/shifter) enables container images for HPC
 * http://biocworkshops2019.bioconductor.org.s3-website-us-east-1.amazonaws.com/page/BioconductorOnContainers__Bioconductor_Containers_Workshop/
+* Run the Docker daemon as a non-root user ([Rootless mode](https://docs.docker.com/engine/security/rootless/))
