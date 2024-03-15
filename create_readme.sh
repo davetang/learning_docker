@@ -58,7 +58,7 @@ fi
 
 if ! [ -x "$(command -v gh-md-toc)" ]; then
    >&2 echo Could not find gh-md-toc
-   ghmdtoc_ver=0.8.0
+   ghmdtoc_ver=0.10.0
    ghmdtoc_url=https://github.com/ekalinin/github-markdown-toc/archive/refs/tags/${ghmdtoc_ver}.tar.gz
    RAN_DIR=$$$RANDOM
    mkdir /tmp/${RAN_DIR} && cd /tmp/${RAN_DIR}
@@ -90,4 +90,3 @@ rm ${out_md} toc
 >&2 echo Done!
 
 exit 0
-
