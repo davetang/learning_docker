@@ -2,11 +2,45 @@
 Table of Contents
 =================
 
+* [Learning Docker](#learning-docker)
+   * [Introduction](#introduction)
+   * [Installing the Docker Engine](#installing-the-docker-engine)
+   * [Checking your installation](#checking-your-installation)
+   * [Docker information](#docker-information)
+   * [Basics](#basics)
+   * [Start containers automatically](#start-containers-automatically)
+   * [Dockerfile](#dockerfile)
+      * [ARG](#arg)
+      * [CMD](#cmd)
+      * [COPY](#copy)
+      * [ENTRYPOINT](#entrypoint)
+   * [Building an image](#building-an-image)
+   * [Renaming an image](#renaming-an-image)
+   * [Running an image](#running-an-image)
+   * [Resource usage](#resource-usage)
+   * [Copying files between host and container](#copying-files-between-host-and-container)
+   * [Sharing between host and container](#sharing-between-host-and-container)
+      * [File permissions](#file-permissions)
+      * [File Permissions 2](#file-permissions-2)
+      * [Read only](#read-only)
+   * [Removing the image](#removing-the-image)
+   * [Committing changes](#committing-changes)
+   * [Access running container](#access-running-container)
+   * [Cleaning up exited containers](#cleaning-up-exited-containers)
+   * [Installing Perl modules](#installing-perl-modules)
+   * [Creating a data container](#creating-a-data-container)
+   * [R](#r)
+   * [Saving and transferring a Docker image](#saving-and-transferring-a-docker-image)
+   * [Sharing your image](#sharing-your-image)
+      * [Docker Hub](#docker-hub)
+      * [Quay.io](#quayio)
+      * [GitHub Actions](#github-actions)
+   * [Tips](#tips)
+   * [Useful links](#useful-links)
 
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
-
-Fri Mar 15 01:08:38 UTC 2024
+Fri Mar 15 01:37:52 UTC 2024
 
 Learning Docker
 ================
@@ -65,6 +99,7 @@ docker run --rm hello-world
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
     ## c1ec31eb5944: Pulling fs layer
+    ## c1ec31eb5944: Verifying Checksum
     ## c1ec31eb5944: Download complete
     ## c1ec31eb5944: Pull complete
     ## Digest: sha256:6352af1ab4ba4b138648f8ee88e63331aae519946d3b67dae50c313c6fc8200f
@@ -183,7 +218,7 @@ docker info
     ##  Architecture: x86_64
     ##  CPUs: 4
     ##  Total Memory: 15.61GiB
-    ##  Name: fv-az842-947
+    ##  Name: fv-az985-377
     ##  ID: ca073c44-6cdd-44dc-93a1-cd9c3d7e5dc6
     ##  Docker Root Dir: /var/lib/docker
     ##  Debug Mode: false
@@ -507,11 +542,10 @@ docker run --rm davetang/bwa:0.7.17
     ## 549f86662946: Pulling fs layer
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
-    ## 3836f06c7ac7: Waiting
+    ## 5f22362f8660: Download complete
     ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
-    ## 5f22362f8660: Verifying Checksum
-    ## 5f22362f8660: Download complete
+    ## 3836f06c7ac7: Verifying Checksum
     ## 3836f06c7ac7: Download complete
     ## feac53061382: Pull complete
     ## 549f86662946: Verifying Checksum
@@ -657,15 +691,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.14 sec
+    ## [bwa_index] Pack FASTA... 0.15 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 3.23 seconds elapse.
-    ## [bwa_index] Update BWT... 0.06 sec
+    ## [bwa_index] 3.69 seconds elapse.
+    ## [bwa_index] Update BWT... 0.07 sec
     ## [bwa_index] Pack forward-only FASTA... 0.11 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 1.04 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 1.48 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 4.620 sec; CPU: 4.602 sec
+    ## [main] Real time: 5.524 sec; CPU: 5.508 sec
 
 We can see the newly created index files.
 
@@ -674,13 +708,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Mar 15 01:04 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Mar 15 01:04 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Mar 15 01:08 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Mar 15 01:08 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Mar 15 01:08 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Mar 15 01:08 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Mar 15 01:08 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Mar 15 01:33 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Mar 15 01:33 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Mar 15 01:37 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Mar 15 01:37 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Mar 15 01:37 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Mar 15 01:37 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Mar 15 01:37 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -807,7 +841,7 @@ ls -lrt $(pwd)/test_root.txt
     ## 3ad6ea492c35: Pull complete
     ## Digest: sha256:e322f4808315c387868a9135beeb11435b5b83130a8599fd7d0014452c34f489
     ## Status: Downloaded newer image for ubuntu:22.10
-    ## -rw-r--r-- 1 root root 0 Mar 15 01:08 /home/runner/work/learning_docker/learning_docker/test_root.txt
+    ## -rw-r--r-- 1 root root 0 Mar 15 01:37 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
@@ -817,7 +851,7 @@ docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pw
 ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## -rw-r--r-- 1 runner docker 0 Mar 15 01:08 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+    ## -rw-r--r-- 1 runner docker 0 Mar 15 01:37 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -855,6 +889,7 @@ docker pull busybox
     ## Using default tag: latest
     ## latest: Pulling from library/busybox
     ## 7b2699543f22: Pulling fs layer
+    ## 7b2699543f22: Verifying Checksum
     ## 7b2699543f22: Download complete
     ## 7b2699543f22: Pull complete
     ## Digest: sha256:650fd573e056b679a5110a70aabeb01e26b76e545ec4b9c70a9523f2dfaf18c6
@@ -955,10 +990,10 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE          COMMAND                  CREATED                  STATUS                              PORTS     NAMES
-    ## 5ca509b08e4f   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             eager_kirch
-    ## 353693717abf   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 2 seconds ago                      distracted_perlman
-    ## a54bcd58bb1f   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago            Exited (0) 2 seconds ago                      nice_shannon
+    ## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
+    ## a68b7c0c8806   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             peaceful_moore
+    ## 1c51f81e30bd   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      beautiful_chandrasekhar
+    ## 79c640c6d022   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      pedantic_jackson
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -967,9 +1002,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 5ca509b08e4f
-    ## 353693717abf
-    ## a54bcd58bb1f
+    ## a68b7c0c8806
+    ## 1c51f81e30bd
+    ## 79c640c6d022
 
 Check to see if the container still exists.
 
@@ -1088,11 +1123,12 @@ docker run --rm rocker/r-ver:4.3.0
     ## 7b347b0f56a3: Pulling fs layer
     ## 2adecea56868: Pulling fs layer
     ## 2adecea56868: Waiting
-    ## db0b9f65a48f: Download complete
+    ## 7b347b0f56a3: Verifying Checksum
     ## 7b347b0f56a3: Download complete
+    ## db0b9f65a48f: Verifying Checksum
+    ## db0b9f65a48f: Download complete
     ## db0b9f65a48f: Pull complete
     ## 2adecea56868: Verifying Checksum
-    ## 2adecea56868: Download complete
     ## 717e1ab771c9: Verifying Checksum
     ## 717e1ab771c9: Download complete
     ## 717e1ab771c9: Pull complete
