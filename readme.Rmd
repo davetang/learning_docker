@@ -879,23 +879,49 @@ docker info -f '{{ .DockerRootDir }}'
 
 This may not be ideal depending on your partitioning. To change the default
 root directory update the daemon configuration file; the default location on
-Linux is `/etc/docker/daemon.json`.
+Linux is `/etc/docker/daemon.json`. This file may not exist, so you need to
+create it.
 
-The example below makes `/home/docker` the Docker root directory.
+The example below makes `/home/docker` the Docker root directory; you can use
+any directory you want but just make sure it exists.
 
 ```console
 cat /etc/docker/daemon.json
-# {
-#    "data-root": "/home/docker"
-# }
+```
+```
+{
+   "data-root": "/home/docker"
+}
 ```
 
-Restart the Docker server and check the Docker root directory.
+Restart the Docker server (this will take a little time, since all the files
+will be copied to the new location) and then check the Docker root directory.
 
 ```console
 sudo systemctl restart docker
 docker info -f '{{ .DockerRootDir}}'
-# /home/docker
+```
+```
+/home/docker
+```
+
+Check out the new home!
+
+```console
+sudo ls -1 /home/docker
+```
+```
+buildkit
+containers
+engine-id
+image
+network
+overlay2
+plugins
+runtimes
+swarm
+tmp
+volumes
 ```
 
 ## Useful links
