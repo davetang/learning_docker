@@ -2,53 +2,23 @@
 Table of Contents
 =================
 
-* [Learning Docker](#learning-docker)
-   * [Introduction](#introduction)
-   * [Installing the Docker Engine](#installing-the-docker-engine)
-   * [Checking your installation](#checking-your-installation)
-   * [Docker information](#docker-information)
-   * [Basics](#basics)
-   * [Start containers automatically](#start-containers-automatically)
-   * [Dockerfile](#dockerfile)
-      * [ARG](#arg)
-      * [CMD](#cmd)
-      * [COPY](#copy)
-      * [ENTRYPOINT](#entrypoint)
-   * [Building an image](#building-an-image)
-   * [Renaming an image](#renaming-an-image)
-   * [Running an image](#running-an-image)
-   * [Resource usage](#resource-usage)
-   * [Copying files between host and container](#copying-files-between-host-and-container)
-   * [Sharing between host and container](#sharing-between-host-and-container)
-      * [File permissions](#file-permissions)
-      * [File Permissions 2](#file-permissions-2)
-      * [Read only](#read-only)
-   * [Removing the image](#removing-the-image)
-   * [Committing changes](#committing-changes)
-   * [Access running container](#access-running-container)
-   * [Cleaning up exited containers](#cleaning-up-exited-containers)
-   * [Installing Perl modules](#installing-perl-modules)
-   * [Creating a data container](#creating-a-data-container)
-   * [R](#r)
-   * [Saving and transferring a Docker image](#saving-and-transferring-a-docker-image)
-   * [Sharing your image](#sharing-your-image)
-      * [Docker Hub](#docker-hub)
-      * [Quay.io](#quayio)
-      * [GitHub Actions](#github-actions)
-   * [Tips](#tips)
-   * [Useful links](#useful-links)
+
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-Fri Jan  5 04:58:25 UTC 2024
+Fri Mar 15 01:08:38 UTC 2024
 
 Learning Docker
 ================
 
 ## Introduction
 
-![Build
-README](https://github.com/davetang/learning_docker/actions/workflows/create_readme.yml/badge.svg)
+<figure>
+<img
+src="https://github.com/davetang/learning_docker/actions/workflows/create_readme.yml/badge.svg"
+alt="Build README" />
+<figcaption aria-hidden="true">Build README</figcaption>
+</figure>
 
 Docker is an open source project that allows one to pack, ship, and run
 any application as a lightweight container. An analogy of Docker
@@ -83,7 +53,7 @@ To see if everything is working, try to obtain the Docker version.
 docker --version
 ```
 
-    ## Docker version 24.0.7, build afdd53b
+    ## Docker version 24.0.9, build 2936816
 
 And run the `hello-world` image. (The `--rm` parameter is used to
 automatically remove the container when it exits.)
@@ -97,7 +67,7 @@ docker run --rm hello-world
     ## c1ec31eb5944: Pulling fs layer
     ## c1ec31eb5944: Download complete
     ## c1ec31eb5944: Pull complete
-    ## Digest: sha256:ac69084025c660510933cca701f615283cdbb3aa0963188770b54c31c8962493
+    ## Digest: sha256:6352af1ab4ba4b138648f8ee88e63331aae519946d3b67dae50c313c6fc8200f
     ## Status: Downloaded newer image for hello-world:latest
     ## 
     ## Hello from Docker!
@@ -130,29 +100,29 @@ docker version
 ```
 
     ## Client: Docker Engine - Community
-    ##  Version:           24.0.7
+    ##  Version:           24.0.9
     ##  API version:       1.43
-    ##  Go version:        go1.20.10
-    ##  Git commit:        afdd53b
-    ##  Built:             Thu Oct 26 09:07:41 2023
+    ##  Go version:        go1.20.13
+    ##  Git commit:        2936816
+    ##  Built:             Thu Feb  1 00:48:39 2024
     ##  OS/Arch:           linux/amd64
     ##  Context:           default
     ## 
     ## Server: Docker Engine - Community
     ##  Engine:
-    ##   Version:          24.0.7
+    ##   Version:          24.0.9
     ##   API version:      1.43 (minimum version 1.12)
-    ##   Go version:       go1.20.10
-    ##   Git commit:       311b9ff
-    ##   Built:            Thu Oct 26 09:07:41 2023
+    ##   Go version:       go1.20.13
+    ##   Git commit:       fca702d
+    ##   Built:            Thu Feb  1 00:48:39 2024
     ##   OS/Arch:          linux/amd64
     ##   Experimental:     false
     ##  containerd:
-    ##   Version:          1.6.26
-    ##   GitCommit:        3dd1e886e55dd695541fdcd67420c2888645a495
+    ##   Version:          1.6.28
+    ##   GitCommit:        ae07eda36dd25f8a1b98dfbf587313b99c0190bb
     ##  runc:
-    ##   Version:          1.1.10
-    ##   GitCommit:        v1.1.10-0-g18a0cb0
+    ##   Version:          1.1.12
+    ##   GitCommit:        v1.1.12-0-g51d5e94
     ##  docker-init:
     ##   Version:          0.19.0
     ##   GitCommit:        de40ad0
@@ -164,12 +134,12 @@ docker info
 ```
 
     ## Client: Docker Engine - Community
-    ##  Version:    24.0.7
+    ##  Version:    24.0.9
     ##  Context:    default
     ##  Debug Mode: false
     ##  Plugins:
     ##   buildx: Docker Buildx (Docker Inc.)
-    ##     Version:  v0.11.2
+    ##     Version:  v0.13.0
     ##     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
     ##   compose: Docker Compose (Docker Inc.)
     ##     Version:  v2.23.3
@@ -180,8 +150,8 @@ docker info
     ##   Running: 0
     ##   Paused: 0
     ##   Stopped: 0
-    ##  Images: 17
-    ##  Server Version: 24.0.7
+    ##  Images: 15
+    ##  Server Version: 24.0.9
     ##  Storage Driver: overlay2
     ##   Backing Filesystem: extfs
     ##   Supports d_type: true
@@ -199,22 +169,22 @@ docker info
     ##  Runtimes: io.containerd.runc.v2 runc
     ##  Default Runtime: runc
     ##  Init Binary: docker-init
-    ##  containerd version: 3dd1e886e55dd695541fdcd67420c2888645a495
-    ##  runc version: v1.1.10-0-g18a0cb0
+    ##  containerd version: ae07eda36dd25f8a1b98dfbf587313b99c0190bb
+    ##  runc version: v1.1.12-0-g51d5e94
     ##  init version: de40ad0
     ##  Security Options:
     ##   apparmor
     ##   seccomp
     ##    Profile: builtin
     ##   cgroupns
-    ##  Kernel Version: 6.2.0-1018-azure
-    ##  Operating System: Ubuntu 22.04.3 LTS
+    ##  Kernel Version: 6.5.0-1016-azure
+    ##  Operating System: Ubuntu 22.04.4 LTS
     ##  OSType: linux
     ##  Architecture: x86_64
     ##  CPUs: 4
     ##  Total Memory: 15.61GiB
-    ##  Name: fv-az1200-423
-    ##  ID: 475e7ed5-e838-42ee-a486-2e6cf60dc459
+    ##  Name: fv-az842-947
+    ##  ID: ca073c44-6cdd-44dc-93a1-cd9c3d7e5dc6
     ##  Docker Root Dir: /var/lib/docker
     ##  Debug Mode: false
     ##  Username: githubactions
@@ -538,10 +508,10 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
-    ## 5f22362f8660: Download complete
     ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
-    ## 3836f06c7ac7: Verifying Checksum
+    ## 5f22362f8660: Verifying Checksum
+    ## 5f22362f8660: Download complete
     ## 3836f06c7ac7: Download complete
     ## feac53061382: Pull complete
     ## 549f86662946: Verifying Checksum
@@ -689,13 +659,13 @@ docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 
     ## [bwa_index] Pack FASTA... 0.14 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 3.05 seconds elapse.
+    ## [bwa_index] 3.23 seconds elapse.
     ## [bwa_index] Update BWT... 0.06 sec
     ## [bwa_index] Pack forward-only FASTA... 0.11 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 0.93 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 1.04 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 4.335 sec; CPU: 4.319 sec
+    ## [main] Real time: 4.620 sec; CPU: 4.602 sec
 
 We can see the newly created index files.
 
@@ -704,13 +674,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner docker      194 Jan  5 04:52 README.md
-    ## -rw-r--r-- 1 runner docker  4772981 Jan  5 04:52 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Jan  5 04:58 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Jan  5 04:58 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Jan  5 04:58 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Jan  5 04:58 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Jan  5 04:58 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner docker      194 Mar 15 01:04 README.md
+    ## -rw-r--r-- 1 runner docker  4772981 Mar 15 01:04 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Mar 15 01:08 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Mar 15 01:08 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Mar 15 01:08 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Mar 15 01:08 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Mar 15 01:08 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -837,7 +807,7 @@ ls -lrt $(pwd)/test_root.txt
     ## 3ad6ea492c35: Pull complete
     ## Digest: sha256:e322f4808315c387868a9135beeb11435b5b83130a8599fd7d0014452c34f489
     ## Status: Downloaded newer image for ubuntu:22.10
-    ## -rw-r--r-- 1 root root 0 Jan  5 04:58 /home/runner/work/learning_docker/learning_docker/test_root.txt
+    ## -rw-r--r-- 1 root root 0 Mar 15 01:08 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
@@ -847,7 +817,7 @@ docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pw
 ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## -rw-r--r-- 1 runner docker 0 Jan  5 04:58 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+    ## -rw-r--r-- 1 runner docker 0 Mar 15 01:08 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -884,11 +854,10 @@ docker pull busybox
 
     ## Using default tag: latest
     ## latest: Pulling from library/busybox
-    ## a307d6ecc620: Pulling fs layer
-    ## a307d6ecc620: Verifying Checksum
-    ## a307d6ecc620: Download complete
-    ## a307d6ecc620: Pull complete
-    ## Digest: sha256:ba76950ac9eaa407512c9d859cea48114eeff8a6f12ebaa5d32ce79d4a017dd8
+    ## 7b2699543f22: Pulling fs layer
+    ## 7b2699543f22: Download complete
+    ## 7b2699543f22: Pull complete
+    ## Digest: sha256:650fd573e056b679a5110a70aabeb01e26b76e545ec4b9c70a9523f2dfaf18c6
     ## Status: Downloaded newer image for busybox:latest
     ## docker.io/library/busybox:latest
 
@@ -898,8 +867,8 @@ Check out `busybox`.
 docker images busybox
 ```
 
-    ## REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
-    ## busybox      latest    9211bbaa0dbd   2 weeks ago   4.26MB
+    ## REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+    ## busybox      latest    ba5dc23f65d4   10 months ago   4.26MB
 
 Remove `busybox`.
 
@@ -908,9 +877,9 @@ docker rmi busybox
 ```
 
     ## Untagged: busybox:latest
-    ## Untagged: busybox@sha256:ba76950ac9eaa407512c9d859cea48114eeff8a6f12ebaa5d32ce79d4a017dd8
-    ## Deleted: sha256:9211bbaa0dbd68fed073065eb9f0a6ed00a75090a9235eca2554c62d1e75c58f
-    ## Deleted: sha256:82ae998286b2bba64ce571578647adcabef93d53867748d6046cc844ff193a83
+    ## Untagged: busybox@sha256:650fd573e056b679a5110a70aabeb01e26b76e545ec4b9c70a9523f2dfaf18c6
+    ## Deleted: sha256:ba5dc23f65d4cc4a4535bce55cf9e63b068eb02946e3422d3587e8ce803b6aab
+    ## Deleted: sha256:95c4a60383f7b6eb6f7b8e153a07cd6e896de0476763bef39d0f6cf3400624bd
 
 ## Committing changes
 
@@ -987,9 +956,9 @@ docker ps -a
 ```
 
     ## CONTAINER ID   IMAGE          COMMAND                  CREATED                  STATUS                              PORTS     NAMES
-    ## 1eac44f6b795   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             nostalgic_ramanujan
-    ## ef01f31be0af   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 2 seconds ago                      trusting_shannon
-    ## b9368ab4d63e   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago            Exited (0) 2 seconds ago                      nice_merkle
+    ## 5ca509b08e4f   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             eager_kirch
+    ## 353693717abf   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 2 seconds ago                      distracted_perlman
+    ## a54bcd58bb1f   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago            Exited (0) 2 seconds ago                      nice_shannon
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -998,9 +967,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 1eac44f6b795
-    ## ef01f31be0af
-    ## b9368ab4d63e
+    ## 5ca509b08e4f
+    ## 353693717abf
+    ## a54bcd58bb1f
 
 Check to see if the container still exists.
 
@@ -1113,27 +1082,23 @@ docker run --rm rocker/r-ver:4.3.0
 
     ## Unable to find image 'rocker/r-ver:4.3.0' locally
     ## 4.3.0: Pulling from rocker/r-ver
-    ## aece8493d397: Pulling fs layer
-    ## 1a2aeff73bde: Pulling fs layer
-    ## 4c728e1acfd1: Pulling fs layer
-    ## 63342e24998f: Pulling fs layer
-    ## 0adeb784dbf6: Pulling fs layer
-    ## 63342e24998f: Waiting
-    ## 0adeb784dbf6: Waiting
-    ## 1a2aeff73bde: Verifying Checksum
-    ## 1a2aeff73bde: Download complete
-    ## 63342e24998f: Verifying Checksum
-    ## 63342e24998f: Download complete
-    ## aece8493d397: Download complete
-    ## 0adeb784dbf6: Verifying Checksum
-    ## 0adeb784dbf6: Download complete
-    ## aece8493d397: Pull complete
-    ## 1a2aeff73bde: Pull complete
-    ## 4c728e1acfd1: Verifying Checksum
-    ## 4c728e1acfd1: Pull complete
-    ## 63342e24998f: Pull complete
-    ## 0adeb784dbf6: Pull complete
-    ## Digest: sha256:98aca4b23ca834aca25598bbb34fdc3fde7bc9ebf98e61625203551ade03c462
+    ## bccd10f490ab: Already exists
+    ## db0b9f65a48f: Pulling fs layer
+    ## 717e1ab771c9: Pulling fs layer
+    ## 7b347b0f56a3: Pulling fs layer
+    ## 2adecea56868: Pulling fs layer
+    ## 2adecea56868: Waiting
+    ## db0b9f65a48f: Download complete
+    ## 7b347b0f56a3: Download complete
+    ## db0b9f65a48f: Pull complete
+    ## 2adecea56868: Verifying Checksum
+    ## 2adecea56868: Download complete
+    ## 717e1ab771c9: Verifying Checksum
+    ## 717e1ab771c9: Download complete
+    ## 717e1ab771c9: Pull complete
+    ## 7b347b0f56a3: Pull complete
+    ## 2adecea56868: Pull complete
+    ## Digest: sha256:090046ca60f4d1c177616b77ea23f1d4ad7316c864bf27b26b2fa10f65bf00c5
     ## Status: Downloaded newer image for rocker/r-ver:4.3.0
     ## 
     ## R version 4.3.0 (2023-04-21) -- "Already Tomorrow"
@@ -1323,24 +1288,48 @@ docker info -f '{{ .DockerRootDir }}'
 
 This may not be ideal depending on your partitioning. To change the
 default root directory update the daemon configuration file; the default
-location on Linux is `/etc/docker/daemon.json`.
+location on Linux is `/etc/docker/daemon.json`. This file may not exist,
+so you need to create it.
 
-The example below makes `/home/docker` the Docker root directory.
+The example below makes `/home/docker` the Docker root directory; you
+can use any directory you want but just make sure it exists.
 
 ``` console
 cat /etc/docker/daemon.json
-# {
-#    "data-root": "/home/docker"
-# }
 ```
 
-Restart the Docker server and check the Docker root directory.
+    {
+       "data-root": "/home/docker"
+    }
+
+Restart the Docker server (this will take a little time, since all the
+files will be copied to the new location) and then check the Docker root
+directory.
 
 ``` console
 sudo systemctl restart docker
 docker info -f '{{ .DockerRootDir}}'
-# /home/docker
 ```
+
+    /home/docker
+
+Check out the new home!
+
+``` console
+sudo ls -1 /home/docker
+```
+
+    buildkit
+    containers
+    engine-id
+    image
+    network
+    overlay2
+    plugins
+    runtimes
+    swarm
+    tmp
+    volumes
 
 ## Useful links
 
