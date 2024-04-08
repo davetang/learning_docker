@@ -10,8 +10,10 @@ RUN apt-get clean all && \
 	apt-get update && \
 	apt-get upgrade -y && \
 	apt-get install -y \
+		git \
+		cmake \
 		libhdf5-dev \
-		libcurl4-gnutls-dev \
+      libcurl4-openssl-dev \
 		libssl-dev \
 		libxml2-dev \
 		libpng-dev \
