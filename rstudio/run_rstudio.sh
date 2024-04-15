@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-version=4.3.2
+version=4.3.3
 rstudio_image=davetang/rstudio:${version}
 container_name=rstudio_server_${version}
 port=8889
@@ -19,6 +19,7 @@ docker run \
    -p ${port}:8787 \
    -v ${package_dir}:/packages \
    -v ${HOME}/github/:/home/rstudio/work \
+   -v ${HOME}/gitlab/:/home/rstudio/gitlab \
    -v ${HOME}/analysis/:/analysis \
    -e PASSWORD=password \
    -e USERID=$(id -u) \
