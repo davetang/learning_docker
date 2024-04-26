@@ -39,7 +39,7 @@ RUN apt-get clean all && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # CMake
-RUN cmake_ver=3.92.2 && cd /tmp/ && \
+RUN cmake_ver=3.29.2 && cd /tmp/ && \
    wget https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}.tar.gz && \
    tar -zxf cmake-${cmake_ver}.tar.gz && \
    cd cmake-${cmake_ver} && \
