@@ -155,3 +155,50 @@ wsl --set-version Ubuntu-20.04 2
 
 Now open your favourite browser and head to localhost:8888!
 
+## Configuration files
+
+[Managing R with .Rprofile, .Renviron, Rprofile.site, Renviron.site, rsession.conf, and repos.conf](https://support.posit.co/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf).
+
+Upon startup, R and RStudio IDE look for a few different files you can use to control the behaviour of your R session, for example by setting options or environment variables. Below is a summary of how to control R options and environment variables on startup.
+
+* `.Rprofile` - sourced as R code.
+* `.Renviron`	- set environment variables only.
+* `Rprofile.site`	- sourced as R code.
+* `Renviron.site` -	set environment variables only.
+* `rsession.conf`	- only RStudio IDE settings, only single repository.
+* `repos.conf` - only for setting repositories.
+
+### .Rprofile
+
+`.Rprofile` files are user-controllable files to set options and environment variables. `.Rprofile` files can be either at the user or project level. User level `.Rprofile` files live in the base of the user's home directory, and project level `.Rprofile` files live in the base of the project directory.
+
+R will source only one `.Rprofile` file. So if you have both a project specific `.Rprofile` file and a user `.Rprofile` file that you want to use, you explicitly source the user level `.Rprofile` at the top of your project level `.Rprofile` with `source("~/.Rprofile")`.
+
+`.Rprofile` files are sourced as regular R code, so setting environment variables must be done inside a `Sys.setenv(key = "value")` call.
+
+One easy way to edit your `.Rprofile` file is to use the `usethis::edit_r_profile()` function from within an R session. You can specify whether you want to edit the user or project level `.Rprofile`.
+
+### .Renviron
+
+`.Renviron` is a user controllable file that can be used to create environment variables. This is especially useful to avoid including credentials like API keys inside R scripts. This file is written in a key-value format, so environment variables are created in the format:
+
+```
+Key1=value1
+Key2=value2
+```
+
+And then `Sys.getenv("Key1")` will return "value1" in an R session.
+
+Like with `.Rprofile`, `.Renviron` files can be at either the user or project level. If there is a project level `.Renviron`, the user level file **will not be sourced**. The {usethis} package includes a helper function for editing `.Renviron` files from an R session with `usethis::edit_r_environ()`.
+
+### Rprofile.site and Renviron.site
+
+Both `.Rprofile` and `.Renviron` files have equivalents that apply server wide. `Rprofile.site` and `Renviron.site` (no leading dot) files are managed by RStudio Server admins, and are specific to a particular version of R. The most common settings for these files involve access to package repositories. For example, using the shared-baseline package management strategy is generally done from an `Rprofile.site`.
+
+Users can override settings in these files with their individual `.Rprofile` files.
+
+These files are set for each version of R and should be located in `R_HOME/etc/`. You can find `R_HOME` by running the command `R.home(component = "home")` in a session of that version of R. So, for example, if you find that `R_HOME` is `/opt/R/3.6.2/lib/R`, the `Rprofile.site` for R 3.6.2 would go in `/opt/R/3.6.2/lib/R/etc/Rprofile.site`.
+
+### rsession.conf and repos.conf
+
+RStudio Server allows server admins to configure particular server-wide R package repositories via the `rsession.conf` and `repos.conf` files. Only one repository can be configured in `rsession.conf`. If multiple repositories are needed, `repos.conf` should be used.
