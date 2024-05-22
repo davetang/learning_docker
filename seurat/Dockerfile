@@ -40,3 +40,4 @@ RUN R -q -e 'install.packages(c("BiocManager", "remotes", "optparse"))'
 RUN R -q -e 'remotes::install_version("SeuratObject", version = "5.0.2", repos = "https://cran.ism.ac.jp/", quiet = FALSE)'
 RUN R -q -e "remotes::install_version('Seurat', version = '${SEURATVER}', repos = 'https://cran.ism.ac.jp/', quiet = FALSE)"
 RUN R -q -e 'library(Seurat)'
+RUN R -q -e 'install.packages("hdf5r")'
