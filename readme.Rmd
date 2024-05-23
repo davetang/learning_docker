@@ -169,6 +169,7 @@ Some commonly used instructions include:
 * `WORKDIR` - Sets the working directory for the image. Any `CMD`, `RUN`,
   `COPY`, or `ENTRYPOINT` instruction after the `WORKDIR` declaration will be
   executed in the context of the working directory.
+* `USER` - Changes the user
 
 I have an example Dockerfile that uses the Ubuntu 18.04 image to build
 [BWA](https://github.com/lh3/bwa), a popular short read alignment tool used in
@@ -922,6 +923,12 @@ runtimes
 swarm
 tmp
 volumes
+```
+
+Use `--progress=plain` to show container output, which is useful for debugging!
+
+```console
+docker build --progress=plain -t davetang/scanpy:3.11 .
 ```
 
 ## Useful links
