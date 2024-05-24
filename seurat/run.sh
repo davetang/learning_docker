@@ -10,6 +10,7 @@ port=8989
 docker run \
    --name ${container_name} \
    -d \
+   --rm \
    -p ${port}:8787 \
    -v ${HOME}/github/:/home/rstudio/work \
    -v ${HOME}/gitlab/:/home/rstudio/gitlab \
