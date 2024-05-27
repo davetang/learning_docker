@@ -1,0 +1,55 @@
+---
+title: "Python in Quarto"
+format: html
+engine: knitr
+---
+
+Use [reticulate](https://rstudio.github.io/reticulate/).
+
+```{r load_reticulate}
+library(reticulate)
+use_python("/usr/bin/python3")
+reticulate::py_config()
+```
+
+Load 10x HDF5 data.
+
+```{python}
+import scanpy as sc
+
+adata = sc.read_10x_h5(
+    filename="filtered_feature_bc_matrix.h5",
+    backup_url="https://figshare.com/ndownloader/files/39546196",
+)
+
+adata.var_names_make_unique()
+adata
+```
+
+Gene lists used for filtering.
+
+```{python}
+# mitochondrial genes
+adata.var["mt"] = adata.var_names.str.startswith("MT-")
+# ribosomal genes
+adata.var["ribo"] = adata.var_names.str.startswith(("RPS", "RPL"))
+# hemoglobin genes.
+adata.var["hb"] = adata.var_names.str.contains(("^HB[^(P)]"))
+
+sc.pp.calculate_qc_metrics(
+    adata, qc_vars=["mt", "ribo", "hb"], inplace=True, percent_top=[20], log1p=True
+)
+adata
+```
+
+Calling `total_counts` in `python`.
+
+```{python}
+adata.obs['total_counts']
+```
+
+Calling `total_counts` in `R`.
+
+```{r call_adata}
+py$adata$obs["total_counts"]
+```
