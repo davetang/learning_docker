@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.4.0
+FROM rocker/verse:4.4.0
 
 MAINTAINER Dave Tang <me@davetang.org>
 
@@ -45,9 +45,8 @@ RUN cmake_ver=3.23.1 && \
    make install && \
    rm -rf /tmp/*
 
-RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse', 'tidymodels'));"
+RUN Rscript -e "install.packages(c('rmarkdown', 'tidymodels'));"
 RUN pip install --upgrade pip && pip install tensorflow
 
 WORKDIR /work
-
-CMD ["R", "--version"]
+COPY --chown=rstudio:rstudio rstudio-prefs.json /home/rstudio/.config/rstudio
