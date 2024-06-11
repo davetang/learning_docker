@@ -31,6 +31,7 @@ RUN apt-get clean all && \
       python3-pip \
       python-is-python3 \
       pandoc \
+      graphviz \
    && apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -47,6 +48,7 @@ RUN cmake_ver=3.23.1 && \
 
 RUN Rscript -e "install.packages(c('rmarkdown', 'tidymodels'));"
 RUN pip install --upgrade pip && pip install tensorflow
+RUN pip install pydot
 
 WORKDIR /work
 COPY --chown=rstudio:rstudio rstudio-prefs.json /home/rstudio/.config/rstudio
