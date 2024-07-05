@@ -931,6 +931,12 @@ Use `--progress=plain` to show container output, which is useful for debugging!
 docker build --progress=plain -t davetang/scanpy:3.11 .
 ```
 
+For Apple laptops using the the M[123] chips, use `--platform linux/amd64` if that's the architecture of the image.
+
+```
+docker run --rm --platform linux/amd64 -p 8787:8787 rocker/verse:4.4.1/
+```
+
 ## Useful links
 
 * [Post installation steps](https://docs.docker.com/engine/install/linux-postinstall/)
