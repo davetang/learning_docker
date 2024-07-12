@@ -313,6 +313,26 @@ is not quite renaming.
 docker run --rm davetang/bwa:0.7.17
 ```
 
+## Setting environment variables
+
+Create a new environment variable (ENV) using `--env`.
+
+```{bash engine.opts='-l'}
+docker run --rm --env YEAR=1984 busybox env
+```
+
+Two ENVs.
+
+```{bash engine.opts='-l'}
+docker run --rm --env YEAR=1984 --env SEED=2049 busybox env
+```
+
+Or `-e` for less typing.
+
+```{bash engine.opts='-l'}
+docker run --rm -e YEAR=1984 -e SEED=2049 busybox env
+```
+
 ## Resource usage
 
 To [restrict](https://docs.docker.com/config/containers/resource_constraints/)
