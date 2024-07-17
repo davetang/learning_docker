@@ -33,5 +33,8 @@
         "console_right_on_top": true,
         "additional_source_columns": 0
     },
-    "editor_theme": "Clouds Midnight"
+    "editor_theme": "Clouds Midnight",
+    "load_workspace": false,
+    "insert_native_pipe_operator": true,
+    "editor_keybindings": "vim"
 }
