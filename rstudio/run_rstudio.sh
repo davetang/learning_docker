@@ -21,6 +21,7 @@ docker run \
    -v ${HOME}/github/:/home/rstudio/work \
    -v ${HOME}/gitlab/:/home/rstudio/gitlab \
    -v ${HOME}/analysis/:/analysis \
+   -v ${HOME}:/data \
    -e PASSWORD=password \
    -e USERID=$(id -u) \
    -e GROUPID=$(id -g) \
