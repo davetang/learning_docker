@@ -25,6 +25,7 @@ RUN apt-get clean all && \
 		libgit2-dev \
 		libgsl-dev \
 		patch \
+		libmagick++-dev \
 	&& apt-get clean all && \
 	apt-get purge && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
