@@ -2,22 +2,22 @@
 
 set -euo pipefail
 
-version=4.4.0
-rstudio_image=davetang/rstudio:${version}
-container_name=rstudio_server_${version}
-port=8889
-package_dir=${HOME}/r_packages_${version}
+RVER=4.5.0
+IMAGE=davetang/rstudio:${RVER}
+NAME=rstudio_server_${RVER}
+PORT=8889
+LIB=${HOME}/r_packages_${RVER}
 
-if [[ ! -d ${package_dir} ]]; then
-   mkdir ${package_dir}
+if [[ ! -d ${LIB} ]]; then
+   mkdir ${LIB}
 fi
 
 docker run \
-   --name ${container_name} \
+   --name ${NAME} \
    -d \
    --restart always \
-   -p ${port}:8787 \
-   -v ${package_dir}:/packages \
+   -p ${PORT}:8787 \
+   -v ${LIB}:/packages \
    -v ${HOME}/github/:/home/rstudio/work \
    -v ${HOME}/gitlab/:/home/rstudio/gitlab \
    -v ${HOME}/analysis/:/analysis \
@@ -25,8 +25,8 @@ docker run \
    -e PASSWORD=password \
    -e USERID=$(id -u) \
    -e GROUPID=$(id -g) \
-   ${rstudio_image}
+   ${IMAGE}
 
->&2 echo ${container_name} listening on port ${port}
+>&2 echo ${NAME} listening on port ${PORT}
 
 exit 0
