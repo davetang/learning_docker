@@ -34,28 +34,19 @@ RUN apt-get clean all && \
       libboost-all-dev \
       pkg-config \
       libgit2-dev \
+      cmake \
+      bzip2 \
+      ca-certificates \
    && apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# CMake
-RUN cmake_ver=3.29.2 && cd /tmp/ && \
-   wget https://github.com/Kitware/CMake/releases/download/v${cmake_ver}/cmake-${cmake_ver}.tar.gz && \
-   tar -zxf cmake-${cmake_ver}.tar.gz && \
-   cd cmake-${cmake_ver} && \
-   ./bootstrap && \
-   make && \
-   make install && \
-   rm -rf /tmp/*
+ENV CONDA_DIR=/opt/conda
+RUN wget --quiet https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh \
+    && bash Miniforge3-Linux-x86_64.sh -b -p $CONDA_DIR \
+    && rm Miniforge3-Linux-x86_64.sh
 
-# Miniconda3
-RUN cd /tmp/ && \
-   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-   bash Miniconda3-latest-Linux-x86_64.sh -b -p ${HOME}/miniconda3 && \
-   ${HOME}/miniconda3/condabin/conda install -y -c conda-forge mamba
-
-# not sure why I cannot use ${HOME} with ENV
-ENV PATH=/root/miniconda3/bin:${PATH}
-RUN rm /tmp/Miniconda3-latest-Linux-x86_64.sh
+# Put conda in PATH for all users (including root)
+ENV PATH=$CONDA_DIR/bin:$PATH
 
 WORKDIR /work
