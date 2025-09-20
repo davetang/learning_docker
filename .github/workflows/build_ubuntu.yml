@@ -33,6 +33,6 @@ jobs:
         name: Build and push
         run: |
           image=davetang/build
-          ver=23.04
+          ver=24.04
           script/docker_build.sh ubuntu/Dockerfile ${image} ${ver}
           docker push ${image}:${ver}
