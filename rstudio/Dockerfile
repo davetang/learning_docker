@@ -1,15 +1,15 @@
 FROM rocker/rstudio:4.5.0
 
-LABEL source="https://github.com/davetang/learning_docker/blob/main/rstudio/Dockerfile"
-
-MAINTAINER Dave Tang <me@davetang.org>
+LABEL maintainer="Dave Tang <me@davetang.org>" \
+      source="https://github.com/davetang/learning_docker/blob/main/rstudio/Dockerfile" \
+      description="Rocker-based RStudio Server with common libraries and R packages"
 
 ARG bioc_ver=3.21
 
 RUN apt-get clean all && \
    apt-get update && \
    apt-get upgrade -y && \
-   apt-get install -y \
+   apt-get install -y --no-install-recommends \
       git \
       cmake \
       libhdf5-dev \
@@ -30,8 +30,8 @@ RUN apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN Rscript -e "install.packages(c('rmarkdown', 'tidyverse', 'tidymodels', 'workflowr', 'BiocManager', 'quarto', 'crew', 'targets'));"
-RUN Rscript -e "BiocManager::install(version = '${bioc_ver}')"
+RUN Rscript -e "install.packages(c('rmarkdown','tidyverse','tidymodels','workflowr','BiocManager','quarto','crew','targets'))" \
+    -e "BiocManager::install(version = '${bioc_ver}')"
 
 # the rstudio/ path is set for building with GitHub Actions
 COPY --chown=rstudio:rstudio rstudio/rstudio-prefs.json /home/rstudio/.config/rstudio
