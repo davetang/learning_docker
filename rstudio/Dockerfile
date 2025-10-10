@@ -30,7 +30,7 @@ RUN apt-get clean all && \
    apt-get purge && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN Rscript -e "install.packages(c('rmarkdown','tidyverse','tidymodels','workflowr','BiocManager','quarto','crew','targets'))" \
+RUN Rscript -e "install.packages(c('rmarkdown','tidyverse','tidymodels','workflowr','BiocManager','quarto','crew','targets','renv'))" \
     -e "BiocManager::install(version = '${bioc_ver}')"
 
 # the rstudio/ path is set for building with GitHub Actions
