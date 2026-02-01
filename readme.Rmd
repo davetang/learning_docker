@@ -258,6 +258,66 @@ Use `--entrypoint` to override ENTRYPOINT instruction.
 docker run --entrypoint
 ```
 
+### Multi-stage builds
+
+[Multi-stage builds](https://docs.docker.com/build/building/multi-stage/) allow you to use multiple `FROM` statements in a Dockerfile. Each `FROM` instruction starts a new build stage, and you can selectively copy artifacts from one stage to another. This is useful for creating smaller production images because you can separate the build environment (with compilers, build tools, and source code) from the runtime environment (with only the final binary).
+
+Here is a simple example that compiles a C program. First, the source code:
+
+```c
+// hello.c
+#include <stdio.h>
+int main() {
+    printf("Hello from Docker!\n");
+    return 0;
+}
+```
+
+A traditional single-stage Dockerfile would include gcc in the final image:
+
+```dockerfile
+FROM ubuntu:24.04
+RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+COPY hello.c /src/hello.c
+RUN gcc -o /usr/local/bin/hello /src/hello.c
+CMD ["hello"]
+```
+
+With multi-stage builds, we compile in one stage and copy only the binary to a minimal final image:
+
+```dockerfile
+# Build stage
+FROM ubuntu:24.04 AS builder
+RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+COPY hello.c /src/hello.c
+RUN gcc -static -o /src/hello /src/hello.c
+
+# Runtime stage
+FROM alpine:latest
+COPY --from=builder /src/hello /usr/local/bin/hello
+CMD ["hello"]
+```
+
+The `AS builder` syntax names the first stage so we can reference it later. The `COPY --from=builder` instruction copies the compiled binary from the build stage to the final image. The final image is based on Alpine Linux and contains only the binary, not gcc or the source code.
+
+Multi-stage builds are particularly useful for:
+
+* Compiled languages (C, C++, Go, Rust) where you need a compiler to build but not to run
+* Applications with build-time dependencies (npm, pip) that aren't needed at runtime
+* Keeping secrets or credentials used during build out of the final image
+
+You can also copy from a specific stage by number (stages are numbered starting from 0):
+
+```dockerfile
+COPY --from=0 /src/hello /usr/local/bin/hello
+```
+
+Or copy from an external image:
+
+```dockerfile
+COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx.conf
+```
+
 ## Building an image
 
 Use the `build` subcommand to build Docker images and use the `-f` parameter if
