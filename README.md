@@ -14,6 +14,7 @@ Table of Contents
       * [CMD](#cmd)
       * [COPY](#copy)
       * [ENTRYPOINT](#entrypoint)
+      * [Multi-stage builds](#multi-stage-builds)
    * [Building an image](#building-an-image)
    * [Renaming an image](#renaming-an-image)
    * [Running an image](#running-an-image)
@@ -48,7 +49,7 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Sun Feb  1 13:32:14 UTC 2026
+Sun Feb  1 13:44:00 UTC 2026
 
 Learning Docker
 ================
@@ -102,7 +103,6 @@ docker run --rm hello-world
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
     ## 17eec7bbc9d7: Pulling fs layer
-    ## 17eec7bbc9d7: Verifying Checksum
     ## 17eec7bbc9d7: Download complete
     ## 17eec7bbc9d7: Pull complete
     ## Digest: sha256:05813aedc15fb7b4d732e1be879d3252c1c9c25d885824f6295cab4538cb85cd
@@ -477,6 +477,83 @@ Use `--entrypoint` to override ENTRYPOINT instruction.
 docker run --entrypoint
 ```
 
+### Multi-stage builds
+
+[Multi-stage
+builds](https://docs.docker.com/build/building/multi-stage/) allow you
+to use multiple `FROM` statements in a Dockerfile. Each `FROM`
+instruction starts a new build stage, and you can selectively copy
+artifacts from one stage to another. This is useful for creating smaller
+production images because you can separate the build environment (with
+compilers, build tools, and source code) from the runtime environment
+(with only the final binary).
+
+Here is a simple example that compiles a C program. First, the source
+code:
+
+``` c
+// hello.c
+#include <stdio.h>
+int main() {
+    printf("Hello from Docker!\n");
+    return 0;
+}
+```
+
+A traditional single-stage Dockerfile would include gcc in the final
+image:
+
+``` dockerfile
+FROM ubuntu:24.04
+RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+COPY hello.c /src/hello.c
+RUN gcc -o /usr/local/bin/hello /src/hello.c
+CMD ["hello"]
+```
+
+With multi-stage builds, we compile in one stage and copy only the
+binary to a minimal final image:
+
+``` dockerfile
+# Build stage
+FROM ubuntu:24.04 AS builder
+RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+COPY hello.c /src/hello.c
+RUN gcc -static -o /src/hello /src/hello.c
+
+# Runtime stage
+FROM alpine:latest
+COPY --from=builder /src/hello /usr/local/bin/hello
+CMD ["hello"]
+```
+
+The `AS builder` syntax names the first stage so we can reference it
+later. The `COPY --from=builder` instruction copies the compiled binary
+from the build stage to the final image. The final image is based on
+Alpine Linux and contains only the binary, not gcc or the source code.
+
+Multi-stage builds are particularly useful for:
+
+- Compiled languages (C, C++, Go, Rust) where you need a compiler to
+  build but not to run
+- Applications with build-time dependencies (npm, pip) that aren’t
+  needed at runtime
+- Keeping secrets or credentials used during build out of the final
+  image
+
+You can also copy from a specific stage by number (stages are numbered
+starting from 0):
+
+``` dockerfile
+COPY --from=0 /src/hello /usr/local/bin/hello
+```
+
+Or copy from an external image:
+
+``` dockerfile
+COPY --from=nginx:latest /etc/nginx/nginx.conf /nginx.conf
+```
+
 ## Building an image
 
 Use the `build` subcommand to build Docker images and use the `-f`
@@ -548,14 +625,14 @@ docker run --rm davetang/bwa:0.7.17
     ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 3836f06c7ac7: Waiting
-    ## 5f22362f8660: Verifying Checksum
-    ## 5f22362f8660: Download complete
     ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
-    ## 3836f06c7ac7: Verifying Checksum
+    ## 5f22362f8660: Verifying Checksum
+    ## 5f22362f8660: Download complete
     ## 3836f06c7ac7: Download complete
-    ## feac53061382: Pull complete
+    ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
+    ## feac53061382: Pull complete
     ## 549f86662946: Pull complete
     ## 5f22362f8660: Pull complete
     ## 3836f06c7ac7: Pull complete
@@ -606,7 +683,7 @@ docker run --rm --env YEAR=1984 busybox env
     ## Digest: sha256:e226d6308690dbe282443c8c7e57365c96b5228f0fe7f40731b5d84d37a06839
     ## Status: Downloaded newer image for busybox:latest
     ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    ## HOSTNAME=4b0078f2bb1d
+    ## HOSTNAME=ad8c1856d09d
     ## YEAR=1984
     ## HOME=/root
 
@@ -617,7 +694,7 @@ docker run --rm --env YEAR=1984 --env SEED=2049 busybox env
 ```
 
     ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    ## HOSTNAME=235c79afd5d9
+    ## HOSTNAME=47170e66b508
     ## YEAR=1984
     ## SEED=2049
     ## HOME=/root
@@ -629,7 +706,7 @@ docker run --rm -e YEAR=1984 -e SEED=2049 busybox env
 ```
 
     ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    ## HOSTNAME=937aa6095f2d
+    ## HOSTNAME=2a707a171843
     ## YEAR=1984
     ## SEED=2049
     ## HOME=/root
@@ -744,13 +821,13 @@ docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 
     ## [bwa_index] Pack FASTA... 0.14 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 3.51 seconds elapse.
+    ## [bwa_index] 3.43 seconds elapse.
     ## [bwa_index] Update BWT... 0.06 sec
     ## [bwa_index] Pack forward-only FASTA... 0.11 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 1.31 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 1.04 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 5.144 sec; CPU: 5.158 sec
+    ## [main] Real time: 4.793 sec; CPU: 4.807 sec
 
 We can see the newly created index files.
 
@@ -759,13 +836,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner runner      194 Feb  1 13:27 README.md
-    ## -rw-r--r-- 1 runner runner  4772981 Feb  1 13:27 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Feb  1 13:31 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Feb  1 13:31 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Feb  1 13:31 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Feb  1 13:31 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Feb  1 13:31 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner runner      194 Feb  1 13:39 README.md
+    ## -rw-r--r-- 1 runner runner  4772981 Feb  1 13:39 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Feb  1 13:43 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Feb  1 13:43 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Feb  1 13:43 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Feb  1 13:43 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Feb  1 13:43 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -892,7 +969,7 @@ ls -lrt $(pwd)/test_root.txt
     ## 3ad6ea492c35: Pull complete
     ## Digest: sha256:e322f4808315c387868a9135beeb11435b5b83130a8599fd7d0014452c34f489
     ## Status: Downloaded newer image for ubuntu:22.10
-    ## -rw-r--r-- 1 root root 0 Feb  1 13:32 /home/runner/work/learning_docker/learning_docker/test_root.txt
+    ## -rw-r--r-- 1 root root 0 Feb  1 13:43 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
@@ -902,7 +979,7 @@ docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pw
 ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## -rw-r--r-- 1 runner runner 0 Feb  1 13:32 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+    ## -rw-r--r-- 1 runner runner 0 Feb  1 13:43 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -1037,10 +1114,10 @@ Show all containers.
 docker ps -a
 ```
 
-    ## CONTAINER ID   IMAGE          COMMAND                  CREATED                  STATUS                              PORTS     NAMES
-    ## a25bda782c48   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             reverent_mayer
-    ## 2f6c0f911d5d   ubuntu:22.10   "touch /home/runner/…"   1 second ago             Exited (0) 1 second ago                       lucid_dubinsky
-    ## 9cef07ddd319   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 1 second ago                       awesome_proskuriakova
+    ## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
+    ## 5f59c2ad3046   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             agitated_hamilton
+    ## 7754f5778633   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago   Exited (0) 1 second ago                       agitated_rosalind
+    ## 1fb1ccd9953a   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago   Exited (0) 2 seconds ago                      compassionate_raman
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -1049,9 +1126,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## a25bda782c48
-    ## 2f6c0f911d5d
-    ## 9cef07ddd319
+    ## 5f59c2ad3046
+    ## 7754f5778633
+    ## 1fb1ccd9953a
 
 Check to see if the container still exists.
 
@@ -1179,9 +1256,9 @@ docker run --rm rocker/r-ver:4.3.0
     ## d6f516f66899: Download complete
     ## e7191ae70de7: Verifying Checksum
     ## e7191ae70de7: Download complete
-    ## 3c645031de29: Pull complete
     ## 336082e130a7: Verifying Checksum
     ## 336082e130a7: Download complete
+    ## 3c645031de29: Pull complete
     ## eb5ba85ece65: Pull complete
     ## 336082e130a7: Pull complete
     ## d6f516f66899: Pull complete
