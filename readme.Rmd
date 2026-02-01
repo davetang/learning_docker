@@ -738,6 +738,147 @@ example `rocker/r-ver:4.3.0`.
 docker run --rm rocker/r-ver:4.3.0
 ```
 
+## Docker Compose
+
+[Docker Compose](https://docs.docker.com/compose/) is a tool for defining and running Docker containers using a YAML configuration file. Instead of typing long `docker run` commands with many parameters, you define everything in a `docker-compose.yml` (or `compose.yml`) file and use simple commands like `docker compose up` and `docker compose down`.
+
+### Basics
+
+A Compose file defines services, where each service corresponds to a container. Here is a simple example that runs RStudio Server:
+
+```yaml
+# docker-compose.yml
+services:
+  rstudio:
+    image: rocker/rstudio:4.5.1
+    container_name: rstudio_server
+    ports:
+      - "8787:8787"
+    environment:
+      - PASSWORD=password
+    volumes:
+      - ./data:/home/rstudio/data
+    restart: unless-stopped
+```
+
+To start the container, run `docker compose up -d` (the `-d` flag runs in detached mode). To stop and remove the container, run `docker compose down`.
+
+### Command line to YAML mapping
+
+The table below shows how common `docker run` parameters map to keys in the Compose YAML file:
+
+| docker run parameter  | Compose YAML key                                       | Example                        |
+| --------------------- | ------------------                                     | ---------                      |
+| `--name`              | `container_name`                                       | `container_name: my_container` |
+| `-p` / `--publish`    | `ports`                                                | `ports: ["8787:8787"]`         |
+| `-v` / `--volume`     | `volumes`                                              | `volumes: ["./data:/data"]`    |
+| `-e` / `--env`        | `environment`                                          | `environment: ["VAR=value"]`   |
+| `-d` / `--detach`     | (use `docker compose up -d`)                           |                                |
+| `--restart`           | `restart`                                              | `restart: unless-stopped`      |
+| `--cpus`              | `cpus`                                                 | `cpus: 0.5`                    |
+| `--memory`            | `mem_limit`                                            | `mem_limit: 512m`              |
+| `-w` / `--workdir`    | `working_dir`                                          | `working_dir: /app`            |
+| `-u` / `--user`       | `user`                                                 | `user: "1000:1000"`            |
+| `--rm`                | (not needed, `docker compose down` removes containers) |                                |
+
+For example, the `docker run` command below is equivalent to the `docker-compose.yml` shown above.
+
+```console
+docker run -d \
+   --name rstudio_server \
+   --restart unless-stopped \
+   -p 8787:8787 \
+   -v $(pwd)/data:/home/rstudio/data \
+   -e PASSWORD=password \
+   rocker/rstudio:4.5.1
+```
+
+### Single container usage
+
+It is perfectly fine to use Docker Compose for single containers. The benefits include:
+
+* Configuration is documented in a file and can be version controlled
+* No need to remember long commands with many parameters
+* Easy to start/stop with `docker compose up -d` and `docker compose down`
+* Can define named volumes that persist data
+
+### Multi-container applications
+
+Docker Compose really shines when running multiple containers that work together. Here is an example with a web application and a database:
+
+```yaml
+# docker-compose.yml
+services:
+  web:
+    image: nginx:latest
+    container_name: web_server
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=myapp
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+```
+
+The `depends_on` key ensures that the `db` service starts before the `web` service. The `volumes` section at the bottom defines a named volume `db_data` that persists the database files.
+
+### Container communication
+
+When you run multiple containers with Docker Compose, they are automatically placed on the same network and can communicate with each other using the **service name** as the hostname.
+
+In the example above, if the web application needed to connect to MySQL, it would use `db` as the hostname (the service name), not `localhost` or an IP address. For example, a connection string might look like:
+
+```
+mysql://root:secret@db:3306/myapp
+```
+
+Docker Compose creates a default network for all services defined in the file. You can also define custom networks if you need more control:
+
+```yaml
+services:
+  app:
+    image: myapp:latest
+    networks:
+      - frontend
+      - backend
+
+  db:
+    image: mysql:8.0
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+```
+
+In this example, `app` can communicate with `db` because they share the `backend` network, but other services on only the `frontend` network cannot reach `db`.
+
+### Common commands
+
+| Command                               | Description                          |
+| ---------                             | -------------                        |
+| `docker compose up -d`                | Start all services in detached mode  |
+| `docker compose down`                 | Stop and remove all containers       |
+| `docker compose ps`                   | List running containers              |
+| `docker compose logs`                 | View logs from all services          |
+| `docker compose logs -f <service>`    | Follow logs from a specific service  |
+| `docker compose exec <service> <cmd>` | Run a command in a running container |
+| `docker compose build`                | Build or rebuild images              |
+| `docker compose pull`                 | Pull latest images                   |
+
 ## Saving and transferring a Docker image
 
 You should just share the Dockerfile used to create your image but if you need
