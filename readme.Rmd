@@ -432,6 +432,131 @@ af6e812a94da   unruffled_liskov   50.49%    584KiB / 1.941GiB   0.03%     736B /
 docker stop af6e812a94da
 ```
 
+## Container isolation and security
+
+By default, Docker containers have access to various system capabilities and resources. For security-sensitive environments, you can run containers in more restrictive ways to minimise the attack surface.
+
+### Read-only root filesystem
+
+Use `--read-only` to mount the container's root filesystem as read-only, preventing any writes to the container filesystem.
+
+```{bash engine.opts='-l'}
+docker run --rm --read-only busybox touch /test.txt
+```
+
+Some applications need to write to temporary directories, so you can combine `--read-only` with `--tmpfs` to allow writes to specific locations:
+
+```{bash engine.opts='-l'}
+docker run --rm --read-only --tmpfs /tmp busybox sh -c "touch /tmp/test.txt && echo 'Write to /tmp succeeded'"
+```
+
+### Dropping capabilities
+
+Linux capabilities allow fine-grained control over what a process can do. By default, Docker containers have a reduced set of capabilities, but you can drop even more using `--cap-drop`.
+
+Drop all capabilities:
+
+```console
+docker run --rm --cap-drop=ALL busybox id
+```
+
+Drop all capabilities and add back only what's needed:
+
+```console
+docker run --rm --cap-drop=ALL --cap-add=NET_BIND_SERVICE nginx
+```
+
+Common capabilities you might want to drop:
+
+| Capability       | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| `NET_RAW`        | Use raw sockets (for ping, network sniffing)      |
+| `SYS_ADMIN`      | Broad system administration operations            |
+| `SYS_PTRACE`     | Trace/debug processes                             |
+| `SETUID/SETGID`  | Change user/group IDs                             |
+| `NET_BIND_SERVICE` | Bind to ports below 1024                        |
+
+### Preventing privilege escalation
+
+Use `--security-opt no-new-privileges` to prevent processes inside the container from gaining additional privileges (e.g., via setuid binaries).
+
+```console
+docker run --rm --security-opt no-new-privileges busybox id
+```
+
+### Network isolation
+
+For containers that don't need network access, use `--network none` to completely disable networking.
+
+```{bash engine.opts='-l'}
+docker run --rm --network none busybox ping -c 1 8.8.8.8
+```
+
+### Running as non-root
+
+As covered in the File Permissions section, use `-u` to run as a non-root user:
+
+```{bash engine.opts='-l'}
+docker run --rm -u 1000:1000 busybox id
+```
+
+### Limiting system calls with seccomp
+
+Docker applies a default seccomp profile that blocks dangerous system calls. You can use a more restrictive custom profile:
+
+```console
+docker run --rm --security-opt seccomp=/path/to/profile.json busybox sh
+```
+
+To see the default profile, check the [Docker seccomp documentation](https://docs.docker.com/engine/security/seccomp/).
+
+### Combining restrictions
+
+For maximum isolation, combine multiple restrictions:
+
+```console
+docker run --rm \
+   --read-only \
+   --tmpfs /tmp \
+   --cap-drop=ALL \
+   --security-opt no-new-privileges \
+   --network none \
+   -u 1000:1000 \
+   busybox id
+```
+
+This creates a container that:
+
+* Cannot write to its filesystem (except `/tmp`)
+* Has no Linux capabilities
+* Cannot gain new privileges
+* Has no network access
+* Runs as a non-root user
+
+### Docker Compose security options
+
+These options can also be specified in a Compose file:
+
+```yaml
+services:
+  secure_app:
+    image: myapp:latest
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true
+    user: "1000:1000"
+    networks:
+      - isolated
+```
+
+For more information on Docker security, see the [Docker security documentation](https://docs.docker.com/engine/security/).
+
 ## Copying files between host and container
 
 Use `docker cp` but I recommend mounting a volume to a Docker container (see
