@@ -98,6 +98,22 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#docker-sandboxes">Docker Sandboxes</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#supported-agents">Supported agents</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#getting-started">Getting started</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#common-commands">Common commands</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#key-features">Key features</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#caveats">Caveats</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#copying-files-between-host-and-container">Copying files between host and container</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#sharing-between-host-and-container">Sharing between host and container</a>
@@ -136,7 +152,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#container-communication">Container communication</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#common-commands">Common commands</a>
+    <li class="toctree-l3"><a class="reference internal" href="#common-commands_1">Common commands</a>
     </li>
         </ul>
     </li>
@@ -209,7 +225,7 @@ that I prepared for BioC Asia 2019.</p>
 <p>To see if everything is working, try to obtain the Docker version.</p>
 <pre><code class="language-bash">docker --version
 </code></pre>
-<pre><code>## Docker version 28.0.4, build b8034c0
+<pre><code>## Docker version 29.1.5, build 0e6fee6
 </code></pre>
 <p>And run the <code>hello-world</code> image. (The <code>--rm</code> parameter is used to
 automatically remove the container when it exits.)</p>
@@ -218,10 +234,10 @@ automatically remove the container when it exits.)</p>
 <pre><code>## Unable to find image 'hello-world:latest' locally
 ## latest: Pulling from library/hello-world
 ## 17eec7bbc9d7: Pulling fs layer
-## 17eec7bbc9d7: Verifying Checksum
 ## 17eec7bbc9d7: Download complete
 ## 17eec7bbc9d7: Pull complete
-## Digest: sha256:05813aedc15fb7b4d732e1be879d3252c1c9c25d885824f6295cab4538cb85cd
+## ea52d2000f90: Download complete
+## Digest: sha256:ef54e839ef541993b4e87f25e752f7cf4238fa55f017957c2eb44077083d7a6a
 ## Status: Downloaded newer image for hello-world:latest
 ## 
 ## Hello from Docker!
@@ -250,21 +266,21 @@ automatically remove the container when it exits.)</p>
 <pre><code class="language-bash">docker version
 </code></pre>
 <pre><code>## Client: Docker Engine - Community
-##  Version:           28.0.4
-##  API version:       1.48
-##  Go version:        go1.23.7
-##  Git commit:        b8034c0
-##  Built:             Tue Mar 25 15:07:16 2025
+##  Version:           29.1.5
+##  API version:       1.52
+##  Go version:        go1.25.6
+##  Git commit:        0e6fee6
+##  Built:             Fri Jan 16 12:48:47 2026
 ##  OS/Arch:           linux/amd64
 ##  Context:           default
 ## 
 ## Server: Docker Engine - Community
 ##  Engine:
-##   Version:          28.0.4
-##   API version:      1.48 (minimum version 1.24)
-##   Go version:       go1.23.7
-##   Git commit:       6430e49
-##   Built:            Tue Mar 25 15:07:16 2025
+##   Version:          29.1.5
+##   API version:      1.52 (minimum version 1.44)
+##   Go version:       go1.25.6
+##   Git commit:       3b01d64
+##   Built:            Fri Jan 16 12:48:47 2026
 ##   OS/Arch:          linux/amd64
 ##   Experimental:     false
 ##  containerd:
@@ -281,15 +297,15 @@ automatically remove the container when it exits.)</p>
 <pre><code class="language-bash">docker info
 </code></pre>
 <pre><code>## Client: Docker Engine - Community
-##  Version:    28.0.4
+##  Version:    29.1.5
 ##  Context:    default
 ##  Debug Mode: false
 ##  Plugins:
 ##   buildx: Docker Buildx (Docker Inc.)
-##     Version:  v0.31.0
+##     Version:  v0.31.1
 ##     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
 ##   compose: Docker Compose (Docker Inc.)
-##     Version:  v2.38.2
+##     Version:  v2.40.3
 ##     Path:     /usr/libexec/docker/cli-plugins/docker-compose
 ## 
 ## Server:
@@ -298,13 +314,9 @@ automatically remove the container when it exits.)</p>
 ##   Paused: 0
 ##   Stopped: 0
 ##  Images: 2
-##  Server Version: 28.0.4
-##  Storage Driver: overlay2
-##   Backing Filesystem: extfs
-##   Supports d_type: true
-##   Using metacopy: false
-##   Native Overlay Diff: false
-##   userxattr: false
+##  Server Version: 29.1.5
+##  Storage Driver: overlayfs
+##   driver-type: io.containerd.snapshotter.v1
 ##  Logging Driver: json-file
 ##  Cgroup Driver: systemd
 ##  Cgroup Version: 2
@@ -312,6 +324,9 @@ automatically remove the container when it exits.)</p>
 ##   Volume: local
 ##   Network: bridge host ipvlan macvlan null overlay
 ##   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+##  CDI spec directories:
+##   /etc/cdi
+##   /var/run/cdi
 ##  Swarm: inactive
 ##  Runtimes: io.containerd.runc.v2 runc
 ##  Default Runtime: runc
@@ -324,14 +339,14 @@ automatically remove the container when it exits.)</p>
 ##   seccomp
 ##    Profile: builtin
 ##   cgroupns
-##  Kernel Version: 6.11.0-1018-azure
+##  Kernel Version: 6.14.0-1017-azure
 ##  Operating System: Ubuntu 24.04.3 LTS
 ##  OSType: linux
 ##  Architecture: x86_64
 ##  CPUs: 4
 ##  Total Memory: 15.62GiB
-##  Name: runnervmkj6or
-##  ID: d1587796-e338-4253-a941-b5a378ddb055
+##  Name: runnervmjduv7
+##  ID: 169aa517-19ec-4d49-bd61-4bb79f5886f6
 ##  Docker Root Dir: /var/lib/docker
 ##  Debug Mode: false
 ##  Username: githubactions
@@ -340,6 +355,7 @@ automatically remove the container when it exits.)</p>
 ##   ::1/128
 ##   127.0.0.0/8
 ##  Live Restore Enabled: false
+##  Firewall Backend: iptables
 </code></pre>
 <h2 id="basics">Basics</h2>
 <p>The two guides linked in the introduction section provide some
@@ -360,7 +376,6 @@ repository</a> from Docker Hub by running
 </code></pre>
 <pre><code>## 18.04: Pulling from library/ubuntu
 ## 7c457f213c76: Pulling fs layer
-## 7c457f213c76: Verifying Checksum
 ## 7c457f213c76: Download complete
 ## 7c457f213c76: Pull complete
 ## Digest: sha256:152dc042452c496007f07ca9127571cb9c29697f42acbfad72324b2bb2e43c98
@@ -657,22 +672,17 @@ documentation</a>.</p>
 <pre><code>## Unable to find image 'davetang/bwa:0.7.17' locally
 ## 0.7.17: Pulling from davetang/bwa
 ## feac53061382: Pulling fs layer
-## 549f86662946: Pulling fs layer
 ## 5f22362f8660: Pulling fs layer
 ## 3836f06c7ac7: Pulling fs layer
-## 3836f06c7ac7: Waiting
-## 5f22362f8660: Verifying Checksum
-## 5f22362f8660: Download complete
-## feac53061382: Verifying Checksum
+## 549f86662946: Pulling fs layer
 ## feac53061382: Download complete
-## 3836f06c7ac7: Verifying Checksum
 ## 3836f06c7ac7: Download complete
+## 5f22362f8660: Download complete
 ## feac53061382: Pull complete
-## 549f86662946: Verifying Checksum
 ## 549f86662946: Download complete
-## 549f86662946: Pull complete
-## 5f22362f8660: Pull complete
 ## 3836f06c7ac7: Pull complete
+## 5f22362f8660: Pull complete
+## 549f86662946: Pull complete
 ## Digest: sha256:f0da4e206f549ed8c08f5558b111cb45677c4de6a3dc0f2f0569c648e8b27fc5
 ## Status: Downloaded newer image for davetang/bwa:0.7.17
 ## 
@@ -710,13 +720,13 @@ documentation</a>.</p>
 <pre><code>## Unable to find image 'busybox:latest' locally
 ## latest: Pulling from library/busybox
 ## 61dfb50712f5: Pulling fs layer
-## 61dfb50712f5: Verifying Checksum
 ## 61dfb50712f5: Download complete
+## 96cfb76e59bd: Download complete
 ## 61dfb50712f5: Pull complete
 ## Digest: sha256:b3255e7dfbcd10cb367af0d409747d511aeb66dfac98cf30e97e87e4207dd76f
 ## Status: Downloaded newer image for busybox:latest
 ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-## HOSTNAME=2a845078b544
+## HOSTNAME=6f1e0745c8b9
 ## YEAR=1984
 ## HOME=/root
 </code></pre>
@@ -724,7 +734,7 @@ documentation</a>.</p>
 <pre><code class="language-bash">docker run --rm --env YEAR=1984 --env SEED=2049 busybox env
 </code></pre>
 <pre><code>## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-## HOSTNAME=f0c1059b1e4c
+## HOSTNAME=c017e9a06831
 ## YEAR=1984
 ## SEED=2049
 ## HOME=/root
@@ -733,7 +743,7 @@ documentation</a>.</p>
 <pre><code class="language-bash">docker run --rm -e YEAR=1984 -e SEED=2049 busybox env
 </code></pre>
 <pre><code>## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-## HOSTNAME=70c10c4053ed
+## HOSTNAME=cdbfc99a3566
 ## YEAR=1984
 ## SEED=2049
 ## HOME=/root
@@ -839,8 +849,8 @@ binaries).</p>
 completely disable networking.</p>
 <pre><code class="language-bash">docker run --rm --network none busybox ping -c 1 8.8.8.8
 </code></pre>
-<pre><code>## PING 8.8.8.8 (8.8.8.8): 56 data bytes
-## ping: sendto: Network is unreachable
+<pre><code>## ping: sendto: Network is unreachable
+## PING 8.8.8.8 (8.8.8.8): 56 data bytes
 </code></pre>
 <h3 id="running-as-non-root">Running as non-root</h3>
 <p>As covered in the File Permissions section, use <code>-u</code> to run as a
@@ -895,6 +905,107 @@ documentation</a>.</p>
 </code></pre>
 <p>For more information on Docker security, see the <a href="https://docs.docker.com/engine/security/">Docker security
 documentation</a>.</p>
+<h2 id="docker-sandboxes">Docker Sandboxes</h2>
+<p><a href="https://docs.docker.com/ai/sandboxes/">Docker Sandboxes</a> let you run AI
+coding agents in isolated environments on your machine. Rather than
+giving an agent direct access to your host system, sandboxes run each
+agent inside a dedicated microVM with its own private Docker daemon and
+only your project workspace mounted in. This provides a secure way to
+give agents autonomy without compromising your system.</p>
+<h3 id="requirements">Requirements</h3>
+<ul>
+<li>Docker Desktop 4.58 or later</li>
+<li>macOS or Windows (experimental); Linux users can use legacy
+  container-based sandboxes with Docker Desktop 4.57+</li>
+<li>An API key for the AI agent (e.g. <code>ANTHROPIC_API_KEY</code> for Claude Code)</li>
+</ul>
+<h3 id="supported-agents">Supported agents</h3>
+<p>Docker Sandboxes currently support <a href="https://docs.anthropic.com/en/docs/claude-code">Claude
+Code</a> with full support
+and partial support for OpenAI Codex, GitHub Copilot, Google Gemini, and
+AWS Kiro.</p>
+<h3 id="getting-started">Getting started</h3>
+<p>Set your API key (using Claude Code as an example):</p>
+<pre><code class="language-console">export ANTHROPIC_API_KEY=sk-ant-api03-xxxxx
+</code></pre>
+<p>Launch a sandbox pointing at your project directory:</p>
+<pre><code class="language-console">docker sandbox run claude ~/my-project
+</code></pre>
+<p>This creates a microVM with an isolated Docker daemon and syncs your
+workspace. The workspace directory is mounted at the same absolute path
+inside the sandbox. The first run takes longer while Docker initialises
+the microVM and fetches the template image.</p>
+<h3 id="common-commands">Common commands</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docker sandbox run claude .</code></td>
+<td>Run Claude Code in the current directory</td>
+</tr>
+<tr>
+<td><code>docker sandbox run --name my-proj claude .</code></td>
+<td>Run with a custom sandbox name</td>
+</tr>
+<tr>
+<td><code>docker sandbox run --template python:3-alpine claude .</code></td>
+<td>Use a custom base image</td>
+</tr>
+<tr>
+<td><code>docker sandbox run claude . -- -p "fix the tests"</code></td>
+<td>Pass arguments to the agent (after <code>--</code>)</td>
+</tr>
+<tr>
+<td><code>docker sandbox ls</code></td>
+<td>List all sandboxes</td>
+</tr>
+<tr>
+<td><code>docker sandbox exec -it &lt;name&gt; bash</code></td>
+<td>Open a shell inside a running sandbox</td>
+</tr>
+<tr>
+<td><code>docker sandbox stop &lt;name&gt;</code></td>
+<td>Stop a sandbox without removing it</td>
+</tr>
+<tr>
+<td><code>docker sandbox rm &lt;name&gt;</code></td>
+<td>Remove a sandbox</td>
+</tr>
+<tr>
+<td><code>docker sandbox reset</code></td>
+<td>Remove all sandboxes and associated data</td>
+</tr>
+</tbody>
+</table>
+<p>Note that sandboxes do not appear in <code>docker ps</code> output since they are
+microVMs, not regular containers.</p>
+<h3 id="key-features">Key features</h3>
+<ul>
+<li><strong>Isolation</strong> - each sandbox runs in a lightweight microVM with its
+  own Docker daemon; agents cannot access your host Docker daemon,
+  existing containers, or files outside the workspace.</li>
+<li><strong>Workspace sync</strong> - bidirectional file synchronisation between your
+  host and the sandbox at matching absolute paths.</li>
+<li><strong>Network control</strong> - network access can be configured with allow and
+  deny lists using <code>docker sandbox network</code>.</li>
+<li><strong>Disposable</strong> - sandboxes are cheap to create and destroy; remove and
+  recreate them to start fresh.</li>
+</ul>
+<h3 id="caveats">Caveats</h3>
+<ul>
+<li>Agents <strong>can modify files</strong> in your workspace. Review changes before
+  executing code or performing actions that auto-run scripts.</li>
+<li>Configuration changes require removing and recreating the sandbox, as
+  settings are established during creation.</li>
+</ul>
+<p>For more information, see the <a href="https://docs.docker.com/ai/sandboxes/">Docker Sandboxes
+documentation</a> and the <a href="https://docs.docker.com/reference/cli/docker/sandbox/">CLI
+reference</a>.</p>
 <h2 id="copying-files-between-host-and-container">Copying files between host and container</h2>
 <p>Use <code>docker cp</code> but I recommend mounting a volume to a Docker container
 (see next section).</p>
@@ -951,27 +1062,27 @@ inside <code>data</code> on the host. The command below will create BWA index fi
 for <code>data/chrI.fa.gz</code>.</p>
 <pre><code class="language-bash">docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 </code></pre>
-<pre><code>## [bwa_index] Pack FASTA... 0.14 sec
+<pre><code>## [bwa_index] Pack FASTA... 0.15 sec
 ## [bwa_index] Construct BWT for the packed sequence...
-## [bwa_index] 3.19 seconds elapse.
+## [bwa_index] 3.48 seconds elapse.
 ## [bwa_index] Update BWT... 0.06 sec
 ## [bwa_index] Pack forward-only FASTA... 0.11 sec
-## [bwa_index] Construct SA from BWT and Occ... 0.93 sec
+## [bwa_index] Construct SA from BWT and Occ... 1.14 sec
 ## [main] Version: 0.7.17-r1188
 ## [main] CMD: bwa index chrI.fa.gz
-## [main] Real time: 4.438 sec; CPU: 4.453 sec
+## [main] Real time: 4.948 sec; CPU: 4.961 sec
 </code></pre>
 <p>We can see the newly created index files.</p>
 <pre><code class="language-bash">ls -lrt data
 </code></pre>
 <pre><code>## total 30436
-## -rw-r--r-- 1 runner runner      194 Feb  5 02:25 README.md
-## -rw-r--r-- 1 runner runner  4772981 Feb  5 02:25 chrI.fa.gz
-## -rw-r--r-- 1 root   root   15072516 Feb  5 02:29 chrI.fa.gz.bwt
-## -rw-r--r-- 1 root   root    3768110 Feb  5 02:29 chrI.fa.gz.pac
-## -rw-r--r-- 1 root   root         41 Feb  5 02:29 chrI.fa.gz.ann
-## -rw-r--r-- 1 root   root         13 Feb  5 02:29 chrI.fa.gz.amb
-## -rw-r--r-- 1 root   root    7536272 Feb  5 02:29 chrI.fa.gz.sa
+## -rw-r--r-- 1 runner runner      194 Feb 13 11:41 README.md
+## -rw-r--r-- 1 runner runner  4772981 Feb 13 11:41 chrI.fa.gz
+## -rw-r--r-- 1 root   root   15072516 Feb 13 11:46 chrI.fa.gz.bwt
+## -rw-r--r-- 1 root   root    3768110 Feb 13 11:46 chrI.fa.gz.pac
+## -rw-r--r-- 1 root   root         41 Feb 13 11:46 chrI.fa.gz.ann
+## -rw-r--r-- 1 root   root         13 Feb 13 11:46 chrI.fa.gz.amb
+## -rw-r--r-- 1 root   root    7536272 Feb 13 11:46 chrI.fa.gz.sa
 </code></pre>
 <p>However note that the generated files are owned by <code>root</code>, which is
 slightly annoying because unless we have root access, we need to start a
@@ -1073,19 +1184,18 @@ ls -lrt $(pwd)/test_root.txt
 <pre><code>## Unable to find image 'ubuntu:22.10' locally
 ## 22.10: Pulling from library/ubuntu
 ## 3ad6ea492c35: Pulling fs layer
-## 3ad6ea492c35: Verifying Checksum
 ## 3ad6ea492c35: Download complete
 ## 3ad6ea492c35: Pull complete
 ## Digest: sha256:e322f4808315c387868a9135beeb11435b5b83130a8599fd7d0014452c34f489
 ## Status: Downloaded newer image for ubuntu:22.10
-## -rw-r--r-- 1 root root 0 Feb  5 02:29 /home/runner/work/learning_docker/learning_docker/test_root.txt
+## -rw-r--r-- 1 root root 0 Feb 13 11:46 /home/runner/work/learning_docker/learning_docker/test_root.txt
 </code></pre>
 <p>In this example, we run the command as a user with the same UID and GID;
 the <code>stat</code> command is used to get the UID and GID.</p>
 <pre><code class="language-bash">docker run -v $(pwd):/$(pwd) -u $(stat -c &quot;%u:%g&quot; $HOME) ubuntu:22.10 touch $(pwd)/test_mine.txt
 ls -lrt $(pwd)/test_mine.txt
 </code></pre>
-<pre><code>## -rw-r--r-- 1 runner runner 0 Feb  5 02:29 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+<pre><code>## -rw-r--r-- 1 runner runner 0 Feb 13 11:46 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 </code></pre>
 <p>One issue with this method is that you may encounter the following
 warning (if running interactively):</p>
@@ -1118,16 +1228,15 @@ find stopped containers and <code>docker rm</code> to remove these containers.</
 <p>Check out <code>busybox</code>.</p>
 <pre><code class="language-bash">docker images busybox
 </code></pre>
-<pre><code>## REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
-## busybox      latest    af3f0f48a24e   16 months ago   4.43MB
+<pre><code>## WARNING: This output is designed for human readability. For machine-readable output, please use --format.
+## IMAGE            ID             DISK USAGE   CONTENT SIZE   EXTRA
+## busybox:latest   b3255e7dfbcd       6.77MB         2.22MB
 </code></pre>
 <p>Remove <code>busybox</code>.</p>
 <pre><code class="language-bash">docker rmi busybox
 </code></pre>
 <pre><code>## Untagged: busybox:latest
-## Untagged: busybox@sha256:b3255e7dfbcd10cb367af0d409747d511aeb66dfac98cf30e97e87e4207dd76f
-## Deleted: sha256:af3f0f48a24edb84e94aff6f44f5d089203453719d3b2328486d311e61db9b09
-## Deleted: sha256:495ba00f2547448d629ce0ff451b352b878d4e3616fc2434585952dbc2bbf029
+## Deleted: sha256:b3255e7dfbcd10cb367af0d409747d511aeb66dfac98cf30e97e87e4207dd76f
 </code></pre>
 <h2 id="committing-changes">Committing changes</h2>
 <p>Generally, it is better to use a Dockerfile to manage your images in a
@@ -1186,18 +1295,18 @@ container exits. For example:</p>
 <p>Show all containers.</p>
 <pre><code class="language-bash">docker ps -a
 </code></pre>
-<pre><code>## CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                              PORTS     NAMES
-## 99d31112bb23   hello-world    "/hello"                 1 second ago    Exited (0) Less than a second ago             quirky_grothendieck
-## 24decff07219   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago   Exited (0) 1 second ago                       silly_chaplygin
-## a0d245881034   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago   Exited (0) 1 second ago                       heuristic_johnson
+<pre><code>## CONTAINER ID   IMAGE          COMMAND                  CREATED                  STATUS                              PORTS     NAMES
+## 4ff2307e3550   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             eloquent_burnell
+## b517f9f618f9   ubuntu:22.10   "touch /home/runner/…"   1 second ago             Exited (0) 1 second ago                       compassionate_colden
+## 21e4b7a0d017   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 2 seconds ago                      goofy_elbakyan
 </code></pre>
 <p>We can use a sub-shell to get all (<code>-a</code>) container IDs (<code>-q</code>) that have
 exited (<code>-f status=exited</code>) and then remove them (<code>docker rm -v</code>).</p>
 <pre><code class="language-bash">docker rm -v $(docker ps -a -q -f status=exited)
 </code></pre>
-<pre><code>## 99d31112bb23
-## 24decff07219
-## a0d245881034
+<pre><code>## 4ff2307e3550
+## b517f9f618f9
+## 21e4b7a0d017
 </code></pre>
 <p>Check to see if the container still exists.</p>
 <pre><code class="language-bash">docker ps -a
@@ -1283,27 +1392,21 @@ for example <code>rocker/r-ver:4.3.0</code>.</p>
 </code></pre>
 <pre><code>## Unable to find image 'rocker/r-ver:4.3.0' locally
 ## 4.3.0: Pulling from rocker/r-ver
-## 3c645031de29: Pulling fs layer
-## eb5ba85ece65: Pulling fs layer
-## 336082e130a7: Pulling fs layer
-## d6f516f66899: Pulling fs layer
 ## e7191ae70de7: Pulling fs layer
-## d6f516f66899: Waiting
-## e7191ae70de7: Waiting
-## eb5ba85ece65: Verifying Checksum
+## eb5ba85ece65: Pulling fs layer
+## d6f516f66899: Pulling fs layer
+## 336082e130a7: Pulling fs layer
+## 3c645031de29: Pulling fs layer
 ## eb5ba85ece65: Download complete
-## d6f516f66899: Verifying Checksum
 ## d6f516f66899: Download complete
-## 3c645031de29: Verifying Checksum
 ## 3c645031de29: Download complete
-## e7191ae70de7: Verifying Checksum
+## 15dc15a849e2: Download complete
 ## e7191ae70de7: Download complete
+## 336082e130a7: Download complete
 ## 3c645031de29: Pull complete
 ## eb5ba85ece65: Pull complete
-## 336082e130a7: Verifying Checksum
-## 336082e130a7: Download complete
-## 336082e130a7: Pull complete
 ## d6f516f66899: Pull complete
+## 336082e130a7: Pull complete
 ## e7191ae70de7: Pull complete
 ## Digest: sha256:48fb09f63e1cbcc1b0ce3974a8f206bff0804b6921bb36dfa08eafa264dad542
 ## Status: Downloaded newer image for rocker/r-ver:4.3.0
@@ -1502,7 +1605,7 @@ networks:
 <p>In this example, <code>app</code> can communicate with <code>db</code> because they share the
 <code>backend</code> network, but other services on only the <code>frontend</code> network
 cannot reach <code>db</code>.</p>
-<h3 id="common-commands">Common commands</h3>
+<h3 id="common-commands_1">Common commands</h3>
 <table>
 <thead>
 <tr>
@@ -1776,5 +1879,5 @@ debugging!</p>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-02-05 02:30:21.457210+00:00
+Build Date UTC : 2026-02-13 11:46:32.954315+00:00
 -->
