@@ -557,6 +557,66 @@ services:
 
 For more information on Docker security, see the [Docker security documentation](https://docs.docker.com/engine/security/).
 
+## Docker Sandboxes
+
+[Docker Sandboxes](https://docs.docker.com/ai/sandboxes/) let you run AI coding agents in isolated environments on your machine. Rather than giving an agent direct access to your host system, sandboxes run each agent inside a dedicated microVM with its own private Docker daemon and only your project workspace mounted in. This provides a secure way to give agents autonomy without compromising your system.
+
+### Requirements
+
+* Docker Desktop 4.58 or later
+* macOS or Windows (experimental); Linux users can use legacy container-based sandboxes with Docker Desktop 4.57+
+* An API key for the AI agent (e.g. `ANTHROPIC_API_KEY` for Claude Code)
+
+### Supported agents
+
+Docker Sandboxes currently support [Claude Code](https://docs.anthropic.com/en/docs/claude-code) with full support and partial support for OpenAI Codex, GitHub Copilot, Google Gemini, and AWS Kiro.
+
+### Getting started
+
+Set your API key (using Claude Code as an example):
+
+```console
+export ANTHROPIC_API_KEY=sk-ant-api03-xxxxx
+```
+
+Launch a sandbox pointing at your project directory:
+
+```console
+docker sandbox run claude ~/my-project
+```
+
+This creates a microVM with an isolated Docker daemon and syncs your workspace. The workspace directory is mounted at the same absolute path inside the sandbox. The first run takes longer while Docker initialises the microVM and fetches the template image.
+
+### Common commands
+
+| Command | Description |
+| ------- | ----------- |
+| `docker sandbox run claude .` | Run Claude Code in the current directory |
+| `docker sandbox run --name my-proj claude .` | Run with a custom sandbox name |
+| `docker sandbox run --template python:3-alpine claude .` | Use a custom base image |
+| `docker sandbox run claude . -- -p "fix the tests"` | Pass arguments to the agent (after `--`) |
+| `docker sandbox ls` | List all sandboxes |
+| `docker sandbox exec -it <name> bash` | Open a shell inside a running sandbox |
+| `docker sandbox stop <name>` | Stop a sandbox without removing it |
+| `docker sandbox rm <name>` | Remove a sandbox |
+| `docker sandbox reset` | Remove all sandboxes and associated data |
+
+Note that sandboxes do not appear in `docker ps` output since they are microVMs, not regular containers.
+
+### Key features
+
+* **Isolation** - each sandbox runs in a lightweight microVM with its own Docker daemon; agents cannot access your host Docker daemon, existing containers, or files outside the workspace.
+* **Workspace sync** - bidirectional file synchronisation between your host and the sandbox at matching absolute paths.
+* **Network control** - network access can be configured with allow and deny lists using `docker sandbox network`.
+* **Disposable** - sandboxes are cheap to create and destroy; remove and recreate them to start fresh.
+
+### Caveats
+
+* Agents **can modify files** in your workspace. Review changes before executing code or performing actions that auto-run scripts.
+* Configuration changes require removing and recreating the sandbox, as settings are established during creation.
+
+For more information, see the [Docker Sandboxes documentation](https://docs.docker.com/ai/sandboxes/) and the [CLI reference](https://docs.docker.com/reference/cli/docker/sandbox/).
+
 ## Copying files between host and container
 
 Use `docker cp` but I recommend mounting a volume to a Docker container (see
