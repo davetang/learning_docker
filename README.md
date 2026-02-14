@@ -47,6 +47,13 @@ Table of Contents
    * [Cleaning up exited containers](#cleaning-up-exited-containers)
    * [Installing Perl modules](#installing-perl-modules)
    * [Creating a data container](#creating-a-data-container)
+   * [Docker volumes](#docker-volumes)
+      * [Creating a volume](#creating-a-volume)
+      * [Listing volumes](#listing-volumes)
+      * [Inspecting a volume](#inspecting-a-volume)
+      * [Using a named volume with a container](#using-a-named-volume-with-a-container)
+      * [Removing a volume](#removing-a-volume)
+      * [Removing unused volumes](#removing-unused-volumes)
    * [R](#r)
    * [Docker Compose](#docker-compose)
       * [Basics](#basics-1)
@@ -65,7 +72,7 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Fri Feb 13 11:46:24 UTC 2026
+Sat Feb 14 08:38:52 UTC 2026
 
 Learning Docker
 ================
@@ -220,7 +227,7 @@ docker info
     ##   /etc/cdi
     ##   /var/run/cdi
     ##  Swarm: inactive
-    ##  Runtimes: io.containerd.runc.v2 runc
+    ##  Runtimes: runc io.containerd.runc.v2
     ##  Default Runtime: runc
     ##  Init Binary: docker-init
     ##  containerd version: dea7da592f5d1d2b7755e3a161be07f43fad8f75
@@ -636,15 +643,15 @@ docker run --rm davetang/bwa:0.7.17
 
     ## Unable to find image 'davetang/bwa:0.7.17' locally
     ## 0.7.17: Pulling from davetang/bwa
-    ## feac53061382: Pulling fs layer
-    ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Pulling fs layer
     ## 549f86662946: Pulling fs layer
-    ## feac53061382: Download complete
+    ## feac53061382: Pulling fs layer
+    ## 5f22362f8660: Pulling fs layer
     ## 3836f06c7ac7: Download complete
     ## 5f22362f8660: Download complete
-    ## feac53061382: Pull complete
+    ## feac53061382: Download complete
     ## 549f86662946: Download complete
+    ## feac53061382: Pull complete
     ## 3836f06c7ac7: Pull complete
     ## 5f22362f8660: Pull complete
     ## 549f86662946: Pull complete
@@ -690,12 +697,12 @@ docker run --rm --env YEAR=1984 busybox env
     ## latest: Pulling from library/busybox
     ## 61dfb50712f5: Pulling fs layer
     ## 61dfb50712f5: Download complete
-    ## 96cfb76e59bd: Download complete
     ## 61dfb50712f5: Pull complete
+    ## 96cfb76e59bd: Download complete
     ## Digest: sha256:b3255e7dfbcd10cb367af0d409747d511aeb66dfac98cf30e97e87e4207dd76f
     ## Status: Downloaded newer image for busybox:latest
     ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    ## HOSTNAME=6f1e0745c8b9
+    ## HOSTNAME=ac70811f561a
     ## YEAR=1984
     ## HOME=/root
 
@@ -706,7 +713,7 @@ docker run --rm --env YEAR=1984 --env SEED=2049 busybox env
 ```
 
     ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    ## HOSTNAME=c017e9a06831
+    ## HOSTNAME=518b284a5c14
     ## YEAR=1984
     ## SEED=2049
     ## HOME=/root
@@ -718,7 +725,7 @@ docker run --rm -e YEAR=1984 -e SEED=2049 busybox env
 ```
 
     ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    ## HOSTNAME=cdbfc99a3566
+    ## HOSTNAME=984b0da66e4c
     ## YEAR=1984
     ## SEED=2049
     ## HOME=/root
@@ -1063,13 +1070,13 @@ docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 
     ## [bwa_index] Pack FASTA... 0.15 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 3.48 seconds elapse.
+    ## [bwa_index] 3.79 seconds elapse.
     ## [bwa_index] Update BWT... 0.06 sec
     ## [bwa_index] Pack forward-only FASTA... 0.11 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 1.14 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 1.28 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 4.948 sec; CPU: 4.961 sec
+    ## [main] Real time: 5.404 sec; CPU: 5.414 sec
 
 We can see the newly created index files.
 
@@ -1078,13 +1085,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner runner      194 Feb 13 11:41 README.md
-    ## -rw-r--r-- 1 runner runner  4772981 Feb 13 11:41 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Feb 13 11:46 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Feb 13 11:46 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Feb 13 11:46 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Feb 13 11:46 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Feb 13 11:46 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner runner      194 Feb 14 08:33 README.md
+    ## -rw-r--r-- 1 runner runner  4772981 Feb 14 08:33 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Feb 14 08:38 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Feb 14 08:38 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Feb 14 08:38 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Feb 14 08:38 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Feb 14 08:38 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -1210,7 +1217,7 @@ ls -lrt $(pwd)/test_root.txt
     ## 3ad6ea492c35: Pull complete
     ## Digest: sha256:e322f4808315c387868a9135beeb11435b5b83130a8599fd7d0014452c34f489
     ## Status: Downloaded newer image for ubuntu:22.10
-    ## -rw-r--r-- 1 root root 0 Feb 13 11:46 /home/runner/work/learning_docker/learning_docker/test_root.txt
+    ## -rw-r--r-- 1 root root 0 Feb 14 08:38 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
@@ -1220,7 +1227,7 @@ docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pw
 ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## -rw-r--r-- 1 runner runner 0 Feb 13 11:46 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+    ## -rw-r--r-- 1 runner runner 0 Feb 14 08:38 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -1355,9 +1362,9 @@ docker ps -a
 ```
 
     ## CONTAINER ID   IMAGE          COMMAND                  CREATED                  STATUS                              PORTS     NAMES
-    ## 4ff2307e3550   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             eloquent_burnell
-    ## b517f9f618f9   ubuntu:22.10   "touch /home/runner/…"   1 second ago             Exited (0) 1 second ago                       compassionate_colden
-    ## 21e4b7a0d017   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 2 seconds ago                      goofy_elbakyan
+    ## eeea76f16e25   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             keen_hypatia
+    ## 44aca1048a15   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 2 seconds ago                      vigilant_cartwright
+    ## 19bef3e7a0af   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago            Exited (0) 2 seconds ago                      elegant_williams
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -1366,9 +1373,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## 4ff2307e3550
-    ## b517f9f618f9
-    ## 21e4b7a0d017
+    ## eeea76f16e25
+    ## 44aca1048a15
+    ## 19bef3e7a0af
 
 Check to see if the container still exists.
 
@@ -1470,6 +1477,82 @@ the `data_container` container.
 docker run -it --volumes-from data_container ubuntu /bin/bash
 ```
 
+## Docker volumes
+
+Docker provides the `docker volume` command to manage **named volumes**,
+which are the preferred way to persist data generated by and used by
+containers. Unlike bind mounts (`-v /host/path:/container/path`), named
+volumes are fully managed by Docker and stored in Docker’s storage
+directory (typically `/var/lib/docker/volumes/`).
+
+Named volumes have several advantages over bind mounts:
+
+- Easier to back up and migrate
+- Can be managed using Docker CLI commands
+- Work on both Linux and Windows containers
+- Can be safely shared among multiple containers
+- Content can be pre-populated by a container
+
+### Creating a volume
+
+Use `docker volume create` to create a named volume.
+
+``` console
+docker volume create my_data
+```
+
+### Listing volumes
+
+Use `docker volume ls` to list all volumes on the host.
+
+``` console
+docker volume ls
+```
+
+### Inspecting a volume
+
+Use `docker volume inspect` to view detailed information about a volume,
+including its mount point on the host filesystem.
+
+``` console
+docker volume inspect my_data
+```
+
+### Using a named volume with a container
+
+Use the `-v` flag with just a volume name (no host path) to mount a
+named volume. Docker will create the volume if it does not already
+exist.
+
+``` console
+docker run --rm -v my_data:/data ubuntu bash -c 'echo "hello" > /data/test.txt'
+```
+
+The data persists across containers. A different container can access
+the same data:
+
+``` console
+docker run --rm -v my_data:/data ubuntu cat /data/test.txt
+```
+
+### Removing a volume
+
+Use `docker volume rm` to remove one or more volumes. A volume cannot be
+removed if it is in use by a container.
+
+``` console
+docker volume rm my_data
+```
+
+### Removing unused volumes
+
+Use `docker volume prune` to remove all volumes not used by at least one
+container. Use with caution.
+
+``` console
+docker volume prune
+```
+
 ## R
 
 Use images from [The Rocker Project](https://www.rocker-project.org/),
@@ -1482,17 +1565,17 @@ docker run --rm rocker/r-ver:4.3.0
     ## Unable to find image 'rocker/r-ver:4.3.0' locally
     ## 4.3.0: Pulling from rocker/r-ver
     ## e7191ae70de7: Pulling fs layer
-    ## eb5ba85ece65: Pulling fs layer
     ## d6f516f66899: Pulling fs layer
     ## 336082e130a7: Pulling fs layer
+    ## eb5ba85ece65: Pulling fs layer
     ## 3c645031de29: Pulling fs layer
-    ## eb5ba85ece65: Download complete
     ## d6f516f66899: Download complete
-    ## 3c645031de29: Download complete
-    ## 15dc15a849e2: Download complete
     ## e7191ae70de7: Download complete
-    ## 336082e130a7: Download complete
+    ## eb5ba85ece65: Download complete
+    ## 15dc15a849e2: Download complete
+    ## 3c645031de29: Download complete
     ## 3c645031de29: Pull complete
+    ## 336082e130a7: Download complete
     ## eb5ba85ece65: Pull complete
     ## d6f516f66899: Pull complete
     ## 336082e130a7: Pull complete
