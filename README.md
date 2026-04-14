@@ -29,6 +29,7 @@ Table of Contents
       * [Limiting system calls with seccomp](#limiting-system-calls-with-seccomp)
       * [Combining restrictions](#combining-restrictions)
       * [Docker Compose security options](#docker-compose-security-options)
+   * [GPU](#gpu)
    * [Docker Sandboxes](#docker-sandboxes)
       * [Requirements](#requirements)
       * [Supported agents](#supported-agents)
@@ -72,7 +73,7 @@ Table of Contents
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
-Sat Feb 14 08:38:52 UTC 2026
+Tue Apr 14 05:10:57 UTC 2026
 
 Learning Docker
 ================
@@ -114,7 +115,7 @@ To see if everything is working, try to obtain the Docker version.
 docker --version
 ```
 
-    ## Docker version 29.1.5, build 0e6fee6
+    ## Docker version 28.0.4, build b8034c0
 
 And run the `hello-world` image. (The `--rm` parameter is used to
 automatically remove the container when it exits.)
@@ -125,11 +126,10 @@ docker run --rm hello-world
 
     ## Unable to find image 'hello-world:latest' locally
     ## latest: Pulling from library/hello-world
-    ## 17eec7bbc9d7: Pulling fs layer
-    ## 17eec7bbc9d7: Download complete
-    ## 17eec7bbc9d7: Pull complete
-    ## ea52d2000f90: Download complete
-    ## Digest: sha256:ef54e839ef541993b4e87f25e752f7cf4238fa55f017957c2eb44077083d7a6a
+    ## 4f55086f7dd0: Pulling fs layer
+    ## 4f55086f7dd0: Download complete
+    ## 4f55086f7dd0: Pull complete
+    ## Digest: sha256:452a468a4bf985040037cb6d5392410206e47db9bf5b7278d281f94d1c2d0931
     ## Status: Downloaded newer image for hello-world:latest
     ## 
     ## Hello from Docker!
@@ -162,26 +162,26 @@ docker version
 ```
 
     ## Client: Docker Engine - Community
-    ##  Version:           29.1.5
-    ##  API version:       1.52
-    ##  Go version:        go1.25.6
-    ##  Git commit:        0e6fee6
-    ##  Built:             Fri Jan 16 12:48:47 2026
+    ##  Version:           28.0.4
+    ##  API version:       1.48
+    ##  Go version:        go1.23.7
+    ##  Git commit:        b8034c0
+    ##  Built:             Tue Mar 25 15:07:16 2025
     ##  OS/Arch:           linux/amd64
     ##  Context:           default
     ## 
     ## Server: Docker Engine - Community
     ##  Engine:
-    ##   Version:          29.1.5
-    ##   API version:      1.52 (minimum version 1.44)
-    ##   Go version:       go1.25.6
-    ##   Git commit:       3b01d64
-    ##   Built:            Fri Jan 16 12:48:47 2026
+    ##   Version:          28.0.4
+    ##   API version:      1.48 (minimum version 1.24)
+    ##   Go version:       go1.23.7
+    ##   Git commit:       6430e49
+    ##   Built:            Tue Mar 25 15:07:16 2025
     ##   OS/Arch:          linux/amd64
     ##   Experimental:     false
     ##  containerd:
-    ##   Version:          v2.2.1
-    ##   GitCommit:        dea7da592f5d1d2b7755e3a161be07f43fad8f75
+    ##   Version:          v2.2.2
+    ##   GitCommit:        301b2dac98f15c27117da5c8af12118a041a31d9
     ##  runc:
     ##   Version:          1.3.4
     ##   GitCommit:        v1.3.4-0-gd6d73eb8
@@ -196,15 +196,15 @@ docker info
 ```
 
     ## Client: Docker Engine - Community
-    ##  Version:    29.1.5
+    ##  Version:    28.0.4
     ##  Context:    default
     ##  Debug Mode: false
     ##  Plugins:
     ##   buildx: Docker Buildx (Docker Inc.)
-    ##     Version:  v0.31.1
+    ##     Version:  v0.33.0
     ##     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
     ##   compose: Docker Compose (Docker Inc.)
-    ##     Version:  v2.40.3
+    ##     Version:  v2.38.2
     ##     Path:     /usr/libexec/docker/cli-plugins/docker-compose
     ## 
     ## Server:
@@ -212,10 +212,14 @@ docker info
     ##   Running: 0
     ##   Paused: 0
     ##   Stopped: 0
-    ##  Images: 2
-    ##  Server Version: 29.1.5
-    ##  Storage Driver: overlayfs
-    ##   driver-type: io.containerd.snapshotter.v1
+    ##  Images: 7
+    ##  Server Version: 28.0.4
+    ##  Storage Driver: overlay2
+    ##   Backing Filesystem: extfs
+    ##   Supports d_type: true
+    ##   Using metacopy: false
+    ##   Native Overlay Diff: false
+    ##   userxattr: false
     ##  Logging Driver: json-file
     ##  Cgroup Driver: systemd
     ##  Cgroup Version: 2
@@ -223,14 +227,11 @@ docker info
     ##   Volume: local
     ##   Network: bridge host ipvlan macvlan null overlay
     ##   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
-    ##  CDI spec directories:
-    ##   /etc/cdi
-    ##   /var/run/cdi
     ##  Swarm: inactive
-    ##  Runtimes: runc io.containerd.runc.v2
+    ##  Runtimes: io.containerd.runc.v2 runc
     ##  Default Runtime: runc
     ##  Init Binary: docker-init
-    ##  containerd version: dea7da592f5d1d2b7755e3a161be07f43fad8f75
+    ##  containerd version: 301b2dac98f15c27117da5c8af12118a041a31d9
     ##  runc version: v1.3.4-0-gd6d73eb8
     ##  init version: de40ad0
     ##  Security Options:
@@ -238,14 +239,14 @@ docker info
     ##   seccomp
     ##    Profile: builtin
     ##   cgroupns
-    ##  Kernel Version: 6.14.0-1017-azure
-    ##  Operating System: Ubuntu 24.04.3 LTS
+    ##  Kernel Version: 6.17.0-1010-azure
+    ##  Operating System: Ubuntu 24.04.4 LTS
     ##  OSType: linux
     ##  Architecture: x86_64
     ##  CPUs: 4
-    ##  Total Memory: 15.62GiB
-    ##  Name: runnervmjduv7
-    ##  ID: 169aa517-19ec-4d49-bd61-4bb79f5886f6
+    ##  Total Memory: 15.61GiB
+    ##  Name: runnervm35a4x
+    ##  ID: 87e60688-5316-4409-91d0-e920c95c7873
     ##  Docker Root Dir: /var/lib/docker
     ##  Debug Mode: false
     ##  Username: githubactions
@@ -254,7 +255,6 @@ docker info
     ##   ::1/128
     ##   127.0.0.0/8
     ##  Live Restore Enabled: false
-    ##  Firewall Backend: iptables
 
 ## Basics
 
@@ -280,6 +280,7 @@ docker pull ubuntu:18.04
 
     ## 18.04: Pulling from library/ubuntu
     ## 7c457f213c76: Pulling fs layer
+    ## 7c457f213c76: Verifying Checksum
     ## 7c457f213c76: Download complete
     ## 7c457f213c76: Pull complete
     ## Digest: sha256:152dc042452c496007f07ca9127571cb9c29697f42acbfad72324b2bb2e43c98
@@ -643,18 +644,23 @@ docker run --rm davetang/bwa:0.7.17
 
     ## Unable to find image 'davetang/bwa:0.7.17' locally
     ## 0.7.17: Pulling from davetang/bwa
-    ## 3836f06c7ac7: Pulling fs layer
-    ## 549f86662946: Pulling fs layer
     ## feac53061382: Pulling fs layer
+    ## 549f86662946: Pulling fs layer
     ## 5f22362f8660: Pulling fs layer
-    ## 3836f06c7ac7: Download complete
-    ## 5f22362f8660: Download complete
+    ## 3836f06c7ac7: Pulling fs layer
+    ## 3836f06c7ac7: Waiting
+    ## feac53061382: Verifying Checksum
     ## feac53061382: Download complete
+    ## 5f22362f8660: Verifying Checksum
+    ## 5f22362f8660: Download complete
+    ## 3836f06c7ac7: Verifying Checksum
+    ## 3836f06c7ac7: Download complete
+    ## 549f86662946: Verifying Checksum
     ## 549f86662946: Download complete
     ## feac53061382: Pull complete
-    ## 3836f06c7ac7: Pull complete
-    ## 5f22362f8660: Pull complete
     ## 549f86662946: Pull complete
+    ## 5f22362f8660: Pull complete
+    ## 3836f06c7ac7: Pull complete
     ## Digest: sha256:f0da4e206f549ed8c08f5558b111cb45677c4de6a3dc0f2f0569c648e8b27fc5
     ## Status: Downloaded newer image for davetang/bwa:0.7.17
     ## 
@@ -695,14 +701,14 @@ docker run --rm --env YEAR=1984 busybox env
 
     ## Unable to find image 'busybox:latest' locally
     ## latest: Pulling from library/busybox
-    ## 61dfb50712f5: Pulling fs layer
-    ## 61dfb50712f5: Download complete
-    ## 61dfb50712f5: Pull complete
-    ## 96cfb76e59bd: Download complete
-    ## Digest: sha256:b3255e7dfbcd10cb367af0d409747d511aeb66dfac98cf30e97e87e4207dd76f
+    ## 481282afbc43: Pulling fs layer
+    ## 481282afbc43: Verifying Checksum
+    ## 481282afbc43: Download complete
+    ## 481282afbc43: Pull complete
+    ## Digest: sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
     ## Status: Downloaded newer image for busybox:latest
     ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    ## HOSTNAME=ac70811f561a
+    ## HOSTNAME=61f9bfc5e3be
     ## YEAR=1984
     ## HOME=/root
 
@@ -713,7 +719,7 @@ docker run --rm --env YEAR=1984 --env SEED=2049 busybox env
 ```
 
     ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    ## HOSTNAME=518b284a5c14
+    ## HOSTNAME=36a716135a00
     ## YEAR=1984
     ## SEED=2049
     ## HOME=/root
@@ -725,7 +731,7 @@ docker run --rm -e YEAR=1984 -e SEED=2049 busybox env
 ```
 
     ## PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    ## HOSTNAME=984b0da66e4c
+    ## HOSTNAME=10fafdb93dcd
     ## YEAR=1984
     ## SEED=2049
     ## HOME=/root
@@ -844,8 +850,8 @@ completely disable networking.
 docker run --rm --network none busybox ping -c 1 8.8.8.8
 ```
 
-    ## ping: sendto: Network is unreachable
     ## PING 8.8.8.8 (8.8.8.8): 56 data bytes
+    ## ping: sendto: Network is unreachable
 
 ### Running as non-root
 
@@ -917,6 +923,64 @@ services:
 
 For more information on Docker security, see the [Docker security
 documentation](https://docs.docker.com/engine/security/).
+
+## GPU
+
+First install drivers for your GPU; on Ubuntu, the easiest way is via
+the `ubuntu-drivers` tool, which detects your GPU and recommends the
+right driver.
+
+``` console
+ubuntu-drivers devices
+sudo ubuntu-drivers autoinstall
+nvidia-smi
+```
+
+[Installing the NVIDIA Container
+Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html):
+
+``` console
+sudo apt-get update && sudo apt-get install -y --no-install-recommends ca-certificates curl gnupg2
+
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+      sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+      sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+sudo apt-get update
+
+export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.19.0-1
+  sudo apt-get install -y \
+      nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
+```
+
+Configure the container runtime by using the `nvidia-ctk` command:
+
+``` console
+sudo nvidia-ctk runtime configure --runtime=docker
+```
+
+    INFO[0000] Config file does not exist; using empty config 
+    INFO[0000] Wrote updated config to /etc/docker/daemon.json 
+    INFO[0000] It is recommended that docker daemon be restarted.
+
+The `nvidia-ctk` command modifies the /etc/docker/daemon.json file on
+the host. The file is updated so that Docker can use the NVIDIA
+Container Runtime.
+
+``` console
+sudo systemctl restart docker
+```
+
+After you install and configure the toolkit and install an NVIDIA GPU
+Driver, you can verify your installation by running a sample workload.
+
+``` console
+docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
+```
 
 ## Docker Sandboxes
 
@@ -1068,15 +1132,15 @@ for `data/chrI.fa.gz`.
 docker run --rm -v $(pwd)/data:/work davetang/bwa:0.7.17 bwa index chrI.fa.gz
 ```
 
-    ## [bwa_index] Pack FASTA... 0.15 sec
+    ## [bwa_index] Pack FASTA... 0.14 sec
     ## [bwa_index] Construct BWT for the packed sequence...
-    ## [bwa_index] 3.79 seconds elapse.
-    ## [bwa_index] Update BWT... 0.06 sec
-    ## [bwa_index] Pack forward-only FASTA... 0.11 sec
-    ## [bwa_index] Construct SA from BWT and Occ... 1.28 sec
+    ## [bwa_index] 3.27 seconds elapse.
+    ## [bwa_index] Update BWT... 0.05 sec
+    ## [bwa_index] Pack forward-only FASTA... 0.10 sec
+    ## [bwa_index] Construct SA from BWT and Occ... 0.95 sec
     ## [main] Version: 0.7.17-r1188
     ## [main] CMD: bwa index chrI.fa.gz
-    ## [main] Real time: 5.404 sec; CPU: 5.414 sec
+    ## [main] Real time: 4.529 sec; CPU: 4.540 sec
 
 We can see the newly created index files.
 
@@ -1085,13 +1149,13 @@ ls -lrt data
 ```
 
     ## total 30436
-    ## -rw-r--r-- 1 runner runner      194 Feb 14 08:33 README.md
-    ## -rw-r--r-- 1 runner runner  4772981 Feb 14 08:33 chrI.fa.gz
-    ## -rw-r--r-- 1 root   root   15072516 Feb 14 08:38 chrI.fa.gz.bwt
-    ## -rw-r--r-- 1 root   root    3768110 Feb 14 08:38 chrI.fa.gz.pac
-    ## -rw-r--r-- 1 root   root         41 Feb 14 08:38 chrI.fa.gz.ann
-    ## -rw-r--r-- 1 root   root         13 Feb 14 08:38 chrI.fa.gz.amb
-    ## -rw-r--r-- 1 root   root    7536272 Feb 14 08:38 chrI.fa.gz.sa
+    ## -rw-r--r-- 1 runner runner      194 Apr 14 05:06 README.md
+    ## -rw-r--r-- 1 runner runner  4772981 Apr 14 05:06 chrI.fa.gz
+    ## -rw-r--r-- 1 root   root   15072516 Apr 14 05:10 chrI.fa.gz.bwt
+    ## -rw-r--r-- 1 root   root    3768110 Apr 14 05:10 chrI.fa.gz.pac
+    ## -rw-r--r-- 1 root   root         41 Apr 14 05:10 chrI.fa.gz.ann
+    ## -rw-r--r-- 1 root   root         13 Apr 14 05:10 chrI.fa.gz.amb
+    ## -rw-r--r-- 1 root   root    7536272 Apr 14 05:10 chrI.fa.gz.sa
 
 However note that the generated files are owned by `root`, which is
 slightly annoying because unless we have root access, we need to start a
@@ -1213,11 +1277,12 @@ ls -lrt $(pwd)/test_root.txt
     ## Unable to find image 'ubuntu:22.10' locally
     ## 22.10: Pulling from library/ubuntu
     ## 3ad6ea492c35: Pulling fs layer
+    ## 3ad6ea492c35: Verifying Checksum
     ## 3ad6ea492c35: Download complete
     ## 3ad6ea492c35: Pull complete
     ## Digest: sha256:e322f4808315c387868a9135beeb11435b5b83130a8599fd7d0014452c34f489
     ## Status: Downloaded newer image for ubuntu:22.10
-    ## -rw-r--r-- 1 root root 0 Feb 14 08:38 /home/runner/work/learning_docker/learning_docker/test_root.txt
+    ## -rw-r--r-- 1 root root 0 Apr 14 05:10 /home/runner/work/learning_docker/learning_docker/test_root.txt
 
 In this example, we run the command as a user with the same UID and GID;
 the `stat` command is used to get the UID and GID.
@@ -1227,7 +1292,7 @@ docker run -v $(pwd):/$(pwd) -u $(stat -c "%u:%g" $HOME) ubuntu:22.10 touch $(pw
 ls -lrt $(pwd)/test_mine.txt
 ```
 
-    ## -rw-r--r-- 1 runner runner 0 Feb 14 08:38 /home/runner/work/learning_docker/learning_docker/test_mine.txt
+    ## -rw-r--r-- 1 runner runner 0 Apr 14 05:10 /home/runner/work/learning_docker/learning_docker/test_mine.txt
 
 One issue with this method is that you may encounter the following
 warning (if running interactively):
@@ -1264,7 +1329,7 @@ docker pull busybox
 
     ## Using default tag: latest
     ## latest: Pulling from library/busybox
-    ## Digest: sha256:b3255e7dfbcd10cb367af0d409747d511aeb66dfac98cf30e97e87e4207dd76f
+    ## Digest: sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
     ## Status: Image is up to date for busybox:latest
     ## docker.io/library/busybox:latest
 
@@ -1274,9 +1339,8 @@ Check out `busybox`.
 docker images busybox
 ```
 
-    ## WARNING: This output is designed for human readability. For machine-readable output, please use --format.
-    ## IMAGE            ID             DISK USAGE   CONTENT SIZE   EXTRA
-    ## busybox:latest   b3255e7dfbcd       6.77MB         2.22MB
+    ## REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+    ## busybox      latest    925ff61909ae   18 months ago   4.42MB
 
 Remove `busybox`.
 
@@ -1285,7 +1349,9 @@ docker rmi busybox
 ```
 
     ## Untagged: busybox:latest
-    ## Deleted: sha256:b3255e7dfbcd10cb367af0d409747d511aeb66dfac98cf30e97e87e4207dd76f
+    ## Untagged: busybox@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
+    ## Deleted: sha256:925ff61909aebae4bcc9bc04bb96a8bd15cd2271f13159fe95ce4338824531dd
+    ## Deleted: sha256:7f74ca72855668453fc4207c1e5c50bb5653e72bb9939eb1d5512c001624e927
 
 ## Committing changes
 
@@ -1362,9 +1428,9 @@ docker ps -a
 ```
 
     ## CONTAINER ID   IMAGE          COMMAND                  CREATED                  STATUS                              PORTS     NAMES
-    ## eeea76f16e25   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             keen_hypatia
-    ## 44aca1048a15   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 2 seconds ago                      vigilant_cartwright
-    ## 19bef3e7a0af   ubuntu:22.10   "touch /home/runner/…"   3 seconds ago            Exited (0) 2 seconds ago                      elegant_williams
+    ## 46a9fdbeacb9   hello-world    "/hello"                 Less than a second ago   Exited (0) Less than a second ago             epic_jennings
+    ## a32e02790746   ubuntu:22.10   "touch /home/runner/…"   1 second ago             Exited (0) 1 second ago                       busy_blackburn
+    ## 9c7495f248b1   ubuntu:22.10   "touch /home/runner/…"   2 seconds ago            Exited (0) 1 second ago                       nice_goldberg
 
 We can use a sub-shell to get all (`-a`) container IDs (`-q`) that have
 exited (`-f status=exited`) and then remove them (`docker rm -v`).
@@ -1373,9 +1439,9 @@ exited (`-f status=exited`) and then remove them (`docker rm -v`).
 docker rm -v $(docker ps -a -q -f status=exited)
 ```
 
-    ## eeea76f16e25
-    ## 44aca1048a15
-    ## 19bef3e7a0af
+    ## 46a9fdbeacb9
+    ## a32e02790746
+    ## 9c7495f248b1
 
 Check to see if the container still exists.
 
@@ -1564,21 +1630,26 @@ docker run --rm rocker/r-ver:4.3.0
 
     ## Unable to find image 'rocker/r-ver:4.3.0' locally
     ## 4.3.0: Pulling from rocker/r-ver
-    ## e7191ae70de7: Pulling fs layer
-    ## d6f516f66899: Pulling fs layer
-    ## 336082e130a7: Pulling fs layer
-    ## eb5ba85ece65: Pulling fs layer
     ## 3c645031de29: Pulling fs layer
-    ## d6f516f66899: Download complete
-    ## e7191ae70de7: Download complete
+    ## eb5ba85ece65: Pulling fs layer
+    ## 336082e130a7: Pulling fs layer
+    ## d6f516f66899: Pulling fs layer
+    ## e7191ae70de7: Pulling fs layer
+    ## d6f516f66899: Waiting
+    ## e7191ae70de7: Waiting
+    ## eb5ba85ece65: Verifying Checksum
     ## eb5ba85ece65: Download complete
-    ## 15dc15a849e2: Download complete
+    ## d6f516f66899: Download complete
+    ## 3c645031de29: Verifying Checksum
     ## 3c645031de29: Download complete
-    ## 3c645031de29: Pull complete
+    ## e7191ae70de7: Verifying Checksum
+    ## e7191ae70de7: Download complete
+    ## 336082e130a7: Verifying Checksum
     ## 336082e130a7: Download complete
+    ## 3c645031de29: Pull complete
     ## eb5ba85ece65: Pull complete
-    ## d6f516f66899: Pull complete
     ## 336082e130a7: Pull complete
+    ## d6f516f66899: Pull complete
     ## e7191ae70de7: Pull complete
     ## Digest: sha256:48fb09f63e1cbcc1b0ce3974a8f206bff0804b6921bb36dfa08eafa264dad542
     ## Status: Downloaded newer image for rocker/r-ver:4.3.0
