@@ -1,10 +1,10 @@
-FROM rocker/rstudio:4.5.2
+FROM rocker/rstudio:4.6.0
 
 LABEL maintainer="Dave Tang <me@davetang.org>" \
       source="https://github.com/davetang/learning_docker/blob/main/rstudio/Dockerfile" \
       description="Rocker-based RStudio Server with common libraries and R packages"
 
-ARG bioc_ver=3.22
+ARG bioc_ver=3.23
 
 RUN apt-get clean all && \
    apt-get update && \
