@@ -37,8 +37,25 @@ RUN apt-get update && \
    # auto-cleans the download cache via /etc/apt/apt.conf.d/docker-clean).
    && rm -rf /var/lib/apt/lists/*
 
-RUN Rscript -e "install.packages(c('rmarkdown','tidyverse','tidymodels','workflowr','BiocManager','quarto','crew','targets','renv'))" \
-    -e "BiocManager::install(version = '${bioc_ver}')"
+# Install CRAN packages with rocker's install2.r helper:
+#   --error        fail the build if any package fails to install
+#   --skipinstalled don't reinstall packages already in the base image
+#   --ncpus -1     compile in parallel across all available cores
+RUN install2.r --error --skipinstalled --ncpus -1 \
+       rmarkdown \
+       tidyverse \
+       tidymodels \
+       workflowr \
+       BiocManager \
+       quarto \
+       crew \
+       targets \
+       renv \
+    # Pin the Bioconductor release version (not a package install, so kept as
+    # an Rscript call; BiocManager is installed from CRAN just above).
+    && Rscript -e "BiocManager::install(version = '${bioc_ver}')" \
+    # Remove the downloaded source tarballs so they aren't baked into the layer.
+    && rm -rf /tmp/downloaded_packages /tmp/*
 
 # the rstudio/ path is set for building with GitHub Actions
 COPY --chown=rstudio:rstudio rstudio/rstudio-prefs.json /home/rstudio/.config/rstudio
