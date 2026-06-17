@@ -10,10 +10,13 @@ LABEL org.opencontainers.image.authors="Dave Tang <me@davetang.org>" \
 
 ARG bioc_ver=3.23
 
-RUN apt-get clean all && \
-   apt-get update && \
-   apt-get upgrade -y && \
-   apt-get install -y --no-install-recommends \
+# Install system libraries needed to build common R/Bioconductor packages.
+# Note: no `apt-get upgrade` on purpose — keep the package set pinned to the
+# rocker base image for reproducible builds; upgrade by bumping the base tag.
+RUN apt-get update && \
+   # DEBIAN_FRONTEND=noninteractive avoids interactive prompts (e.g. tzdata)
+   # hanging the build; scoped to this command so it doesn't leak at runtime.
+   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       git \
       cmake \
       libhdf5-dev \
@@ -30,9 +33,9 @@ RUN apt-get clean all && \
       libgsl-dev \
       patch \
       libmagick++-dev \
-   && apt-get clean all && \
-   apt-get purge && \
-   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+   # Drop the apt package lists to keep the image layer small (the base image
+   # auto-cleans the download cache via /etc/apt/apt.conf.d/docker-clean).
+   && rm -rf /var/lib/apt/lists/*
 
 RUN Rscript -e "install.packages(c('rmarkdown','tidyverse','tidymodels','workflowr','BiocManager','quarto','crew','targets','renv'))" \
     -e "BiocManager::install(version = '${bioc_ver}')"
