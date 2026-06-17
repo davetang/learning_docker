@@ -1,8 +1,12 @@
 FROM rocker/rstudio:4.6.0
 
-LABEL maintainer="Dave Tang <me@davetang.org>" \
-      source="https://github.com/davetang/learning_docker/blob/main/rstudio/Dockerfile" \
-      description="Rocker-based RStudio Server with common libraries and R packages"
+# OCI standard image labels (org.opencontainers.image.*); registry-agnostic
+# metadata readable via `docker inspect`. Replaces the deprecated LABEL maintainer.
+LABEL org.opencontainers.image.authors="Dave Tang <me@davetang.org>" \
+      org.opencontainers.image.source="https://github.com/davetang/learning_docker/blob/main/rstudio/Dockerfile" \
+      org.opencontainers.image.description="Rocker-based RStudio Server with common libraries and R packages" \
+      org.opencontainers.image.title="rstudio" \
+      org.opencontainers.image.base.name="rocker/rstudio:4.6.0"
 
 ARG bioc_ver=3.23
 
