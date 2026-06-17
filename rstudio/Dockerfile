@@ -18,6 +18,7 @@ RUN apt-get update && \
    # hanging the build; scoped to this command so it doesn't leak at runtime.
    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       git \
+      curl \
       cmake \
       libhdf5-dev \
       libcurl4-openssl-dev \
@@ -62,3 +63,15 @@ COPY --chown=rstudio:rstudio rstudio/rstudio-prefs.json /home/rstudio/.config/rs
 COPY --chown=rstudio:rstudio rstudio/.Rprofile /home/rstudio/
 
 WORKDIR /home/rstudio
+
+# Document the RStudio Server port (does not publish it; use -p at run time).
+EXPOSE 8787
+
+# Report container health based on whether RStudio Server responds:
+#   --interval      run the check every 30s
+#   --timeout       a check taking longer than 5s counts as a failure
+#   --start-period  grace window for startup; failures here don't count
+#   --retries       only mark unhealthy after 3 consecutive failures
+# curl -fsS fails on HTTP errors and stays quiet; || exit 1 signals failure.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+   CMD curl -fsS http://localhost:8787/ || exit 1
