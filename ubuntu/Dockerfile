@@ -1,19 +1,24 @@
 FROM ubuntu:24.04
 
-MAINTAINER Dave Tang <me@davetang.org>
-LABEL source="https://github.com/davetang/learning_docker/blob/main/ubuntu/Dockerfile"
+# OCI standard image labels (org.opencontainers.image.*); registry-agnostic
+# metadata readable via `docker inspect`. Replaces the deprecated LABEL maintainer.
+LABEL org.opencontainers.image.authors="Dave Tang <me@davetang.org>" \
+      org.opencontainers.image.source="https://github.com/davetang/learning_docker/blob/main/ubuntu/Dockerfile" \
+      org.opencontainers.image.description="Ubuntu base image with common build tools/libraries and Miniforge" \
+      org.opencontainers.image.title="build" \
+      org.opencontainers.image.base.name="ubuntu:24.04"
 
-ENV DEBIAN_FRONTEND=noninteractive
+# Build-time only; not persisted as ENV so containers stay interactive-friendly.
+ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get clean all && \
-   apt-get update && \
+RUN apt-get update && \
    apt-get upgrade -y && \
-   apt-get install -y \
+   apt-get install -y --no-install-recommends \
       autoconf \
       build-essential \
       default-jre \
       gettext \
-      git-core \
+      git \
       libhdf5-dev \
       libcurl4-gnutls-dev \
       libssl-dev \
@@ -37,14 +42,22 @@ RUN apt-get clean all && \
       cmake \
       bzip2 \
       ca-certificates \
-   && apt-get clean all && \
-   apt-get purge && \
+   && apt-get clean && \
    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV CONDA_DIR=/opt/conda
-RUN wget --quiet https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh \
-    && bash Miniforge3-Linux-x86_64.sh -b -p $CONDA_DIR \
-    && rm Miniforge3-Linux-x86_64.sh
+# Pin for reproducible builds; bump deliberately.
+ARG MINIFORGE_VERSION=26.3.2-3
+ARG TARGETARCH
+RUN case "${TARGETARCH}" in \
+        amd64)  arch=x86_64  ;; \
+        arm64)  arch=aarch64 ;; \
+        *) echo "unsupported arch: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac && \
+    wget --quiet "https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-Linux-${arch}.sh" -O /tmp/miniforge.sh && \
+    bash /tmp/miniforge.sh -b -p $CONDA_DIR && \
+    rm /tmp/miniforge.sh && \
+    $CONDA_DIR/bin/conda clean -afy
 
 # Put conda in PATH for all users (including root)
 ENV PATH=$CONDA_DIR/bin:$PATH
